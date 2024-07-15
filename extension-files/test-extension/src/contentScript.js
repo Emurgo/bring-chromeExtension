@@ -25,10 +25,11 @@ const injectIFrame = () => {
 
 // Listen for message
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log({ request });
   if (request.type === 'INJECT') {
     console.log(`injecting to: `, request.domain);
     injectIFrame();
   }
-  sendResponse({});
+  sendResponse({ status: 'success' });
   return true;
 });

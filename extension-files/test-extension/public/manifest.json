@@ -25,7 +25,6 @@
       "matches": [
         "<all_urls>"
       ],
-      "run_at": "document_idle",
       "js": [
         "contentScript.js"
       ]
