@@ -9,7 +9,21 @@ const get = async (key) => {
     return data[key]
 }
 
+const remove = async (key) => {
+    chrome.storage.local.remove(key, () => {
+        console.log(`Remove ${key} from cache successfully`)
+    })
+}
+
+const clear = async () => {
+    chrome.storage.local.clear(() => {
+        console.log('Cache cleared successfully')
+    })
+}
+
 export default {
     set,
-    get
+    get,
+    remove,
+    clear
 }

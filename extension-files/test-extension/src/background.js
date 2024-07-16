@@ -1,8 +1,7 @@
 'use strict';
-import bringweb3 from 'bringweb3-sdk'
+import { initializeBackground } from 'bringweb3-sdk'
 
-bringweb3.initialize()
-
+initializeBackground()
 // With background scripts you can communicate with popup
 // and contentScript files.
 // For more information on background script,
