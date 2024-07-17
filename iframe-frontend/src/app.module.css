@@ -21,3 +21,12 @@
     color: white;
     background-color: #031417;
 }
+
+.xMark {
+    background: transparent;
+    color: white;
+    border: none;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+}

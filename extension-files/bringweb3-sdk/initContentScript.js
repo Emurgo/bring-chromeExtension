@@ -1,32 +1,67 @@
+import { IFRAME_SRC } from "./config.js";
+
+const ACTIONS = {
+    OPEN: 'OPEN',
+    CLOSE: 'CLOSE'
+}
+
+let iframeEl = null
+
 const initContentScript = () => {
-    // Log `title` of current active web page
-    const pageTitle = document.head.getElementsByTagName('title')[0].innerHTML;
-    console.log(
-        `Page title is: '${pageTitle}' - evaluated by Chrome extension's 'contentScript.js' file`
-    );
+    const applyStyles = (element, style) => {
+        if (!element || !style || !Object.keys(style).length) return
+        Object.keys(style).forEach(key => {
+            element.style[key] = style[key]
+        })
+    }
 
     const handleIframeMessages = event => {
-        console.log('BRING EVENT: ', { event });
+        const { data } = event
+        const { from, action, style } = data
+        if (from !== 'bringweb3') return
+        console.log('BRING EVENT:', { event: data });
+        switch (action) {
+            case ACTIONS.OPEN:
+                applyStyles(iframeEl, style)
+                console.log('ACTION:', action);
+                break;
+            case ACTIONS.CLOSE:
+                if (iframeEl) iframeEl.style.display = 'none'
+                console.log('ACTION:', action);
+                break;
+            default:
+                console.log('Non exist ACTION:', action);
+                break;
+        }
     }
 
     window.addEventListener('message', handleIframeMessages)
+    function getHighestZIndex() {
+        return Math.max(
+            ...Array.from(document.querySelectorAll('*'))
+                .map(el => parseFloat(window.getComputedStyle(el).zIndex))
+                .filter(zIndex => !Number.isNaN(zIndex))
+        );
+    }
 
+    // setTimeout(() => {
+    //     console.log("Highest z-index:", getHighestZIndex());
+    // }, 5000);
 
     const injectIFrame = () => {
         const iframe = document.createElement('iframe');
         iframe.id = "bringweb3-iframe";
-        iframe.src = "http://localhost:5173/";
-        iframe.style.width = "350px";
-        iframe.style.height = "600px";
-        iframe.style.position = "fixed";
-        iframe.style.right = "16px";
-        iframe.style.top = "calc(50vh - 300px)";
-        iframe.style.borderRadius = "10px";
-        iframe.style.border = "1px solid #ccc";
-        iframe.style.cssText += 'z-index: 9999999999 !important;';
+        iframe.src = IFRAME_SRC;
         iframe.sandbox = "allow-popups allow-scripts allow-same-origin";
+        iframe.style.position = "fixed";
+        iframe.style.width = "1px";
+        iframe.style.height = "1px";
+        iframe.style.right = "8px";
+        iframe.style.borderRadius = "10px";
+        iframe.style.border = "none";
+        iframe.style.cssText += `z-index: 99999999999999 !important;`;
         document.body.insertBefore(iframe, document.body.firstChild);
-
+        iframeEl = iframe
     }
 
 

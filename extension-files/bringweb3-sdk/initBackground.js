@@ -50,10 +50,7 @@ const initBackground = async () => {
         if (changeInfo.status !== 'complete' || tab.url === previousUrl) return
         storage.set('previousUrl', tab.url)
         console.log('fired');
-        await chrome.tabs.sendMessage(tabId, {
-            type: 'INJECT',
-            // domain: url
-        })
+
         const relevantDomains = await storage.get('relevantDomains')
         const { url } = tab
 
