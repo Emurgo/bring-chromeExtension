@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import style from './app.module.css'
+// import { useSearchParams } from './hooks/useSearchParams'
 
 enum ACTIONS {
   OPEN = 'OPEN',
@@ -26,6 +27,7 @@ const iframeStyle: Styles = {
 }
 
 const App = () => {
+  // const { getParam } = useSearchParams()
 
   const message = (message: Message) => {
     window.parent.postMessage({ type: 'test', from: 'bringweb3', ...message }, '*')
