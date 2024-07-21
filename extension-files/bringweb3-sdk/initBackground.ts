@@ -7,8 +7,8 @@ const calcDelay = (timestamp: number) => {
     return (timestamp - now) / 1000 / 60 // milliseconds to minutes
 }
 
-const updateCache = async () => {
-    const res = await fetchDomains()
+const updateCache = async (apiKey: string) => {
+    const res = await fetchDomains(apiKey)
 
     storage.set('relevantDomains', res.relevantDomains)
 
@@ -37,12 +37,17 @@ const getRelevantDomain = (relevantDomains: string[], url: string | undefined) =
     return ''
 }
 
-const initBackground = async () => {
+interface InitBackgroundProps {
+    apiKey: string
+}
+
+const initBackground = async ({ apiKey }: InitBackgroundProps) => {
+
     await storage.clear()
-    updateCache()
+    updateCache(apiKey)
     chrome.alarms.onAlarm.addListener(async (alarm) => {
         if (alarm.name === UPDATE_CACHE_ALARM_NAME) {
-            await updateCache()
+            await updateCache(apiKey)
         }
     })
 
@@ -61,9 +66,12 @@ const initBackground = async () => {
         if (!match || !match.length) return
 
         const { token, isValid } = await validateDomain({
-            domain: match,
-            url,
-            address: 'TEST'
+            apiKey,
+            query: {
+                domain: match,
+                url,
+                address: 'TEST'
+            }
         })
 
         if (!isValid) return

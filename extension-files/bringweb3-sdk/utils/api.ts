@@ -1,9 +1,9 @@
-import { API_KEY, API_URL } from "../config";
+import { API_URL } from "../config";
 
-export const fetchDomains = async () => {
+export const fetchDomains = async (apiKey: string) => {
     const res = await fetch(`${API_URL}/domains?country=us`, {
         headers: {
-            'x-api-key': API_KEY
+            'x-api-key': apiKey
         }
     })
     const json = await res.json()
@@ -12,13 +12,16 @@ export const fetchDomains = async () => {
 }
 
 interface ValidateDomainProps {
-    url: string,
-    domain: string,
-    address: string,
-    country?: string
+    apiKey: string,
+    query: {
+        url: string,
+        domain: string,
+        address: string,
+        country?: string
+    }
 }
 
-export const validateDomain = async (query: ValidateDomainProps) => {
+export const validateDomain = async ({ apiKey, query }: ValidateDomainProps) => {
 
     const params = new URLSearchParams()
     Object.entries(query).forEach(([key, value]) => {
@@ -33,7 +36,7 @@ export const validateDomain = async (query: ValidateDomainProps) => {
 
     const res = await fetch(`${API_URL}/token?${params.toString()}`, {
         headers: {
-            'x-api-key': API_KEY
+            'x-api-key': apiKey
         }
     })
     const json = await res.json()

@@ -1,7 +1,7 @@
 'use strict';
 import { initBackground } from 'bringweb3-sdk'
 
-initBackground()
+initBackground({ apiKey: process.env.API_KEY })
 // With background scripts you can communicate with popup
 // and contentScript files.
 // For more information on background script,

@@ -10,7 +10,3 @@ dist
 npm-debug.log*
 
 .env
-
-# conf files
-config.ts
-config.js
