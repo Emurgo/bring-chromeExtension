@@ -1,6 +1,7 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import style from './app.module.css'
-// import { useSearchParams } from './hooks/useSearchParams'
+import { useSearchParams } from './hooks/useSearchParams'
+import { API_URL, API_KEY } from './config'
 
 enum ACTIONS {
   OPEN = 'OPEN',
@@ -16,7 +17,14 @@ interface Message {
   style?: Styles
 }
 
-const IFRAME_HEIGHT = 200
+interface Info {
+  walletAddress?: string
+  platformName?: string,
+  retailerId?: string,
+  url?: string
+}
+
+const IFRAME_HEIGHT = 400
 
 const iframeStyle: Styles = {
   width: '360px',
@@ -27,8 +35,34 @@ const iframeStyle: Styles = {
 }
 
 const App = () => {
-  // const { getParam } = useSearchParams()
+  const { getParam } = useSearchParams()
+  const [info, setInfo] = useState<Info>({})
 
+  useEffect(() => {
+    const verify = async () => {
+      try {
+        const res = await fetch(`${API_URL}/verify`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': API_KEY
+          },
+          body: JSON.stringify({
+            token: getParam('token'),
+          })
+        })
+        const json = await res.json()
+        if (json.status !== 200) throw `got ${json.status} code`
+        setInfo(json.info)
+        open()
+        console.log(json);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    verify()
+  }, [])
   const message = (message: Message) => {
     window.parent.postMessage({ type: 'test', from: 'bringweb3', ...message }, '*')
     console.log(`iframe post a message: ${message.action}`);
@@ -37,10 +71,6 @@ const App = () => {
   const open = () => {
     message({ action: ACTIONS.OPEN, style: iframeStyle })
   }
-
-  useEffect(() => {
-    open()
-  }, [])
 
   const activate = () => {
     console.log('iframe: activate');
@@ -57,6 +87,12 @@ const App = () => {
         onClick={close}
       >X</button>
       <h1 className={style.h1}>BRINGWEB3</h1>
+      <div style={{ color: 'white' }}>
+        {info?.walletAddress ? <div>walletAddress: {info.walletAddress}</div> : null}
+        {info?.platformName ? <div>platformName: {info.platformName}</div> : null}
+        {info?.retailerId ? <div>retailerId: {info.retailerId}</div> : null}
+        {info?.url ? <div>url: {info.url}</div> : null}
+      </div>
       <button onClick={activate} className={style.btn}>Activate</button>
     </div>
   )

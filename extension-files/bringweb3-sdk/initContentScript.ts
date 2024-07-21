@@ -1,4 +1,5 @@
 import { IFRAME_SRC } from "./config.js";
+import getQueryParams from "./utils/getQueryParams.js";
 
 const ACTIONS = {
     OPEN: 'OPEN',
@@ -8,6 +9,10 @@ const ACTIONS = {
 type IFrame = HTMLIFrameElement | null
 
 interface Style {
+    [key: string]: string
+}
+
+interface InjectIFrameProps {
     [key: string]: string
 }
 
@@ -55,14 +60,11 @@ const initContentScript = () => {
 
     window.addEventListener('message', handleIframeMessages)
 
-    // setTimeout(() => {
-    //     console.log("Highest z-index:", getHighestZIndex());
-    // }, 5000);
-
-    const injectIFrame = () => {
+    const injectIFrame = (query: InjectIFrameProps) => {
+        const params = getQueryParams(query)
         const iframe = document.createElement('iframe');
         iframe.id = "bringweb3-iframe";
-        iframe.src = IFRAME_SRC;
+        iframe.src = `${IFRAME_SRC}?${params}`;
         iframe.setAttribute('sandbox', "allow-popups allow-scripts allow-same-origin")
         // iframe.sandbox = "allow-popups allow-scripts allow-same-origin";
         iframe.style.position = "fixed";
@@ -81,8 +83,9 @@ const initContentScript = () => {
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         console.log({ request, sender });
         if (request.type === 'INJECT') {
+            const { token } = request;
             console.log(`injecting to: `, request.domain);
-            injectIFrame();
+            injectIFrame({ token });
         }
         sendResponse({ status: 'success' });
         return true;

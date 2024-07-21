@@ -1,4 +1,5 @@
 import { API_URL } from "../config";
+import getQueryParams from "./getQueryParams";
 
 export const fetchDomains = async (apiKey: string) => {
     const res = await fetch(`${API_URL}/domains?country=us`, {
@@ -23,16 +24,7 @@ interface ValidateDomainProps {
 
 export const validateDomain = async ({ apiKey, query }: ValidateDomainProps) => {
 
-    const params = new URLSearchParams()
-    Object.entries(query).forEach(([key, value]) => {
-        if (key === 'url') {
-            params.append(key, encodeURIComponent(value))
-        } else {
-            params.append(key, value)
-        }
-    })
-    //test
-    params.append('country', 'us')
+    const params = getQueryParams({ ...query, country: 'us' })
 
     const res = await fetch(`${API_URL}/token?${params.toString()}`, {
         headers: {
