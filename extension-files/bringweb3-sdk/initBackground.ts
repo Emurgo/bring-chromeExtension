@@ -1,8 +1,8 @@
-import { fetchDomains, validateDomain } from "./utils/api.js"
-import storage from "./utils/storage.js"
+import { fetchDomains, validateDomain } from "./utils/api"
+import storage from "./utils/storage"
 import { UPDATE_CACHE_ALARM_NAME } from './utils/constants.js'
 
-const calcDelay = (timestamp) => {
+const calcDelay = (timestamp: number) => {
     const now = Date.now()
     return (timestamp - now) / 1000 / 60 // milliseconds to minutes
 }
@@ -21,16 +21,17 @@ const updateCache = async () => {
     })
 }
 
-const getDomain = (url) => {
+const getDomain = (url: string) => {
     return url.replace(/^(https?:\/\/)?(www\.)?/, '');
 }
 
-const getRelevantDomain = (relevantDomains, url) => {
+const getRelevantDomain = (relevantDomains: string[], url: string | undefined) => {
+    if (!url) return
     const domain = getDomain(url)
     // console.log({ relevantDomains, domain });
-    for (let i = 0; i < relevantDomains.length; i++) {
-        if (domain.startsWith(relevantDomains[i]) || domain.split('/')[0] === 'aurora.plus') {
-            return relevantDomains[i]
+    for (const relevantDomain of relevantDomains) {
+        if (domain.startsWith(relevantDomain) || domain.split('/')[0] === 'aurora.plus') {
+            return relevantDomain
         }
     }
     return ''
@@ -48,6 +49,7 @@ const initBackground = async () => {
     chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
         const previousUrl = await storage.get('previousUrl')
         if (changeInfo.status !== 'complete' || tab.url === previousUrl) return
+        if (!tab.url) return
         storage.set('previousUrl', tab.url)
         console.log('fired');
 
@@ -56,14 +58,19 @@ const initBackground = async () => {
 
         const match = getRelevantDomain(relevantDomains, url)
 
-        if (!match.length) return
+        if (!match || !match.length) return
 
-        const { validDomain } = await validateDomain(match)
+        const { token, isValid } = await validateDomain({
+            domain: match,
+            url,
+            address: 'TEST'
+        })
 
-        if (!validDomain) return
+        if (!isValid) return
 
         const res = await chrome.tabs.sendMessage(tabId, {
             type: 'INJECT',
+            token,
             domain: url
         })
     })

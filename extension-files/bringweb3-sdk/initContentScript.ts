@@ -5,17 +5,36 @@ const ACTIONS = {
     CLOSE: 'CLOSE'
 }
 
-let iframeEl = null
+type IFrame = HTMLIFrameElement | null
+
+interface Style {
+    [key: string]: string
+}
+
+interface BringEvent {
+    data: {
+        from: string
+        action: string
+        style?: Style[]
+    }
+}
+
+let iframeEl: IFrame = null
 
 const initContentScript = () => {
-    const applyStyles = (element, style) => {
-        if (!element || !style || !Object.keys(style).length) return
-        Object.keys(style).forEach(key => {
-            element.style[key] = style[key]
-        })
+    console.log('initContentScript');
+
+    const applyStyles = (element: IFrame, style: Style[] | undefined) => {
+        if (!element || !style || !Object.keys(style).length) return;
+
+        Object.entries(style).forEach(([key, value]) => {
+            if (key in element.style) {
+                (element.style as any)[key] = value;
+            }
+        });
     }
 
-    const handleIframeMessages = event => {
+    const handleIframeMessages = (event: BringEvent) => {
         const { data } = event
         const { from, action, style } = data
         if (from !== 'bringweb3') return
@@ -36,13 +55,6 @@ const initContentScript = () => {
     }
 
     window.addEventListener('message', handleIframeMessages)
-    function getHighestZIndex() {
-        return Math.max(
-            ...Array.from(document.querySelectorAll('*'))
-                .map(el => parseFloat(window.getComputedStyle(el).zIndex))
-                .filter(zIndex => !Number.isNaN(zIndex))
-        );
-    }
 
     // setTimeout(() => {
     //     console.log("Highest z-index:", getHighestZIndex());
@@ -52,7 +64,8 @@ const initContentScript = () => {
         const iframe = document.createElement('iframe');
         iframe.id = "bringweb3-iframe";
         iframe.src = IFRAME_SRC;
-        iframe.sandbox = "allow-popups allow-scripts allow-same-origin";
+        iframe.setAttribute('sandbox', "allow-popups allow-scripts allow-same-origin")
+        // iframe.sandbox = "allow-popups allow-scripts allow-same-origin";
         iframe.style.position = "fixed";
         iframe.style.width = "1px";
         iframe.style.height = "1px";

@@ -1,9 +1,9 @@
 # dependencies
-/node_modules
+node_modules
 
 # production
 /build
-
+dist
 # misc
 .DS_Store
 
@@ -11,4 +11,6 @@ npm-debug.log*
 
 .env
 
+# conf files
+config.ts
 config.js
