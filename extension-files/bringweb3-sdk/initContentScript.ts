@@ -22,7 +22,6 @@ interface BringEvent {
 let iframeEl: IFrame = null
 
 const initContentScript = () => {
-    console.log('initContentScript');
 
     const applyStyles = (element: IFrame, style: Style[] | undefined) => {
         if (!element || !style || !Object.keys(style).length) return;
