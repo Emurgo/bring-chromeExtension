@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import style from './app.module.css'
 import { useSearchParams } from './hooks/useSearchParams'
-import { API_URL, API_KEY } from './config'
+import verify from './api/verify'
+import activate from './api/activate'
 
 enum ACTIONS {
   OPEN = 'OPEN',
@@ -37,32 +38,25 @@ const iframeStyle: Styles = {
 const App = () => {
   const { getParam } = useSearchParams()
   const [info, setInfo] = useState<Info>({})
+  const [show, setShow] = useState(false)
 
   useEffect(() => {
-    const verify = async () => {
+    const verifyAndShow = async () => {
       try {
-        const res = await fetch(`${API_URL}/verify`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': API_KEY
-          },
-          body: JSON.stringify({
-            token: getParam('token'),
-          })
-        })
-        const json = await res.json()
-        if (json.status !== 200) throw `got ${json.status} code`
-        setInfo(json.info)
+        const res = await verify(getParam('token'))
+        if (res.status !== 200) throw `got ${res.status} code`
+        setInfo(res.info)
+        setShow(true)
         open()
-        console.log(json);
+        console.log(res);
       } catch (error) {
         console.log(error);
       }
     }
 
-    verify()
+    verifyAndShow()
   }, [])
+
   const message = (message: Message) => {
     window.parent.postMessage({ type: 'test', from: 'bringweb3', ...message }, '*')
     console.log(`iframe post a message: ${message.action}`);
@@ -72,13 +66,25 @@ const App = () => {
     message({ action: ACTIONS.OPEN, style: iframeStyle })
   }
 
-  const activate = () => {
+  const activateAction = async () => {
     console.log('iframe: activate');
+
+    const res = await activate({
+      walletAddress: info.walletAddress || '',
+      platformName: info.platformName || '',
+      retailerId: info.retailerId || '',
+      url: info.url || '',
+      tokenSymbol: 'AURORA'
+    })
+
+    console.log(res);
   }
 
   const close = () => {
     message({ action: ACTIONS.CLOSE })
   }
+
+  if (!show) return null
 
   return (
     <div className={style.container}>
@@ -93,7 +99,7 @@ const App = () => {
         {info?.retailerId ? <div>retailerId: {info.retailerId}</div> : null}
         {info?.url ? <div>url: {info.url}</div> : null}
       </div>
-      <button onClick={activate} className={style.btn}>Activate</button>
+      <button onClick={activateAction} className={style.btn}>Activate</button>
     </div>
   )
 }
