@@ -26,7 +26,7 @@ const getDomain = (url: string) => {
 }
 
 const getRelevantDomain = (relevantDomains: string[], url: string | undefined) => {
-    if (!url) return
+    if (!url || !relevantDomains || !relevantDomains.length) return ''
     const domain = getDomain(url)
     // console.log({ relevantDomains, domain });
     for (const relevantDomain of relevantDomains) {

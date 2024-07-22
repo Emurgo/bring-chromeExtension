@@ -3,7 +3,8 @@ import getQueryParams from "./utils/getQueryParams.js";
 
 const ACTIONS = {
     OPEN: 'OPEN',
-    CLOSE: 'CLOSE'
+    CLOSE: 'CLOSE',
+    ADD_KEYFRAMES: 'ADD_KEYFRAMES'
 }
 
 type IFrame = HTMLIFrameElement | null
@@ -16,17 +17,44 @@ interface InjectIFrameProps {
     [key: string]: string
 }
 
+interface KeyFrame {
+    name: string
+    rules: string
+}
+
 interface BringEvent {
     data: {
         from: string
         action: string
         style?: Style[]
+        keyFrames?: KeyFrame[]
     }
 }
 
 let iframeEl: IFrame = null
 
 const initContentScript = () => {
+
+    const addKeyframes = (keyFrames: KeyFrame[] | undefined): void => {
+        console.log({ keyFrames });
+
+        if (!keyFrames || !keyFrames.length) return
+
+        const style = document.createElement('style');
+
+        document.head.appendChild(style);
+
+        const sheet = style.sheet;
+
+        if (sheet) {
+            keyFrames.forEach(({ name, rules }) => {
+                sheet.insertRule(`@keyframes ${name} { ${rules} }`, sheet.cssRules.length);
+            })
+            // sheet.insertRule(`@keyframes ${name} { ${rules} }`, sheet.cssRules.length);
+        } else {
+            console.error('Failed to create stylesheet');
+        }
+    }
 
     const applyStyles = (element: IFrame, style: Style[] | undefined) => {
         if (!element || !style || !Object.keys(style).length) return;
@@ -40,22 +68,24 @@ const initContentScript = () => {
 
     const handleIframeMessages = (event: BringEvent) => {
         const { data } = event
-        const { from, action, style } = data
+        const { from, action, style, keyFrames } = data
         if (from !== 'bringweb3') return
         console.log('BRING EVENT:', { event: data });
         switch (action) {
             case ACTIONS.OPEN:
                 applyStyles(iframeEl, style)
-                console.log('ACTION:', action);
                 break;
             case ACTIONS.CLOSE:
                 if (iframeEl) iframeEl.style.display = 'none'
-                console.log('ACTION:', action);
+                break;
+            case ACTIONS.ADD_KEYFRAMES:
+                addKeyframes(keyFrames)
                 break;
             default:
                 console.log('Non exist ACTION:', action);
                 break;
         }
+        console.log('ACTION:', action);
     }
 
     window.addEventListener('message', handleIframeMessages)
@@ -63,6 +93,7 @@ const initContentScript = () => {
     const injectIFrame = (query: InjectIFrameProps) => {
         const params = getQueryParams(query)
         const iframe = document.createElement('iframe');
+        iframe.role = 'dialog'
         iframe.id = "bringweb3-iframe";
         iframe.src = `${IFRAME_SRC}?${params}`;
         iframe.setAttribute('sandbox', "allow-popups allow-scripts allow-same-origin")
@@ -74,7 +105,7 @@ const initContentScript = () => {
         iframe.style.borderRadius = "10px";
         iframe.style.border = "none";
         iframe.style.cssText += `z-index: 99999999999999 !important;`;
-        document.body.insertBefore(iframe, document.body.firstChild);
+        document.documentElement.appendChild(iframe);
         iframeEl = iframe
     }
 
