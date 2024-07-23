@@ -1,6 +1,12 @@
-import { fetchDomains, validateDomain } from "./utils/api"
+import fetchDomains from "./utils/api/fetchDomains"
+import validateDomain from "./utils/api/validateDomain"
+import checkEvents from "./utils/api/checkEvents"
+
+import { UPDATE_CACHE_ALARM_NAME, CHECK_EVENTS_ALARM_NAME } from './utils/constants.js'
 import storage from "./utils/storage"
-import { UPDATE_CACHE_ALARM_NAME } from './utils/constants.js'
+
+const address = '0xA67BCD6b66114E9D5bde78c1711198449D104b28'
+// const address = 'TEST'
 
 const calcDelay = (timestamp: number) => {
     const now = Date.now()
@@ -21,6 +27,18 @@ const updateCache = async (apiKey: string) => {
     })
 }
 
+const checkWalletStatus = async (apiKey: string, walletAddress: string) => {
+    if (!walletAddress) return
+    const res = await checkEvents({ apiKey, walletAddress })
+}
+
+const initWalletStatus = async (apiKey: string, walletAddress: string) => {
+    checkWalletStatus(apiKey, walletAddress)
+    chrome.alarms.create(CHECK_EVENTS_ALARM_NAME, {
+        periodInMinutes: 60 * 24
+    })
+}
+
 const getDomain = (url: string) => {
     return url.replace(/^(https?:\/\/)?(www\.)?/, '');
 }
@@ -37,21 +55,52 @@ const getRelevantDomain = (relevantDomains: string[], url: string | undefined) =
     return ''
 }
 
-interface InitBackgroundProps {
+interface Configuration {
     apiKey: string
 }
 
-const initBackground = async ({ apiKey }: InitBackgroundProps) => {
+const initBackground = async ({ apiKey }: Configuration) => {
 
-    await storage.clear()
+    // await storage.clear()
+
     updateCache(apiKey)
+
+    initWalletStatus(apiKey, address)
+
     chrome.alarms.onAlarm.addListener(async (alarm) => {
-        if (alarm.name === UPDATE_CACHE_ALARM_NAME) {
-            await updateCache(apiKey)
+        const { name } = alarm
+
+        switch (name) {
+            case UPDATE_CACHE_ALARM_NAME:
+                updateCache(apiKey)
+                break;
+            case CHECK_EVENTS_ALARM_NAME:
+                checkWalletStatus(apiKey, address)
+                break;
+            default:
+                console.error('alarm with no use case:', name);
+                break;
+        }
+    })
+
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        console.log({ request, sender });
+        const { action, time } = request
+        switch (action) {
+            case 'OPT_OUT':
+                storage.set('optOut', Date.now() + time)
+                break;
+
+            default:
+                break;
         }
     })
 
     chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+        const optOut = await storage.get('optOut')
+
+        if (optOut && optOut > Date.now()) return
+
         const previousUrl = await storage.get('previousUrl')
         if (changeInfo.status !== 'complete' || tab.url === previousUrl) return
         if (!tab.url) return
@@ -70,14 +119,14 @@ const initBackground = async ({ apiKey }: InitBackgroundProps) => {
             query: {
                 domain: match,
                 url,
-                address: 'TEST'
+                address: address
             }
         })
 
         if (!isValid) return
 
         const res = await chrome.tabs.sendMessage(tabId, {
-            type: 'INJECT',
+            action: 'INJECT',
             token,
             domain: url
         })

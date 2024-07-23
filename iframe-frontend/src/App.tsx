@@ -1,45 +1,28 @@
+import styles from './app.module.css'
 import { useEffect, useState } from 'react'
-import style from './app.module.css'
 import { useSearchParams } from './hooks/useSearchParams'
 import verify from './api/verify'
-import activate from './api/activate'
 import { iframeStyle, keyFrames } from './utils/iframeStyles'
+import { sendMessage, ACTIONS } from './utils/sendMessage'
+import Offer from './components/Offer/Offer'
+import { motion, AnimatePresence, Variants } from 'framer-motion'
+import Activate from './components/Activate/Activate'
 
-enum ACTIONS {
-  OPEN = 'OPEN',
-  CLOSE = 'CLOSE',
-  ADD_KEYFRAMES = 'ADD_KEYFRAMES'
-}
-
-interface Styles {
-  [key: string]: string
-}
-
-interface Message {
-  action?: ACTIONS
-  style?: Styles
-  keyFrames?: Styles[]
-}
-
-interface Info {
-  walletAddress?: string
-  platformName?: string,
-  retailerId?: string,
-  url?: string
+enum STEPS {
+  OFFER = 0,
+  ACTIVATE = 1
 }
 
 const App = () => {
   const { getParam } = useSearchParams()
-  const [info, setInfo] = useState<Info>({})
+  const [info, setInfo] = useState<Info | null>(null)
   const [show, setShow] = useState(false)
-
-  const message = (message: Message) => {
-    window.parent.postMessage({ type: 'test', from: 'bringweb3', ...message }, '*')
-    // console.log(`iframe post a message: ${message.action}`);
-  }
+  const [step, setStep] = useState(STEPS.OFFER)
+  const [direction, setDirection] = useState(1)
+  const [redirectUrl, setRedirectUrl] = useState('')
 
   useEffect(() => {
-    message({ action: ACTIONS.ADD_KEYFRAMES, keyFrames })
+    sendMessage({ action: ACTIONS.ADD_KEYFRAMES, keyFrames })
 
     const verifyAndShow = async () => {
       try {
@@ -57,45 +40,76 @@ const App = () => {
   }, [])
 
   const open = () => {
-    message({ action: ACTIONS.OPEN, style: iframeStyle })
-  }
-
-  const activateAction = async () => {
-    const res = await activate({
-      walletAddress: info.walletAddress || '',
-      platformName: info.platformName || '',
-      retailerId: info.retailerId || '',
-      url: info.url || '',
-      tokenSymbol: 'AURORA'
-    })
-
-    console.log(res);
+    sendMessage({ action: ACTIONS.OPEN, style: iframeStyle })
   }
 
   const close = () => {
-    message({ action: ACTIONS.CLOSE })
+    sendMessage({ action: ACTIONS.CLOSE })
   }
 
-  if (!show) return null
+  const slideVariants: Variants = {
+    enter: (direction: number) => ({
+      y: direction > 0 ? `100%` : `-100%`,
+      opacity: 0,
+    }),
+    center: {
+      y: 0,
+      opacity: 1,
+    },
+    exit: (direction: number) => ({
+      y: direction < 0 ? `100%` : `-100%`,
+      opacity: 0,
+    }),
+  };
+
+  // if (!show) return null
 
   return (
-    <div className={style.container}>
+    <>
       <button
-        className={style.xMark}
+        className={styles.xMark}
         onClick={close}
       >X</button>
-      <h1 className={style.h1}>BRINGWEB3</h1>
-      <div className={style.details}>
-        {info?.walletAddress ? <div>walletAddress: {info.walletAddress}</div> : null}
-        {info?.platformName ? <div>platformName: {info.platformName}</div> : null}
-        {info?.retailerId ? <div>retailerId: {info.retailerId}</div> : null}
-        {info?.url ? <div>url: <a className={style.link} target='_blank' href={info.url}>Link</a></div> : null}
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', width: '100%' }}>
-        <button onClick={activateAction} className={style.btn}>Activate</button>
-        <button>Opt-out</button>
-      </div>
-    </div>
+      <AnimatePresence
+        initial={false}
+        custom={direction}
+        mode='wait'
+      >
+        <motion.div
+          key={step}
+          custom={direction}
+          variants={slideVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{ duration: .2 }}
+        >
+          {
+            step === STEPS.OFFER ?
+              <Offer
+                info={info}
+                setRedirectUrl={setRedirectUrl}
+                nextFn={() => {
+                  setStep(STEPS.ACTIVATE)
+                  setDirection(-1)
+                }}
+              />
+              :
+              step === STEPS.ACTIVATE ?
+                <Activate
+                  redirectUrl={redirectUrl}
+                  prevFn={() => {
+                    setStep(STEPS.OFFER)
+                    setDirection(1)
+                  }}
+                />
+                :
+                null
+          }
+
+        </motion.div>
+      </AnimatePresence>
+    </>
   )
 }
 

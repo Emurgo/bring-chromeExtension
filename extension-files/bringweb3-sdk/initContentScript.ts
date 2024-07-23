@@ -4,6 +4,7 @@ import getQueryParams from "./utils/getQueryParams.js";
 const ACTIONS = {
     OPEN: 'OPEN',
     CLOSE: 'CLOSE',
+    OPT_OUT: 'OPT_OUT',
     ADD_KEYFRAMES: 'ADD_KEYFRAMES'
 }
 
@@ -28,6 +29,7 @@ interface BringEvent {
         action: string
         style?: Style[]
         keyFrames?: KeyFrame[]
+        time?: number
     }
 }
 
@@ -68,7 +70,7 @@ const initContentScript = () => {
 
     const handleIframeMessages = (event: BringEvent) => {
         const { data } = event
-        const { from, action, style, keyFrames } = data
+        const { from, action, style, keyFrames, time } = data
         if (from !== 'bringweb3') return
         console.log('BRING EVENT:', { event: data });
         switch (action) {
@@ -77,6 +79,11 @@ const initContentScript = () => {
                 break;
             case ACTIONS.CLOSE:
                 if (iframeEl) iframeEl.style.display = 'none'
+                break;
+            case ACTIONS.OPT_OUT:
+                console.log('DANIEL OPTING');
+
+                chrome.runtime.sendMessage({ action, time })
                 break;
             case ACTIONS.ADD_KEYFRAMES:
                 addKeyframes(keyFrames)
@@ -99,6 +106,8 @@ const initContentScript = () => {
         iframe.setAttribute('sandbox', "allow-popups allow-scripts allow-same-origin")
         // iframe.sandbox = "allow-popups allow-scripts allow-same-origin";
         iframe.style.position = "fixed";
+        iframe.scrolling = "no";
+        iframe.style.overflow = "hidden";
         iframe.style.width = "1px";
         iframe.style.height = "1px";
         iframe.style.right = "8px";
@@ -113,7 +122,7 @@ const initContentScript = () => {
     // Listen for message
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         console.log({ request, sender });
-        if (request.type === 'INJECT') {
+        if (request.action === 'INJECT') {
             const { token } = request;
             console.log(`injecting to: `, request.domain);
             injectIFrame({ token });

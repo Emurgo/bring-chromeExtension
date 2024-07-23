@@ -1,0 +1,15 @@
+.container {
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.activate_btn {
+    color: white;
+    background-color: lightseagreen;
+    padding: 8px 16px;
+    border-radius: 12px;
+    text-decoration: none;
+}

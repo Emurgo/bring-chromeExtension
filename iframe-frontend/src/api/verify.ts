@@ -5,12 +5,7 @@ type Token = string | null
 
 interface VerifyResponse {
     status: number
-    info: {
-        walletAddress: string
-        platformName: string
-        retailerId: string
-        url: string
-    }
+    info: Info
 }
 
 const verify = async (token: Token): Promise<VerifyResponse> => {

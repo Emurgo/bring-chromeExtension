@@ -1,16 +1,5 @@
-import { API_URL } from "../config";
-import getQueryParams from "./getQueryParams";
-
-export const fetchDomains = async (apiKey: string) => {
-    const res = await fetch(`${API_URL}/domains?country=us`, {
-        headers: {
-            'x-api-key': apiKey
-        }
-    })
-    const json = await res.json()
-    // console.log({ json });
-    return json
-}
+import { API_URL } from "../../config";
+import getQueryParams from "../getQueryParams";
 
 interface ValidateDomainProps {
     apiKey: string,
@@ -22,7 +11,7 @@ interface ValidateDomainProps {
     }
 }
 
-export const validateDomain = async ({ apiKey, query }: ValidateDomainProps) => {
+const validateDomain = async ({ apiKey, query }: ValidateDomainProps) => {
 
     const params = getQueryParams({ ...query, country: 'us' })
 
@@ -35,3 +24,5 @@ export const validateDomain = async ({ apiKey, query }: ValidateDomainProps) => 
     // console.log({ json });
     return json
 }
+
+export default validateDomain;
