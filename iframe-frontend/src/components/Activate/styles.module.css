@@ -6,10 +6,41 @@
     gap: 8px;
 }
 
+.subcontainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: white;
+}
+
+.title,
+.p {
+    margin: 0;
+}
+
 .activate_btn {
     color: white;
-    background-color: lightseagreen;
-    padding: 8px 16px;
-    border-radius: 12px;
+    background-color: #0A2EC0;
+    padding: 8px 64px;
+    border-radius: 4px;
     text-decoration: none;
+}
+
+.markdown {
+    padding: 16px;
+    border-radius: 4px;
+    max-height: 120px;
+    background: white;
+    font-size: 12px;
+    overflow-y: scroll;
+}
+
+.markdown::-webkit-scrollbar {
+    width: 4px;
+}
+
+.markdown::-webkit-scrollbar-thumb {
+    background-color: green;
+    border-radius: 32px;
 }

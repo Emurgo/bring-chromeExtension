@@ -3,6 +3,7 @@
     right: 16px;
     top: 16px;
     background: transparent;
+    z-index: 10;
     color: white;
     border: none;
     outline: none;

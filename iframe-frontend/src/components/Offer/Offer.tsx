@@ -1,37 +1,35 @@
 import styles from './styles.module.css'
 import activate from '../../api/activate'
-import { sendMessage, ACTIONS } from '../../utils/sendMessage'
+import OptOut from '../OptOut/OptOut'
+import { useState } from 'react'
 
 interface OfferProps {
-    info: Info | null
+    info: Info
     nextFn: () => void
+    closeFn: () => void
     setRedirectUrl: (url: string) => void
 }
 
-const Offer = ({ info, nextFn, setRedirectUrl }: OfferProps) => {
+const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: OfferProps) => {
+
+    const [optOutOpen, setOptOutOpen] = useState(false)
 
     const activateAction = async () => {
         try {
-            if (!info?.walletAddress || !info.platformName || !info.retailerId) return
             const res = await activate({
-                walletAddress: info.walletAddress || '',
-                platformName: info.platformName || '',
-                retailerId: info.retailerId || '',
-                url: info.url || '',
+                walletAddress: info.walletAddress,
+                platformName: info.platformName,
+                retailerId: info.retailerId,
+                url: info.url,
                 tokenSymbol: 'AURORA'
             })
             if (res.status === 200) {
                 setRedirectUrl(res.url)
                 nextFn()
-                console.log(res);
             }
         } catch (error) {
             console.error(error);
         }
-    }
-
-    const optOut = () => {
-        sendMessage({ action: ACTIONS.OPT_OUT, time: 5 * 1000 * 60 })
     }
 
     const splitWordMaxFive = (word: string): string => {
@@ -44,22 +42,43 @@ const Offer = ({ info, nextFn, setRedirectUrl }: OfferProps) => {
 
     return (
         <div className={styles.container}>
-            <h1 className={styles.h1}>BRINGWEB3</h1>
-            {/* <img
-                src={info.iconUrl}
-                alt="brand logo"
-                width={58}
-            /> */}
+            <div className={styles.wallet_container}>
+                {info?.walletAddress ? <span className={styles.wallet}>{splitWordMaxFive(info.walletAddress)}</span> : null}
+            </div>
+            <div className={styles.company_name_container}>
+                <img
+                    src={info?.iconUrl}
+                    alt="brand logo"
+                    width={48}
+                    className={styles.img}
+                />
+                <h1 className={styles.h1}>{info.name}</h1>
+            </div>
             <div className={styles.details}>
-                {info?.walletAddress ? <div>walletAddress: {splitWordMaxFive(info.walletAddress)}</div> : null}
-                {info?.platformName ? <div>platformName: {info.platformName}</div> : null}
-                {info?.retailerId ? <div>retailerId: {info.retailerId}</div> : null}
-                {info?.url ? <div>url: <a className={styles.link} target='_blank' href={info.url}>Link</a></div> : null}
+                <h2 className={styles.subtitle}>Earn Crypto Cashback</h2>
+                <span>{`Receive up to ${parseFloat(info.maxCashback)}${info?.cashbackSymbol} of your total spent in `}<span className={styles.cashback_symbol}>CSPR</span></span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', width: '100%' }}>
                 <button onClick={activateAction} className={styles.btn}>Yes</button>
-                <button onClick={optOut}>Opt-out</button>
+                <div className={styles.btns_container}>
+                    <button
+                        className={styles.action_btn}
+                        onClick={closeFn}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className={styles.action_btn}
+                        onClick={() => setOptOutOpen(true)}
+                    >
+                        Turn off
+                    </button>
+                </div>
             </div>
+            <OptOut
+                open={optOutOpen}
+                onClose={() => setOptOutOpen(false)}
+            />
         </div>
     )
 }

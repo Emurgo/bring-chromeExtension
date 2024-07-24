@@ -3,14 +3,14 @@ interface Styles {
     [key: string]: string
 }
 
-const IFRAME_HEIGHT = 320
+const IFRAME_HEIGHT = 400
 
 export const iframeStyle: Styles = {
     animation: 'slideIn .3s ease-in-out',
-    width: '300px',
+    width: '600px',
     height: `${IFRAME_HEIGHT}px`,
-    border: '.5px solid gray',
-    borderRadius: '12px',
+    // border: '.5px solid gray',
+    borderRadius: '4px',
     display: 'block',
     // top: `calc(50vh - ${IFRAME_HEIGHT / 2}px)`,
     top: '10px'

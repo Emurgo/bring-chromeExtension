@@ -13,8 +13,15 @@ interface Info {
     walletAddress: string
     platformName: string
     retailerId: string
-    url: string
+    name: string
+    maxCashback: string
+    cashbackSymbol: string
+    backgroundColor: string
+    retailerTermsUrl: string
+    generalTermsUrl: string
+    cryptoSymbols: string[]
     iconUrl: string
+    url: string
 }
 
 interface Message {
