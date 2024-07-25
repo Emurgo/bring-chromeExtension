@@ -114,10 +114,7 @@ const App = () => {
                   retailerMarkdown={retailerMarkdown}
                   generalMarkdown={generalMarkdown}
                   redirectUrl={redirectUrl}
-                  prevFn={() => {
-                    setStep(STEPS.OFFER)
-                    setDirection(1)
-                  }}
+                  platformName={info.platformName}
                 />
                 :
                 null

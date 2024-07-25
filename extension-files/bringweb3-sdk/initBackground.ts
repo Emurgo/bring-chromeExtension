@@ -63,26 +63,26 @@ const getRelevantDomain = async (relevantDomains: string[], url: string | undefi
 }
 
 interface Configuration {
-    apiKey: string
+    identifier: string
 }
 
-const initBackground = async ({ apiKey }: Configuration) => {
+const initBackground = async ({ identifier }: Configuration) => {
 
     // await storage.clear()
 
-    updateCache(apiKey)
+    updateCache(identifier)
 
-    initWalletStatus(apiKey, address)
+    initWalletStatus(identifier, address)
 
     chrome.alarms.onAlarm.addListener(async (alarm) => {
         const { name } = alarm
 
         switch (name) {
             case UPDATE_CACHE_ALARM_NAME:
-                updateCache(apiKey)
+                updateCache(identifier)
                 break;
             case CHECK_EVENTS_ALARM_NAME:
-                checkWalletStatus(apiKey, address)
+                checkWalletStatus(identifier, address)
                 break;
             default:
                 console.error('alarm with no use case:', name);
@@ -122,7 +122,7 @@ const initBackground = async ({ apiKey }: Configuration) => {
         if (!match || !match.length) return
 
         const { token, isValid } = await validateDomain({
-            apiKey,
+            apiKey: identifier,
             query: {
                 domain: match,
                 url,

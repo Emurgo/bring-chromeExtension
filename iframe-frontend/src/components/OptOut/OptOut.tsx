@@ -1,9 +1,9 @@
 import styles from './styles.module.css'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-interface OptOutProps {
+interface Props {
     onClose: () => void;
     open: boolean
 }
@@ -15,8 +15,23 @@ const options = [
     { label: 'forever', time: Infinity },
 ]
 
-const OptOut = ({ open, onClose }: OptOutProps) => {
+const OptOut = ({ open, onClose }: Props) => {
     const [isOpted, setIsOpted] = useState(false)
+    const popupRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
+                onClose();
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [onClose]);
 
     const handleOptOut = (time: number) => {
         sendMessage({ action: ACTIONS.OPT_OUT, time })
@@ -34,6 +49,7 @@ const OptOut = ({ open, onClose }: OptOutProps) => {
                     exit={{ opacity: 0 }}
                     className={styles.overlay}>
                     <motion.div
+                        ref={popupRef}
                         transition={{ ease: 'easeInOut' }}
                         initial={{ y: '100px' }}
                         animate={{ y: '0' }}

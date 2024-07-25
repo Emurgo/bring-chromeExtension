@@ -21,8 +21,11 @@
 }
 
 .activate_btn {
-    color: white;
-    background-color: #0A2EC0;
+    color: var(--primary-btn-color);
+    background-color: var(--primary-btn-bg-color);
+    border-width: var(--primary-btn-border-size);
+    border-color: var(--primary-btn-border-color);
+    border-style: solid;
     padding: 8px 64px;
     border-radius: 4px;
     text-decoration: none;
@@ -32,7 +35,7 @@
     padding: 4px 16px;
     border-radius: 4px;
     max-height: 144px;
-    background: white;
+    background: var(--markdown-bg-color);
     font-size: 12px;
     overflow-y: scroll;
 }
@@ -42,6 +45,6 @@
 }
 
 .markdown::-webkit-scrollbar-thumb {
-    background-color: green;
+    background-color: var(--markdown-scrollbar-color);
     border-radius: 32px;
 }

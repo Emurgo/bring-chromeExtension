@@ -12,11 +12,8 @@ const CloseBtn = () => {
             onClick={close}
             className={styles.btn}
         >
-            <img
-                src="/icons/x-mark.svg"
-                width={16}
-                height={16}
-                alt="x mark"
+            <div
+                className={styles.icon}
             />
         </button>
     )

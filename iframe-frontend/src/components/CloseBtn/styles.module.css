@@ -9,5 +9,20 @@
     font-size: 16px;
     font-weight: 700;
     cursor: pointer;
-    transition: .2s;
+}
+
+.icon {
+    width: 16px;
+    height: 16px;
+    background-color: var(--x-button-color);
+
+    -webkit-mask-size: 100%;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-image: url('/icons/x-mark.svg');
+
+    mask-size: 100%;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-image: url('/icons/x-mark.svg');
 }

@@ -4,6 +4,7 @@ import OptOut from '../OptOut/OptOut'
 import { useState } from 'react'
 import CryptoSymbolSelect from '../CryptoSymbolSelect/CryptoSymbolSelect'
 import CloseBtn from '../CloseBtn/CloseBtn'
+import PlatformLogo from '../PlatformLogo/PlatformLogo'
 interface OfferProps {
     info: Info
     nextFn: () => void
@@ -47,15 +48,9 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: OfferProps) => {
             <div className={styles.wallet_container}>
                 {info?.walletAddress ? <span className={styles.wallet}>{splitWordMaxFive(info.walletAddress)}</span> : null}
             </div>
-            <div className={styles.company_name_container}>
-                <img
-                    src={info?.iconUrl}
-                    alt="brand logo"
-                    width={48}
-                    className={styles.img}
-                />
-                <h1 className={styles.h1}>{info.name}</h1>
-            </div>
+            <PlatformLogo
+                platformName={info.platformName}
+            />
             <div className={styles.details}>
                 <h2 className={styles.subtitle}>Earn Crypto Cashback</h2>
                 <span>{`Receive up to ${parseFloat(info.maxCashback)}${info?.cashbackSymbol} of your total spent in `}
