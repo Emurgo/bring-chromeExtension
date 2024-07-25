@@ -1,5 +1,6 @@
 import styles from './styles.module.css'
 import Markdown from 'react-markdown'
+import CloseBtn from '../CloseBtn/CloseBtn'
 interface ActivateProps {
     prevFn: () => void
     redirectUrl: string
@@ -11,6 +12,7 @@ const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown }: ActivatePr
 
     return (
         <div className={styles.container}>
+            <CloseBtn />
             <div className={styles.subcontainer}>
                 <h1 className={styles.title}>Activate Crypto Cashback</h1>
                 <p className={styles.p}>Once your purchase is approved, you'll be notified.</p>

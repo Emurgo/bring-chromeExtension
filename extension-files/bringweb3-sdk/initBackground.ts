@@ -97,8 +97,8 @@ const initBackground = async ({ apiKey }: Configuration) => {
             case 'OPT_OUT':
                 storage.set('optOut', Date.now() + time)
                 break;
-
             default:
+                console.log(`Unknown action: ${action}`);
                 break;
         }
     })

@@ -1,10 +1,9 @@
-.xMark {
+.btn {
     position: absolute;
     right: 16px;
     top: 16px;
     background: transparent;
-    z-index: 10;
-    color: white;
+    z-index: 1;
     border: none;
     outline: none;
     font-size: 16px;

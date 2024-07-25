@@ -1,6 +1,5 @@
 .container {
     padding: 16px;
-    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -51,6 +50,7 @@
     padding: 32px 40px;
     border-radius: 8px;
     font-weight: 700;
+    user-select: none;
 }
 
 .link {
@@ -87,14 +87,4 @@
     font-weight: 700;
     font-size: 16px;
     cursor: pointer;
-}
-
-.cashback_symbol {
-    margin-left: 4px;
-    border: 2px dashed green;
-    color: green;
-    padding: 2px 20px;
-    border-radius: 4px;
-    font-weight: 900;
-    font-size: 14px;
 }

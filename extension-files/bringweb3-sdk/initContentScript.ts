@@ -100,11 +100,9 @@ const initContentScript = () => {
     const injectIFrame = (query: InjectIFrameProps) => {
         const params = getQueryParams(query)
         const iframe = document.createElement('iframe');
-        iframe.role = 'dialog'
         iframe.id = "bringweb3-iframe";
         iframe.src = `${IFRAME_SRC}?${params}`;
         iframe.setAttribute('sandbox', "allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation")
-        // iframe.sandbox = "allow-popups allow-scripts allow-same-origin";
         iframe.style.position = "fixed";
         iframe.scrolling = "no";
         iframe.style.overflow = "hidden";

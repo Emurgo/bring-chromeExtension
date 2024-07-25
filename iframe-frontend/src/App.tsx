@@ -1,4 +1,3 @@
-import styles from './app.module.css'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from './hooks/useSearchParams'
 import verify from './api/verify'
@@ -84,10 +83,6 @@ const App = () => {
 
   return (
     <>
-      <button
-        className={styles.xMark}
-        onClick={close}
-      >X</button>
       <AnimatePresence
         initial={false}
         custom={direction}

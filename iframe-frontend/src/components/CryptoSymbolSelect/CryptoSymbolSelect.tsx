@@ -1,7 +1,38 @@
+import styles from './styles.module.css'
 
-const CryptoSymbolSelect = () => {
+interface props {
+    options: string[]
+    select: string
+    set: (select: string) => void
+}
+
+const CryptoSymbolSelect = ({ options, select, set }: props): JSX.Element => {
+
+    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        set(e.target.value)
+    }
+
+    if (options.length === 1) {
+        return (
+            <span className={styles.cashback_symbol}>{options[0]}</span>
+        )
+    }
+
     return (
-        <div>CryptoSymbolSelect</div>
+        <select
+            className={styles.select}
+            onChange={handleChange}
+        >
+            {options.map(option => (
+                <option
+                    key={option}
+                    value={option}
+                    selected={option === select}
+                >
+                    {option}
+                </option>
+            ))}
+        </select>
     )
 }
 

@@ -28,11 +28,13 @@ const OptOut = ({ open, onClose }: OptOutProps) => {
             {open ?
 
                 <motion.div
+                    transition={{ ease: 'easeInOut' }}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     className={styles.overlay}>
                     <motion.div
+                        transition={{ ease: 'easeInOut' }}
                         initial={{ y: '100px' }}
                         animate={{ y: '0' }}
                         exit={{ y: '100px' }}

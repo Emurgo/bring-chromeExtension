@@ -2,7 +2,8 @@ import styles from './styles.module.css'
 import activate from '../../api/activate'
 import OptOut from '../OptOut/OptOut'
 import { useState } from 'react'
-
+import CryptoSymbolSelect from '../CryptoSymbolSelect/CryptoSymbolSelect'
+import CloseBtn from '../CloseBtn/CloseBtn'
 interface OfferProps {
     info: Info
     nextFn: () => void
@@ -11,22 +12,22 @@ interface OfferProps {
 }
 
 const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: OfferProps) => {
-
+    const [tokenSymbol, setTokenSymbol] = useState(info.cryptoSymbols[0])
     const [optOutOpen, setOptOutOpen] = useState(false)
 
     const activateAction = async () => {
         try {
+            const { walletAddress, platformName, retailerId, url } = info
             const res = await activate({
-                walletAddress: info.walletAddress,
-                platformName: info.platformName,
-                retailerId: info.retailerId,
-                url: info.url,
-                tokenSymbol: 'AURORA'
+                walletAddress,
+                platformName,
+                retailerId,
+                url,
+                tokenSymbol
             })
-            if (res.status === 200) {
-                setRedirectUrl(res.url)
-                nextFn()
-            }
+            if (res.status !== 200) throw `Got ${res.status} status`
+            setRedirectUrl(res.url)
+            nextFn()
         } catch (error) {
             console.error(error);
         }
@@ -42,6 +43,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: OfferProps) => {
 
     return (
         <div className={styles.container}>
+            <CloseBtn />
             <div className={styles.wallet_container}>
                 {info?.walletAddress ? <span className={styles.wallet}>{splitWordMaxFive(info.walletAddress)}</span> : null}
             </div>
@@ -56,7 +58,13 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: OfferProps) => {
             </div>
             <div className={styles.details}>
                 <h2 className={styles.subtitle}>Earn Crypto Cashback</h2>
-                <span>{`Receive up to ${parseFloat(info.maxCashback)}${info?.cashbackSymbol} of your total spent in `}<span className={styles.cashback_symbol}>CSPR</span></span>
+                <span>{`Receive up to ${parseFloat(info.maxCashback)}${info?.cashbackSymbol} of your total spent in `}
+                    <CryptoSymbolSelect
+                        options={info.cryptoSymbols}
+                        select={tokenSymbol}
+                        set={setTokenSymbol}
+                    />
+                </span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', width: '100%' }}>
                 <button onClick={activateAction} className={styles.btn}>Yes</button>
