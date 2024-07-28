@@ -1,0 +1,1 @@
+type WalletAddress = string | undefined

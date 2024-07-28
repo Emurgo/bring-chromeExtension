@@ -1,7 +1,7 @@
 {
-  "name": "test-extension",
+  "name": "bringweb3-mock-extension",
   "version": "0.1.0",
-  "description": "test extension for the bringweb3-sdk",
+  "description": "Mock extension for the bringweb3-sdk",
   "private": true,
   "scripts": {
     "watch": "node --env-file=.env ./node_modules/webpack/bin/webpack.js --mode=development --watch --config config/webpack.config.js",

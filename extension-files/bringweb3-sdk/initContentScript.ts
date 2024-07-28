@@ -35,10 +35,15 @@ interface BringEvent {
 
 let iframeEl: IFrame = null
 
-const initContentScript = () => {
 
+interface Configuration {
+    getWalletAddress: () => Promise<WalletAddress>
+    promptLogin: () => Promise<WalletAddress>
+    customTheme?: Style
+}
+
+const initContentScript = async ({ getWalletAddress, customTheme }: Configuration) => {
     const addKeyframes = (keyFrames: KeyFrame[] | undefined): void => {
-        console.log({ keyFrames });
 
         if (!keyFrames || !keyFrames.length) return
 
@@ -52,7 +57,6 @@ const initContentScript = () => {
             keyFrames.forEach(({ name, rules }) => {
                 sheet.insertRule(`@keyframes ${name} { ${rules} }`, sheet.cssRules.length);
             })
-            // sheet.insertRule(`@keyframes ${name} { ${rules} }`, sheet.cssRules.length);
         } else {
             console.error('Failed to create stylesheet');
         }
@@ -72,7 +76,7 @@ const initContentScript = () => {
         const { data } = event
         const { from, action, style, keyFrames, time } = data
         if (from !== 'bringweb3') return
-        console.log('BRING EVENT:', { event: data });
+        // console.log('BRING EVENT:', { event: data });
         switch (action) {
             case ACTIONS.OPEN:
                 applyStyles(iframeEl, style)
@@ -81,8 +85,6 @@ const initContentScript = () => {
                 if (iframeEl) iframeEl.style.display = 'none'
                 break;
             case ACTIONS.OPT_OUT:
-                console.log('DANIEL OPTING');
-
                 chrome.runtime.sendMessage({ action, time })
                 break;
             case ACTIONS.ADD_KEYFRAMES:
@@ -92,16 +94,16 @@ const initContentScript = () => {
                 console.log('Non exist ACTION:', action);
                 break;
         }
-        console.log('ACTION:', action);
     }
 
     window.addEventListener('message', handleIframeMessages)
 
     const injectIFrame = (query: InjectIFrameProps) => {
-        const params = getQueryParams(query)
+        const params = getQueryParams({ query })
+        const customStyles = customTheme ? `&${getQueryParams({ query: customTheme, prefix: 'theme' })}` : ''
         const iframe = document.createElement('iframe');
         iframe.id = "bringweb3-iframe";
-        iframe.src = `${IFRAME_SRC}?${params}`;
+        iframe.src = `${IFRAME_SRC}?${params}${customStyles}`;
         iframe.setAttribute('sandbox', "allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation")
         iframe.style.position = "fixed";
         iframe.scrolling = "no";
@@ -119,14 +121,25 @@ const initContentScript = () => {
 
     // Listen for message
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-        console.log({ request, sender });
-        if (request.action === 'INJECT') {
-            const { token } = request;
-            console.log(`injecting to: `, request.domain);
-            injectIFrame({ token });
+        const { action } = request
+
+        switch (action) {
+
+            case 'GET_WALLET_ADDRESS':
+                getWalletAddress()
+                    .then(walletAddress => sendResponse({ status: 'success', walletAddress }))
+                return true
+
+            case 'INJECT':
+                const { token } = request;
+                console.log(`injecting to: ${request.domain}`);
+                injectIFrame({ token });
+                sendResponse({ status: 'success' });
+                return true
+
+            default:
+                break;
         }
-        sendResponse({ status: 'success' });
-        return true;
     });
 }
 

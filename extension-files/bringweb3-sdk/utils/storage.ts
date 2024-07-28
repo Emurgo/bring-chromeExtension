@@ -1,7 +1,5 @@
 const set = async (key: string, value: string) => {
-    chrome.storage.local.set({ [key]: value },
-        () =>
-            console.log(`${key} cached successfully`));
+    chrome.storage.local.set({ [key]: value });
 }
 
 const get = async (key: string) => {
@@ -10,9 +8,7 @@ const get = async (key: string) => {
 }
 
 const remove = async (key: string) => {
-    chrome.storage.local.remove(key, () => {
-        console.log(`Remove ${key} from cache successfully`)
-    })
+    chrome.storage.local.remove(key)
 }
 
 const clear = async () => {

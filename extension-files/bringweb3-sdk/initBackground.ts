@@ -7,7 +7,26 @@ import storage from "./utils/storage"
 
 const quietTime = 30 * 60 * 1000
 
-const address = '0xA67BCD6b66114E9D5bde78c1711198449D104b28'
+const getWalletAddress = async (): Promise<string | undefined> => {
+    let walletAddress: WalletAddress = await storage.get('walletAddress')
+
+    try {
+        const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
+
+        if (!tabs || !tabs[0] || !tabs[0].id) return;
+        const { id } = tabs[0]
+
+        const res = await chrome.tabs.sendMessage(id, { action: 'GET_WALLET_ADDRESS' });
+
+        if (walletAddress !== res?.walletAddress) {
+            walletAddress = res?.walletAddress
+            await storage.set('walletAddress', walletAddress as string)
+        }
+    } catch (error) {
+        console.log("Can't update wallet address");
+    }
+    return walletAddress
+}
 
 const calcDelay = (timestamp: number) => {
     const now = Date.now()
@@ -22,19 +41,19 @@ const updateCache = async (apiKey: string) => {
     const { nextUpdateTimestamp } = res
 
     const delay = calcDelay(nextUpdateTimestamp)
-    console.log({ delay });
 
     chrome.alarms.create(UPDATE_CACHE_ALARM_NAME, {
         delayInMinutes: delay
     })
 }
 
-const checkWalletStatus = async (apiKey: string, walletAddress: string) => {
+const checkWalletStatus = async (apiKey: string, walletAddress: WalletAddress) => {
     if (!walletAddress) return
     const res = await checkEvents({ apiKey, walletAddress })
 }
 
-const initWalletStatus = async (apiKey: string, walletAddress: string) => {
+const initWalletStatus = async (apiKey: string, walletAddress: WalletAddress) => {
+    if (!walletAddress) return
     checkWalletStatus(apiKey, walletAddress)
     chrome.alarms.create(CHECK_EVENTS_ALARM_NAME, {
         periodInMinutes: 60 * 24
@@ -48,7 +67,6 @@ const getDomain = (url: string) => {
 const getRelevantDomain = async (relevantDomains: string[], url: string | undefined) => {
     if (!url || !relevantDomains || !relevantDomains.length) return ''
     const domain = getDomain(url)
-    // console.log({ relevantDomains, domain });
     for (const relevantDomain of relevantDomains) {
         if (domain.startsWith(relevantDomain)) {
 
@@ -63,18 +81,16 @@ const getRelevantDomain = async (relevantDomains: string[], url: string | undefi
 }
 
 interface Configuration {
-    identifier: string,
-    getWalletAddress: () => Promise<string> | string
+    identifier: string
 }
 
-const initBackground = async ({ identifier, getWalletAddress }: Configuration) => {
-    console.log(await getWalletAddress());
+const initBackground = async ({ identifier }: Configuration) => {
 
     // await storage.clear()
 
     updateCache(identifier)
 
-    initWalletStatus(identifier, address)
+    initWalletStatus(identifier, await getWalletAddress())
 
     chrome.alarms.onAlarm.addListener(async (alarm) => {
         const { name } = alarm
@@ -84,7 +100,7 @@ const initBackground = async ({ identifier, getWalletAddress }: Configuration) =
                 updateCache(identifier)
                 break;
             case CHECK_EVENTS_ALARM_NAME:
-                checkWalletStatus(identifier, address)
+                checkWalletStatus(identifier, await getWalletAddress())
                 break;
             default:
                 console.error('alarm with no use case:', name);
@@ -93,7 +109,6 @@ const initBackground = async ({ identifier, getWalletAddress }: Configuration) =
     })
 
     chrome.runtime.onMessage.addListener((request, sender) => {
-        console.log({ request, sender });
         const { action, time } = request
         switch (action) {
             case 'OPT_OUT':
@@ -123,12 +138,14 @@ const initBackground = async ({ identifier, getWalletAddress }: Configuration) =
 
         if (!match || !match.length) return
 
+        const address = await getWalletAddress()
+
         const { token, isValid } = await validateDomain({
             apiKey: identifier,
             query: {
                 domain: match,
                 url,
-                address: address
+                address
             }
         })
 
