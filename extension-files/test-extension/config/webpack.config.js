@@ -18,7 +18,7 @@ const config = merge(common, {
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {
-        'API_KEY': JSON.stringify(process.env.API_KEY)
+        'PLATFORM_IDENTIFIER': JSON.stringify(process.env.PLATFORM_IDENTIFIER)
       }
     })
   ]

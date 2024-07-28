@@ -8,7 +8,6 @@ import storage from "./utils/storage"
 const quietTime = 30 * 60 * 1000
 
 const address = '0xA67BCD6b66114E9D5bde78c1711198449D104b28'
-// const address = 'TEST'
 
 const calcDelay = (timestamp: number) => {
     const now = Date.now()
@@ -23,6 +22,7 @@ const updateCache = async (apiKey: string) => {
     const { nextUpdateTimestamp } = res
 
     const delay = calcDelay(nextUpdateTimestamp)
+    console.log({ delay });
 
     chrome.alarms.create(UPDATE_CACHE_ALARM_NAME, {
         delayInMinutes: delay
@@ -63,10 +63,12 @@ const getRelevantDomain = async (relevantDomains: string[], url: string | undefi
 }
 
 interface Configuration {
-    identifier: string
+    identifier: string,
+    getWalletAddress: () => Promise<string> | string
 }
 
-const initBackground = async ({ identifier }: Configuration) => {
+const initBackground = async ({ identifier, getWalletAddress }: Configuration) => {
+    console.log(await getWalletAddress());
 
     // await storage.clear()
 
