@@ -5,6 +5,8 @@ import { useState } from 'react'
 import CryptoSymbolSelect from '../CryptoSymbolSelect/CryptoSymbolSelect'
 import CloseBtn from '../CloseBtn/CloseBtn'
 import PlatformLogo from '../PlatformLogo/PlatformLogo'
+import { sendMessage, ACTIONS } from '../../utils/sendMessage'
+
 interface OfferProps {
     info: Info
     nextFn: () => void
@@ -18,7 +20,11 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: OfferProps) => {
 
     const activateAction = async () => {
         try {
-            const { walletAddress, platformName, retailerId, url } = info
+            const { platformName, retailerId, url } = info
+            let { walletAddress } = info
+            if (!walletAddress) {
+                sendMessage({ action: ACTIONS.PROMPT_LOGIN })
+            }
             const res = await activate({
                 walletAddress,
                 platformName,

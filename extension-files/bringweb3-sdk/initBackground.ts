@@ -7,24 +7,26 @@ import storage from "./utils/storage"
 
 const quietTime = 30 * 60 * 1000
 
-const getWalletAddress = async (): Promise<string | undefined> => {
+const getWalletAddress = async (tabId?: number): Promise<WalletAddress> => {
     let walletAddress: WalletAddress = await storage.get('walletAddress')
 
     try {
-        const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
+        if (!tabId) {
+            const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
+            if (!tabs || !tabs[0] || !tabs[0].id) return walletAddress;
+            tabId = tabs[0].id
+        }
 
-        if (!tabs || !tabs[0] || !tabs[0].id) return;
-        const { id } = tabs[0]
+        const res = await chrome.tabs.sendMessage(tabId, { action: 'GET_WALLET_ADDRESS' });
 
-        const res = await chrome.tabs.sendMessage(id, { action: 'GET_WALLET_ADDRESS' });
-
-        if (walletAddress !== res?.walletAddress) {
+        if (res?.walletAddress && walletAddress !== res?.walletAddress) {
             walletAddress = res?.walletAddress
             await storage.set('walletAddress', walletAddress as string)
         }
     } catch (error) {
         console.log("Can't update wallet address");
     }
+
     return walletAddress
 }
 
@@ -138,7 +140,8 @@ const initBackground = async ({ identifier }: Configuration) => {
 
         if (!match || !match.length) return
 
-        const address = await getWalletAddress()
+        const address = await getWalletAddress(tabId)
+        console.log({ address });
 
         const { token, isValid } = await validateDomain({
             apiKey: identifier,
