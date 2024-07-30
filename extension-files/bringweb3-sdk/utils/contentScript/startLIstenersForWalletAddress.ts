@@ -17,7 +17,14 @@ const startListenersForWalletAddress = ({ walletAddressListeners, getWalletAddre
                 iframeEl = document.querySelector('#bringweb3-iframe')
                 if (!iframeEl) return
             }
-            iframeEl.contentWindow?.postMessage({ action: 'WALLET_ADDRESS_UPDATE', walletAddress: await getWalletAddress() }, '*')
+            if (!iframeEl.contentWindow) {
+                console.log('No contentWindow');
+                return
+            }
+            const address = await getWalletAddress()
+            console.log({ address });
+
+            iframeEl.contentWindow.postMessage({ action: 'WALLET_ADDRESS_UPDATE', walletAddress: address }, '*')
         });
     }
 }

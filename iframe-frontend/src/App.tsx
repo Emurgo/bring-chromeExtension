@@ -64,6 +64,13 @@ const App = () => {
     sendMessage({ action: ACTIONS.CLOSE })
   }
 
+  const setWalletAddress = (walletAddress: WalletAddress): void => {
+    if (!info) return
+    const tmpInfo = structuredClone(info)
+    tmpInfo.walletAddress = walletAddress
+    setInfo(tmpInfo)
+  }
+
   const slideVariants: Variants = {
     enter: (direction: number) => ({
       y: direction > 0 ? `100%` : `-100%`,
@@ -102,6 +109,7 @@ const App = () => {
               <Offer
                 info={info}
                 setRedirectUrl={setRedirectUrl}
+                setWalletAddress={setWalletAddress}
                 closeFn={close}
                 nextFn={() => {
                   setStep(STEPS.ACTIVATE)

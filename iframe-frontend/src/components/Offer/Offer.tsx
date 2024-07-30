@@ -1,29 +1,60 @@
 import styles from './styles.module.css'
 import activate from '../../api/activate'
 import OptOut from '../OptOut/OptOut'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import CryptoSymbolSelect from '../CryptoSymbolSelect/CryptoSymbolSelect'
 import CloseBtn from '../CloseBtn/CloseBtn'
 import PlatformLogo from '../PlatformLogo/PlatformLogo'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 
-interface OfferProps {
+interface BringEventData {
+    from: string
+    action: string
+    walletAddress: WalletAddress
+}
+
+// interface BringEvent {
+//     data: BringEventData
+// }
+
+interface Props {
     info: Info
     nextFn: () => void
     closeFn: () => void
     setRedirectUrl: (url: string) => void
+    setWalletAddress: (walletAddress: WalletAddress) => void
 }
 
-const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: OfferProps) => {
+const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Props) => {
     const [tokenSymbol, setTokenSymbol] = useState(info.cryptoSymbols[0])
     const [optOutOpen, setOptOutOpen] = useState(false)
+    const [waiting, setWaiting] = useState(false)
+
+    const walletAddressUpdate = (e: MessageEvent<BringEventData>) => {
+        const { walletAddress, action } = e.data
+        if (action !== 'WALLET_ADDRESS_UPDATE') return
+        setWalletAddress(walletAddress)
+        if (waiting) {
+            activateAction()
+        }
+    }
+
+    useEffect(() => {
+        window.addEventListener("message", walletAddressUpdate)
+
+        return () => {
+            window.removeEventListener("message", walletAddressUpdate)
+        }
+    }, [])
 
     const activateAction = async () => {
         try {
             const { platformName, retailerId, url } = info
             let { walletAddress } = info
             if (!walletAddress) {
+                setWaiting(true)
                 sendMessage({ action: ACTIONS.PROMPT_LOGIN })
+                return
             }
             const res = await activate({
                 walletAddress,

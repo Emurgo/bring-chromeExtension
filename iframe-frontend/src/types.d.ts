@@ -10,8 +10,10 @@ interface Styles {
     [key: string]: string
 }
 
+type WalletAddress = string | undefined
+
 interface Info {
-    walletAddress: string
+    walletAddress: WalletAddress
     platformName: string
     retailerId: string
     name: string
