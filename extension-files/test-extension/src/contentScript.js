@@ -13,6 +13,12 @@ initContentScript({
     ],
     customTheme: {
         primaryColor: '#FF0000',
+        secondaryColor: '#00FF00',
+        backgroundColor: '#0000FF',
+        textColor: '#FFFFFF',
+        borderRadius: '10px',
+        fontSize: '16px',
+        fontFamily: 'Arial, sans-serif'
     }
 });
 // TBD:

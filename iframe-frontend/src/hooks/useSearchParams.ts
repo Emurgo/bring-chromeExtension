@@ -4,7 +4,7 @@ interface SearchParamsResult {
     getParam: (key: string) => string | null;
     setParam: (key: string, value: string) => void;
     deleteParam: (key: string) => void;
-    getAllParams: () => URLSearchParams;
+    getAllParams: () => Record<string, string>;
 }
 
 export function useSearchParams(): SearchParamsResult {
@@ -40,8 +40,12 @@ export function useSearchParams(): SearchParamsResult {
         window.history.pushState(null, '', `?${newSearchParams.toString()}`);
     }, [searchParams]);
 
-    const getAllParams = useCallback((): URLSearchParams => {
-        return new URLSearchParams(searchParams);
+    const getAllParams = useCallback((): Record<string, string> => {
+        const paramsObject: Record<string, string> = {};
+        searchParams.forEach((value, key) => {
+            paramsObject[key] = value;
+        });
+        return paramsObject;
     }, [searchParams]);
 
     return { getParam, setParam, deleteParam, getAllParams };

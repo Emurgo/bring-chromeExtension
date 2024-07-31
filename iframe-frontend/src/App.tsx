@@ -6,6 +6,7 @@ import { sendMessage, ACTIONS } from './utils/sendMessage'
 import Offer from './components/Offer/Offer'
 import { motion, AnimatePresence, Variants } from 'framer-motion'
 import Activate from './components/Activate/Activate'
+import useCustomTheme from './hooks/useCustomTheme'
 
 enum STEPS {
   OFFER = 0,
@@ -14,6 +15,7 @@ enum STEPS {
 
 const App = () => {
   const { getParam } = useSearchParams()
+  const { done } = useCustomTheme()
   const [info, setInfo] = useState<Info | null>(null)
   const [show, setShow] = useState(false)
   const [step, setStep] = useState(STEPS.OFFER)

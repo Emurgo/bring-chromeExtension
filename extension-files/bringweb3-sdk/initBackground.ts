@@ -148,7 +148,7 @@ const initBackground = async ({ identifier }: Configuration) => {
             query: {
                 domain: match,
                 url,
-                address: undefined
+                address
             }
         })
 

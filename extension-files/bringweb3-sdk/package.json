@@ -1,11 +1,14 @@
 {
-  "name": "bringweb3-sdk",
+  "name": "@bringweb3/sdk",
   "version": "0.0.1",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "license": "MIT",
   "private": true,
+  "publishConfig": {
+    "access": "restricted"
+  },
   "scripts": {
     "watch": "tsup index.ts --format cjs,esm --dts --watch",
     "build": "tsup index.ts --format cjs,esm --dts --minify",
