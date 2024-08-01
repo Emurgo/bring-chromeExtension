@@ -14,8 +14,8 @@ enum STEPS {
 }
 
 const App = () => {
+  useCustomTheme()
   const { getParam } = useSearchParams()
-  const { done } = useCustomTheme()
   const [info, setInfo] = useState<Info | null>(null)
   const [show, setShow] = useState(false)
   const [step, setStep] = useState(STEPS.OFFER)
@@ -125,6 +125,7 @@ const App = () => {
                   generalMarkdown={generalMarkdown}
                   redirectUrl={redirectUrl}
                   platformName={info.platformName}
+                  walletAddress={info.walletAddress}
                 />
                 :
                 null

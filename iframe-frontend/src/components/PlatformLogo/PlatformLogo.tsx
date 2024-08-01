@@ -4,7 +4,7 @@ interface Props {
     height?: number
 }
 
-const PlatformLogo = ({ platformName, width = 160, height }: Props) => {
+const PlatformLogo = ({ platformName, width = 108, height }: Props) => {
     return (
         <img
             src={`/images/logos/${platformName}.svg`}

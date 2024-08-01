@@ -1,23 +1,43 @@
 .container {
-    padding: 32px;
+    padding: 16px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 9px;
     user-select: none;
+}
+
+.wallet_container {
+    display: flex;
+    align-self: flex-start;
+    justify-content: center;
+    align-items: center;
+    height: 23px;
+    background: var(--wallet-background-color);
+    padding: 0 12px;
+    border-radius: 4px;
+}
+
+.wallet {
+    color: var(--wallet-color);
+    font-size: 10px;
+    font-weight: 400;
+    border: var(--wallet-border-size) solid var(--wallet-border-color);
 }
 
 .subcontainer {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 20px;
     color: white;
 }
 
-.title,
 .p {
+    font-size: 14px;
     margin: 0;
+    line-height: 18px;
+    text-align: center;
 }
 
 .activate_btn {
@@ -26,18 +46,26 @@
     border-width: var(--primary-btn-border-size);
     border-color: var(--primary-btn-border-color);
     border-style: solid;
-    padding: 8px 64px;
+    width: 290px;
+    height: 36px;
+    line-height: 36px;
+    font-weight: 600;
+    text-align: center;
     border-radius: 4px;
     text-decoration: none;
 }
 
 .markdown {
-    padding: 4px 16px;
+    padding: 4px 12px;
     border-radius: 4px;
-    max-height: 144px;
+    max-height: 110px;
+    color: var(--markdown-color);
     background: var(--markdown-bg-color);
     font-size: 12px;
+    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.05);
     overflow-y: scroll;
+    margin-top: 11px;
+    margin-bottom: 16px;
 }
 
 .markdown::-webkit-scrollbar {

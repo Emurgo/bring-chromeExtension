@@ -1,6 +1,7 @@
 'use strict';
-import { initBackground } from 'bringweb3-sdk'
+import { bringInitBackground } from '@bringweb3/sdk'
 
-initBackground({
+bringInitBackground({
     identifier: process.env.PLATFORM_IDENTIFIER,
+    apiEndpoint: 'sandbox' // 'sandbox' || 'prod'
 })

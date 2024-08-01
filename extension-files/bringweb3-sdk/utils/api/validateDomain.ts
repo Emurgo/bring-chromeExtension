@@ -1,4 +1,4 @@
-import { API_URL } from "../../config";
+import { ApiEndpoint } from "../apiEndpoint";
 import getQueryParams from "../getQueryParams";
 
 interface ValidateDomainProps {
@@ -12,10 +12,10 @@ interface ValidateDomainProps {
 }
 
 const validateDomain = async ({ apiKey, query }: ValidateDomainProps) => {
-
+    const endpoint = ApiEndpoint.getInstance().getApiEndpoint()
     const params = getQueryParams({ query: { ...query, country: 'us' } })
 
-    const res = await fetch(`${API_URL}/token?${params.toString()}`, {
+    const res = await fetch(`${endpoint}/token?${params.toString()}`, {
         headers: {
             'x-api-key': apiKey
         }

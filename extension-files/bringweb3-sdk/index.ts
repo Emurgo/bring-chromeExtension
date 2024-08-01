@@ -1,7 +1,7 @@
-import initContentScript from "./initContentScript.js"
-import initBackground from "./initBackground.js"
+import bringInitContentScript from "./bringInitContentScript.js"
+import bringInitBackground from "./bringInitBackground.js"
 
 export {
-    initBackground,
-    initContentScript
+    bringInitBackground,
+    bringInitContentScript
 }

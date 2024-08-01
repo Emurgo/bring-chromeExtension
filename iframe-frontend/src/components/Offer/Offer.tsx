@@ -6,7 +6,7 @@ import CryptoSymbolSelect from '../CryptoSymbolSelect/CryptoSymbolSelect'
 import CloseBtn from '../CloseBtn/CloseBtn'
 import PlatformLogo from '../PlatformLogo/PlatformLogo'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage'
-
+import splitWordMaxFive from '../../utils/splitWordMaxFive'
 interface BringEventData {
     from: string
     action: string
@@ -71,26 +71,21 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
         }
     }
 
-    const splitWordMaxFive = (word: string): string => {
-        if (word.length <= 10) {
-            const middleIndex = Math.ceil(word.length / 2);
-            return `${word.slice(0, middleIndex)}...${word.slice(middleIndex)}`
-        }
-        return `${word.slice(0, 5)}...${word.slice(-5)}`
-    }
-
     return (
         <div className={styles.container}>
             <CloseBtn />
             <div className={styles.wallet_container}>
-                {info?.walletAddress ? <span className={styles.wallet}>{splitWordMaxFive(info.walletAddress)}</span> : null}
+                {info?.walletAddress ? <div className={styles.wallet}>{splitWordMaxFive(info.walletAddress)}</div> : null}
             </div>
             <PlatformLogo
                 platformName={info.platformName}
             />
             <div className={styles.details}>
-                <h2 className={styles.subtitle}>Earn Crypto Cashback</h2>
-                <span>{`Receive up to ${parseFloat(info.maxCashback)}${info?.cashbackSymbol} of your total spent in `}
+                <div className={styles.subtitle_container}>
+                    <img src="/icons/coins.svg" alt="coins" height={42} />
+                    <h2 className={styles.subtitle}>Earn Crypto Cashback</h2>
+                </div>
+                <span className={styles.sm_txt}>Receive up to <span className={styles.cashback_amount}>{parseFloat(info.maxCashback)}{info?.cashbackSymbol}</span> of your total spent in
                     <CryptoSymbolSelect
                         options={info.cryptoSymbols}
                         select={tokenSymbol}
@@ -98,8 +93,8 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
                     />
                 </span>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', width: '100%' }}>
-                <button onClick={activateAction} className={styles.btn}>Yes</button>
+            <div className={styles.action_container}>
+                <button onClick={activateAction} className={styles.btn}>Let's go</button>
                 <div className={styles.btns_container}>
                     <button
                         className={styles.action_btn}

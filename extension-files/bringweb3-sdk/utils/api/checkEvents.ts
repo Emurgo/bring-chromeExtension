@@ -1,4 +1,4 @@
-import { API_URL } from "../../config";
+import { ApiEndpoint } from "../apiEndpoint";
 
 interface CheckEventsProps {
     apiKey: string;
@@ -6,7 +6,8 @@ interface CheckEventsProps {
 }
 
 const checkEvents = async ({ apiKey, walletAddress }: CheckEventsProps) => {
-    const res = await fetch(`${API_URL}/check-events`, {
+    const endpoint = ApiEndpoint.getInstance().getApiEndpoint()
+    const res = await fetch(`${endpoint}/check-events`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

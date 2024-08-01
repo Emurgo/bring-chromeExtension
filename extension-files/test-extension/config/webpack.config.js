@@ -13,12 +13,13 @@ const config = merge(common, {
     background: PATHS.src + '/background.js',
   },
   watchOptions: {
-    ignored: /node_modules\/(?!bringweb3-sdk)/,
+    ignored: /node_modules\/(?!@bringweb3\/sdk)/,
   },
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {
-        'PLATFORM_IDENTIFIER': JSON.stringify(process.env.PLATFORM_IDENTIFIER)
+        'PLATFORM_IDENTIFIER': JSON.stringify(process.env.PLATFORM_IDENTIFIER),
+        'IFRAME_ENDPOINT': JSON.stringify(process.env.IFRAME_ENDPOINT)
       }
     })
   ]
