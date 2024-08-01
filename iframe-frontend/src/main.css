@@ -1,41 +1,45 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 * {
-    font-family: "Open Sans", sans-serif;
+    font-family: "Poppins", sans-serif;
 }
 
 :root {
     /* colors */
-    --primary-color: #181D40;
+    --primary-color: #0F1429;
     /* Primary Buttons */
-    --primary-btn-bg-color: #0A2EC0;
+    --primary-btn-bg-color: #B2332D;
     --primary-btn-color: white;
     --primary-btn-border-color: transparent;
     --primary-btn-border-size: 0;
     /* Secondary Buttons */
-    --secondary-btn-bg-color: transparent;
-    --secondary-btn-color: gray;
+    --secondary-btn-bg-color: #1B254A;
+    --secondary-btn-color: #8FA5FF;
     --secondary-btn-border-color: gray;
-    --secondary-btn-border-size: 1px;
+    --secondary-btn-border-size: 0;
     /* Markdown files */
-    --markdown-bg-color: white;
-    --markdown-scrollbar-color: green;
+    --markdown-color: #DADCE5;
+    --markdown-bg-color: #161D3B;
+    --markdown-scrollbar-color: #DADCE5;
     /* WallerAddress */
-    --wallet-color: white;
+    --wallet-color: #DADCE5;
+    --wallet-background-color: #161D3B;
     --wallet-border-color: white;
-    --wallet-border-size: 1px;
+    --wallet-border-size: 0;
     /* Details */
-    --details-bg-color: white;
+    --details-bg-color: #161D3B;
+    --cashback-amount-color: #8FA5FF;
     /* Opt out */
-    --optout-overlay-bg-color: #2e2aabb5;
-    --optout-bg-color: white;
-    --optout-button-bg-color: transparent;
+    --optout-overlay-bg-color: rgba(15, 20, 41, 0.95);
+    ;
+    --optout-bg-color: #0F1429;
+    --optout-button-bg-color: #1B254A;
     --optout-button-border-color: gray;
-    --optout-button-border-size: 2px;
-    --optout-button-color: black;
-    --optout-close-button-color: black;
+    --optout-button-border-size: 0;
+    --optout-button-color: #8FA5FF;
+    --optout-close-button-color: #DADCE5;
     /* X button */
-    --x-button-color: white;
+    --x-button-color: #B9BBBF;
 }
 
 body {

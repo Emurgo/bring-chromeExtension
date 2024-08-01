@@ -1,4 +1,3 @@
-import { IFRAME_SRC } from "./config.js";
 import injectIFrame from "./utils/contentScript/injectIFrame.js";
 import handleIframeMessages from "./utils/contentScript/handleIframeMessages.js";
 import startListenersForWalletAddress from "./utils/contentScript/startLIstenersForWalletAddress.js";
@@ -7,6 +6,7 @@ let iframeEl: IFrame = null
 
 
 interface Configuration {
+    iframeEndpoint: string
     getWalletAddress: () => Promise<WalletAddress>
     promptLogin: () => Promise<WalletAddress>
     walletAddressListeners: string[]
@@ -15,8 +15,14 @@ interface Configuration {
 
 
 
-const initContentScript = async ({ getWalletAddress, promptLogin, walletAddressListeners, customTheme }: Configuration) => {
-    if (!getWalletAddress || !promptLogin || !walletAddressListeners?.length) return console.error('Missing configuration')
+const bringInitContentScript = async ({
+    getWalletAddress,
+    promptLogin,
+    walletAddressListeners,
+    customTheme,
+    iframeEndpoint
+}: Configuration) => {
+    if (!getWalletAddress || !promptLogin || !walletAddressListeners?.length || !iframeEndpoint) throw new Error('Missing configuration')
 
     startListenersForWalletAddress({
         walletAddressListeners,
@@ -46,7 +52,7 @@ const initContentScript = async ({ getWalletAddress, promptLogin, walletAddressL
                 console.log(`injecting to: ${request.domain}`);
                 iframeEl = injectIFrame({
                     query: { token },
-                    iframeSrc: IFRAME_SRC,
+                    iframeSrc: iframeEndpoint,
                     theme: customTheme
                 });
                 sendResponse({ status: 'success' });
@@ -59,4 +65,4 @@ const initContentScript = async ({ getWalletAddress, promptLogin, walletAddressL
     });
 }
 
-export default initContentScript;
+export default bringInitContentScript;

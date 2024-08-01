@@ -55,6 +55,7 @@ const OptOut = ({ open, onClose }: Props) => {
                         animate={{ y: '0' }}
                         exit={{ y: '100px' }}
                         className={styles.card}>
+                        <div className={styles.title}>Turn off Cashback offers for</div>
                         {!isOpted ? <div className={styles.container}>
                             {options.map((option) => (
                                 <button
@@ -73,7 +74,7 @@ const OptOut = ({ open, onClose }: Props) => {
                             className={styles.close_btn}
                             onClick={onClose}
                         >
-                            Close
+                            Cancel
                         </button>
                     </motion.div >
                 </motion.div>

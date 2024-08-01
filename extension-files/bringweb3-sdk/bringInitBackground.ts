@@ -1,9 +1,10 @@
-import fetchDomains from "./utils/api/fetchDomains"
-import validateDomain from "./utils/api/validateDomain"
-import checkEvents from "./utils/api/checkEvents"
+import fetchDomains from "./utils/api/fetchDomains.js"
+import validateDomain from "./utils/api/validateDomain.js"
+import checkEvents from "./utils/api/checkEvents.js"
+import { Endpoint, ApiEndpoint } from "./utils/apiEndpoint.js"
 
 import { UPDATE_CACHE_ALARM_NAME, CHECK_EVENTS_ALARM_NAME } from './utils/constants.js'
-import storage from "./utils/storage"
+import storage from "./utils/storage.js"
 
 const quietTime = 30 * 60 * 1000
 
@@ -82,12 +83,16 @@ const getRelevantDomain = async (relevantDomains: string[], url: string | undefi
     return ''
 }
 
+
 interface Configuration {
     identifier: string
+    apiEndpoint: Endpoint
 }
 
-const initBackground = async ({ identifier }: Configuration) => {
-
+const bringInitBackground = async ({ identifier, apiEndpoint }: Configuration) => {
+    if (!identifier || !apiEndpoint) throw new Error('Missing configuration')
+    if (!['prod', 'sandbox'].includes(apiEndpoint)) throw new Error('unknown apiEndpoint')
+    ApiEndpoint.getInstance().setApiEndpoint(apiEndpoint)
     // await storage.clear()
 
     updateCache(identifier)
@@ -169,4 +174,4 @@ const initBackground = async ({ identifier }: Configuration) => {
     })
 }
 
-export default initBackground
+export default bringInitBackground

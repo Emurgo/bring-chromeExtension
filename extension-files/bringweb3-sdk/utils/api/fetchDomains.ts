@@ -1,7 +1,9 @@
-import { API_URL } from "../../config"
+import { ApiEndpoint } from "../apiEndpoint"
 
 const fetchDomains = async (apiKey: string) => {
-    const res = await fetch(`${API_URL}/domains?country=us`, {
+    const endpoint = ApiEndpoint.getInstance().getApiEndpoint()
+
+    const res = await fetch(`${endpoint}/domains?country=us`, {
         headers: {
             'x-api-key': apiKey
         }

@@ -1,7 +1,8 @@
 'use strict';
-import { initContentScript } from "bringweb3-sdk";
+import { bringInitContentScript } from "@bringweb3/sdk";
 
-initContentScript({
+bringInitContentScript({
+    iframeEndpoint: process.env.IFRAME_ENDPOINT,
     getWalletAddress: async () => await new Promise(resolve => setTimeout(() => resolve('0xA67BCD6b66114E9D5bde78c1711198449D104b28'), 200)),
     promptLogin: async () => await new Promise(resolve => setTimeout(() => resolve('0xA67BCD6b66114E9D5bde78c1711198449D104b28'), 4000)),
     walletAddressListeners: [
