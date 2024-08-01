@@ -4,7 +4,41 @@
     font-family: "Open Sans", sans-serif;
 }
 
+:root {
+    /* colors */
+    --primary-color: #181D40;
+    /* Primary Buttons */
+    --primary-btn-bg-color: #0A2EC0;
+    --primary-btn-color: white;
+    --primary-btn-border-color: transparent;
+    --primary-btn-border-size: 0;
+    /* Secondary Buttons */
+    --secondary-btn-bg-color: transparent;
+    --secondary-btn-color: gray;
+    --secondary-btn-border-color: gray;
+    --secondary-btn-border-size: 1px;
+    /* Markdown files */
+    --markdown-bg-color: white;
+    --markdown-scrollbar-color: green;
+    /* WallerAddress */
+    --wallet-color: white;
+    --wallet-border-color: white;
+    --wallet-border-size: 1px;
+    /* Details */
+    --details-bg-color: white;
+    /* Opt out */
+    --optout-overlay-bg-color: #2e2aabb5;
+    --optout-bg-color: white;
+    --optout-button-bg-color: transparent;
+    --optout-button-border-color: gray;
+    --optout-button-border-size: 2px;
+    --optout-button-color: black;
+    --optout-close-button-color: black;
+    /* X button */
+    --x-button-color: white;
+}
+
 body {
     margin: 0;
-    background: #0f2f34;
+    background: var(--primary-color);
 }

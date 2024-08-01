@@ -1,0 +1,50 @@
+.overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: var(--optout-overlay-bg-color);
+}
+
+.card {
+    position: absolute;
+    z-index: 3;
+    bottom: 0;
+    padding-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: end;
+    gap: 16px;
+    width: 100%;
+    min-height: 128px;
+    background-color: var(--optout-bg-color);
+    border-top-left-radius: 56px;
+    border-top-right-radius: 56px;
+}
+
+.container {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.btn {
+    background: var(--optout-button-bg-color);
+    color: var(--optout-button-color);
+    border: var(--optout-button-border-size) solid var(--optout-button-border-color);
+    border-radius: 4px;
+    min-width: 100px;
+    padding: 8px 20px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.close_btn {
+    background: transparent;
+    color: var(-optout-close-button-color);
+    border: none;
+    outline: none;
+    font-size: 16px;
+    cursor: pointer;
+}

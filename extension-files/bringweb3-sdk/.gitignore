@@ -1,14 +1,12 @@
 # dependencies
-/node_modules
+node_modules
 
 # production
 /build
-
+dist
 # misc
 .DS_Store
 
 npm-debug.log*
 
 .env
-
-config.js

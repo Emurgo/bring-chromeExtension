@@ -1,62 +1,138 @@
-import { useEffect } from 'react'
-import style from './app.module.css'
+import { useEffect, useState } from 'react'
+import { useSearchParams } from './hooks/useSearchParams'
+import verify from './api/verify'
+import { iframeStyle, keyFrames } from './utils/iframeStyles'
+import { sendMessage, ACTIONS } from './utils/sendMessage'
+import Offer from './components/Offer/Offer'
+import { motion, AnimatePresence, Variants } from 'framer-motion'
+import Activate from './components/Activate/Activate'
+import useCustomTheme from './hooks/useCustomTheme'
 
-enum ACTIONS {
-  OPEN = 'OPEN',
-  CLOSE = 'CLOSE'
-}
-
-interface Styles {
-  [key: string]: string
-}
-
-interface Message {
-  action?: ACTIONS
-  style?: Styles
-}
-
-const IFRAME_HEIGHT = 200
-
-const iframeStyle: Styles = {
-  width: '360px',
-  height: `${IFRAME_HEIGHT}px`,
-  border: '1px solid white',
-  display: 'block',
-  top: `calc(50vh - ${IFRAME_HEIGHT / 2}px)`
+enum STEPS {
+  OFFER = 0,
+  ACTIVATE = 1
 }
 
 const App = () => {
+  const { getParam } = useSearchParams()
+  const { done } = useCustomTheme()
+  const [info, setInfo] = useState<Info | null>(null)
+  const [show, setShow] = useState(false)
+  const [step, setStep] = useState(STEPS.OFFER)
+  const [direction, setDirection] = useState(1)
+  const [redirectUrl, setRedirectUrl] = useState('')
+  const [retailerMarkdown, setRetailerMarkdown] = useState('')
+  const [generalMarkdown, setGeneralMarkdown] = useState('')
 
-  const message = (message: Message) => {
-    window.parent.postMessage({ type: 'test', from: 'bringweb3', ...message }, '*')
-    console.log(`iframe post a message: ${message.action}`);
-  }
-
-  const open = () => {
-    message({ action: ACTIONS.OPEN, style: iframeStyle })
+  const loadMarkdown = async (
+    url: string,
+    setData: (data: string) => void,
+  ) => {
+    try {
+      const response = await fetch(url)
+      const data = await response.text()
+      setData(data)
+    } catch (error) {
+      console.error("Error fetching markdown:", error)
+    }
   }
 
   useEffect(() => {
-    open()
+    sendMessage({ action: ACTIONS.ADD_KEYFRAMES, keyFrames })
+
+    const verifyAndShow = async () => {
+      try {
+        const res = await verify(getParam('token'))
+        if (res.status !== 200) throw `got ${res.status} code`
+        setInfo(res.info)
+        setShow(true)
+        open()
+
+        loadMarkdown(res.info.retailerTermsUrl, setRetailerMarkdown)
+        loadMarkdown(res.info.generalTermsUrl, setGeneralMarkdown)
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    verifyAndShow()
   }, [])
 
-  const activate = () => {
-    console.log('iframe: activate');
+  const open = () => {
+    sendMessage({ action: ACTIONS.OPEN, style: iframeStyle })
   }
 
   const close = () => {
-    message({ action: ACTIONS.CLOSE })
+    sendMessage({ action: ACTIONS.CLOSE })
   }
 
+  const setWalletAddress = (walletAddress: WalletAddress): void => {
+    if (!info) return
+    const tmpInfo = structuredClone(info)
+    tmpInfo.walletAddress = walletAddress
+    setInfo(tmpInfo)
+  }
+
+  const slideVariants: Variants = {
+    enter: (direction: number) => ({
+      y: direction > 0 ? `100%` : `-100%`,
+      opacity: 0,
+    }),
+    center: {
+      y: 0,
+      opacity: 1,
+    },
+    exit: (direction: number) => ({
+      y: direction < 0 ? `100%` : `-100%`,
+      opacity: 0,
+    }),
+  };
+
+  if (!show || !info) return null
+
   return (
-    <div className={style.container}>
-      <button
-        className={style.xMark}
-        onClick={close}
-      >X</button>
-      <h1 className={style.h1}>BRINGWEB3</h1>
-      <button onClick={activate} className={style.btn}>Activate</button>
-    </div>
+    <>
+      <AnimatePresence
+        initial={false}
+        custom={direction}
+        mode='wait'
+      >
+        <motion.div
+          key={step}
+          custom={direction}
+          variants={slideVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{ duration: .2 }}
+        >
+          {
+            step === STEPS.OFFER ?
+              <Offer
+                info={info}
+                setRedirectUrl={setRedirectUrl}
+                setWalletAddress={setWalletAddress}
+                closeFn={close}
+                nextFn={() => {
+                  setStep(STEPS.ACTIVATE)
+                  setDirection(-1)
+                }}
+              />
+              :
+              step === STEPS.ACTIVATE ?
+                <Activate
+                  retailerMarkdown={retailerMarkdown}
+                  generalMarkdown={generalMarkdown}
+                  redirectUrl={redirectUrl}
+                  platformName={info.platformName}
+                />
+                :
+                null
+          }
+
+        </motion.div>
+      </AnimatePresence>
+    </>
   )
 }
 
