@@ -7,6 +7,8 @@ import Offer from './components/Offer/Offer'
 import { motion, AnimatePresence, Variants } from 'framer-motion'
 import Activate from './components/Activate/Activate'
 import useCustomTheme from './hooks/useCustomTheme'
+import { GA_MEASUREMENT_ID } from './config'
+import { GoogleAnalyticsProvider } from './hooks/useGoogleAnalytics'
 
 enum STEPS {
   OFFER = 0,
@@ -92,47 +94,54 @@ const App = () => {
 
   return (
     <>
-      <AnimatePresence
-        initial={false}
-        custom={direction}
-        mode='wait'
+      <GoogleAnalyticsProvider
+        measurementId={GA_MEASUREMENT_ID}
+        platform={info.platformName}
+        walletAddress={info.walletAddress}
       >
-        <motion.div
-          key={step}
+        <AnimatePresence
+          initial={false}
           custom={direction}
-          variants={slideVariants}
-          initial="enter"
-          animate="center"
-          exit="exit"
-          transition={{ duration: .2 }}
+          mode='wait'
         >
-          {
-            step === STEPS.OFFER ?
-              <Offer
-                info={info}
-                setRedirectUrl={setRedirectUrl}
-                setWalletAddress={setWalletAddress}
-                closeFn={close}
-                nextFn={() => {
-                  setStep(STEPS.ACTIVATE)
-                  setDirection(-1)
-                }}
-              />
-              :
-              step === STEPS.ACTIVATE ?
-                <Activate
-                  retailerMarkdown={retailerMarkdown}
-                  generalMarkdown={generalMarkdown}
-                  redirectUrl={redirectUrl}
-                  platformName={info.platformName}
-                  walletAddress={info.walletAddress}
+          <motion.div
+            key={step}
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: .2 }}
+          >
+            {
+              step === STEPS.OFFER ?
+                <Offer
+                  info={info}
+                  setRedirectUrl={setRedirectUrl}
+                  setWalletAddress={setWalletAddress}
+                  closeFn={close}
+                  nextFn={() => {
+                    setStep(STEPS.ACTIVATE)
+                    setDirection(-1)
+                  }}
                 />
                 :
-                null
-          }
+                step === STEPS.ACTIVATE ?
+                  <Activate
+                    retailerMarkdown={retailerMarkdown}
+                    generalMarkdown={generalMarkdown}
+                    redirectUrl={redirectUrl}
+                    platformName={info.platformName}
+                    walletAddress={info.walletAddress}
+                    retailerName={info.name}
+                  />
+                  :
+                  null
+            }
 
-        </motion.div>
-      </AnimatePresence>
+          </motion.div>
+        </AnimatePresence>
+      </GoogleAnalyticsProvider>
     </>
   )
 }

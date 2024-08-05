@@ -2,6 +2,7 @@ import styles from './styles.module.css'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useGoogleAnalytics } from '../../hooks/useGoogleAnalytics';
 
 interface Props {
     onClose: () => void;
@@ -16,6 +17,7 @@ const options = [
 ]
 
 const OptOut = ({ open, onClose }: Props) => {
+    const { sendGaEvent } = useGoogleAnalytics()
     const [isOpted, setIsOpted] = useState(false)
     const popupRef = useRef<HTMLDivElement>(null);
 
@@ -33,15 +35,19 @@ const OptOut = ({ open, onClose }: Props) => {
         };
     }, [onClose]);
 
-    const handleOptOut = (time: number) => {
+    const handleOptOut = (time: number, label: string) => {
         sendMessage({ action: ACTIONS.OPT_OUT, time })
         setIsOpted(true)
+        sendGaEvent('opt_out', {
+            category: 'user_action',
+            action: 'click',
+            details: label
+        })
     }
 
     return (
         <AnimatePresence>
             {open ?
-
                 <motion.div
                     transition={{ ease: 'easeInOut' }}
                     initial={{ opacity: 0 }}
@@ -61,7 +67,7 @@ const OptOut = ({ open, onClose }: Props) => {
                                 <button
                                     key={option.label}
                                     className={styles.btn}
-                                    onClick={() => handleOptOut(option.time)}
+                                    onClick={() => handleOptOut(option.time, option.label)}
                                 >
                                     {option.label}
                                 </button>

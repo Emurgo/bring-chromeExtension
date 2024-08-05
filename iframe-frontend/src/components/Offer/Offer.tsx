@@ -7,6 +7,7 @@ import CloseBtn from '../CloseBtn/CloseBtn'
 import PlatformLogo from '../PlatformLogo/PlatformLogo'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 import splitWordMaxFive from '../../utils/splitWordMaxFive'
+import { useGoogleAnalytics } from '../../hooks/useGoogleAnalytics'
 interface BringEventData {
     from: string
     action: string
@@ -26,6 +27,7 @@ interface Props {
 }
 
 const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Props) => {
+    const { sendGaEvent } = useGoogleAnalytics()
     const [tokenSymbol, setTokenSymbol] = useState(info.cryptoSymbols[0])
     const [optOutOpen, setOptOutOpen] = useState(false)
     const [waiting, setWaiting] = useState(false)
@@ -64,6 +66,12 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
                 tokenSymbol
             })
             if (res.status !== 200) throw `Got ${res.status} status`
+            sendGaEvent('retailer_activation', {
+                category: 'user_action',
+                action: 'click',
+                process: 'activate',
+                details: info.name
+            })
             setRedirectUrl(res.url)
             nextFn()
         } catch (error) {
@@ -98,7 +106,14 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
                 <div className={styles.btns_container}>
                     <button
                         className={styles.action_btn}
-                        onClick={closeFn}
+                        onClick={() => {
+                            sendGaEvent('popup_close', {
+                                category: 'user_action',
+                                action: 'click',
+                                details: 'extension'
+                            })
+                            closeFn()
+                        }}
                     >
                         Cancel
                     </button>
