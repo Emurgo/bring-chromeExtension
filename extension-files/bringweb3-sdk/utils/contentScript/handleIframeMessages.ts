@@ -18,14 +18,16 @@ const ACTIONS = {
 const handleIframeMessages = ({ event, iframeEl, promptLogin }: Props) => {
     const { data } = event
     const { from, action, style, keyFrames, time } = data
+
     if (from !== 'bringweb3') return
-    // console.log('BRING EVENT:', { event: data });
+
     switch (action) {
         case ACTIONS.OPEN:
             applyStyles(iframeEl, style)
             break;
         case ACTIONS.CLOSE:
             if (iframeEl) iframeEl.style.display = 'none'
+            if (time) chrome.runtime.sendMessage({ action, time })
             break;
         case ACTIONS.PROMPT_LOGIN:
             promptLogin()

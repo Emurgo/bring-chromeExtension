@@ -45,6 +45,7 @@ const bringInitContentScript = async ({
             case 'GET_WALLET_ADDRESS':
                 getWalletAddress()
                     .then(walletAddress => sendResponse({ status: 'success', walletAddress }))
+                    .catch(err => sendResponse({ status: 'success', walletAddress: undefined }))
                 return true
 
             case 'INJECT':
@@ -59,7 +60,7 @@ const bringInitContentScript = async ({
                 return true
 
             default:
-                console.error(`Unkown action: ${action}`);
+                console.error(`Unknown action: ${action}`);
                 break;
         }
     });

@@ -21,10 +21,18 @@ const OptOut = ({ open, onClose }: Props) => {
     const [isOpted, setIsOpted] = useState(false)
     const popupRef = useRef<HTMLDivElement>(null);
 
+    const handleClose = (): void => {
+        if (isOpted) {
+            sendMessage({ action: ACTIONS.CLOSE })
+        } else {
+            onClose()
+        }
+    }
+
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
-                onClose();
+                handleClose();
             }
         }
 
@@ -33,7 +41,7 @@ const OptOut = ({ open, onClose }: Props) => {
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [onClose]);
+    }, [onClose, isOpted]);
 
     const handleOptOut = (time: number, label: string) => {
         sendMessage({ action: ACTIONS.OPT_OUT, time })
@@ -61,26 +69,29 @@ const OptOut = ({ open, onClose }: Props) => {
                         animate={{ y: '0' }}
                         exit={{ y: '100px' }}
                         className={styles.card}>
-                        <div className={styles.title}>Turn off Cashback offers for</div>
-                        {!isOpted ? <div className={styles.container}>
-                            {options.map((option) => (
-                                <button
-                                    key={option.label}
-                                    className={styles.btn}
-                                    onClick={() => handleOptOut(option.time, option.label)}
-                                >
-                                    {option.label}
-                                </button>
-                            ))}
-                        </div>
+                        {!isOpted ?
+                            <>
+                                <div className={styles.title}>Turn off Cashback offers for</div>
+                                <div className={styles.container}>
+                                    {options.map((option) => (
+                                        <button
+                                            key={option.label}
+                                            className={styles.btn}
+                                            onClick={() => handleOptOut(option.time, option.label)}
+                                        >
+                                            {option.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </>
                             :
-                            <div>Turned off</div>
+                            <div className={styles.message}>Your request to turn off offers has been received. You can reactivate them anytime in settings.</div>
                         }
                         <button
                             className={styles.close_btn}
-                            onClick={onClose}
+                            onClick={handleClose}
                         >
-                            Cancel
+                            {isOpted ? 'Close' : 'Cancel'}
                         </button>
                     </motion.div >
                 </motion.div>

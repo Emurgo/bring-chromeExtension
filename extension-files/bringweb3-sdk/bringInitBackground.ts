@@ -67,7 +67,8 @@ const getDomain = (url: string) => {
     return url.replace(/^(https?:\/\/)?(www\.)?/, '');
 }
 
-const getRelevantDomain = async (relevantDomains: string[], url: string | undefined) => {
+const getRelevantDomain = async (url: string | undefined) => {
+    const relevantDomains = await storage.get('relevantDomains')
     if (!url || !relevantDomains || !relevantDomains.length) return ''
     const domain = getDomain(url)
     for (const relevantDomain of relevantDomains) {
@@ -81,6 +82,19 @@ const getRelevantDomain = async (relevantDomains: string[], url: string | undefi
         }
     }
     return ''
+}
+
+const addQuietDomain = async (domain: string, time?: number) => {
+    if (!time) time = quietTime
+
+    let quietDomains = await storage.get('quietDomains')
+
+    if (typeof quietDomains === 'object') {
+        quietDomains[domain] = Date.now() + time
+    } else {
+        quietDomains = { [domain]: Date.now() + quietTime }
+    }
+    storage.set('quietDomains', quietDomains)
 }
 
 
@@ -115,11 +129,17 @@ const bringInitBackground = async ({ identifier, apiEndpoint }: Configuration) =
         }
     })
 
-    chrome.runtime.onMessage.addListener((request, sender) => {
+    chrome.runtime.onMessage.addListener(async (request, sender) => {
         const { action, time } = request
+
         switch (action) {
             case 'OPT_OUT':
                 storage.set('optOut', Date.now() + time)
+                break;
+            case 'CLOSE':
+                const domain = await getRelevantDomain(sender.tab?.url || sender.origin)
+                if (!domain) break;
+                addQuietDomain(domain, time)
                 break;
             default:
                 console.log(`Unknown action: ${action}`);
@@ -128,24 +148,23 @@ const bringInitBackground = async ({ identifier, apiEndpoint }: Configuration) =
     })
 
     chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-        const optOut = await storage.get('optOut')
+        const optOut = await storage.get('optOut');
 
-        if (optOut && optOut > Date.now()) return
+        if (optOut && optOut > Date.now()) return;
 
-        const previousUrl = await storage.get('previousUrl')
-        if (changeInfo.status !== 'complete' || tab.url === previousUrl) return
-        if (!tab.url) return
+        const previousUrl = await storage.get('previousUrl');
+        if (changeInfo.status !== 'complete' || tab.url === previousUrl) return;
+        if (!tab.url) return;
         storage.set('previousUrl', tab.url)
         console.log('fired');
 
-        const relevantDomains = await storage.get('relevantDomains')
-        const { url } = tab
+        const { url } = tab;
 
-        const match = await getRelevantDomain(relevantDomains, url)
+        const match = await getRelevantDomain(url);
 
-        if (!match || !match.length) return
+        if (!match || !match.length) return;
 
-        const address = await getWalletAddress(tabId)
+        const address = await getWalletAddress(tabId);
         console.log({ address });
 
         const { token, isValid } = await validateDomain({
@@ -155,22 +174,18 @@ const bringInitBackground = async ({ identifier, apiEndpoint }: Configuration) =
                 url,
                 address
             }
-        })
+        });
 
         if (!isValid) {
-            let quietDomains = await storage.get('quietDomains')
-            typeof quietDomains === 'object' ?
-                (quietDomains[match] = Date.now() + quietTime) :
-                (quietDomains = { [match]: Date.now() + quietTime })
-            storage.set('quietDomains', quietDomains)
-            return
+            addQuietDomain(match);
+            return;
         }
 
         const res = await chrome.tabs.sendMessage(tabId, {
             action: 'INJECT',
             token,
             domain: url
-        })
+        });
     })
 }
 

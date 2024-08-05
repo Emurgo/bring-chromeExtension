@@ -7,7 +7,7 @@ import Offer from './components/Offer/Offer'
 import { motion, AnimatePresence, Variants } from 'framer-motion'
 import Activate from './components/Activate/Activate'
 import useCustomTheme from './hooks/useCustomTheme'
-import { GA_MEASUREMENT_ID } from './config'
+import { GA_MEASUREMENT_ID, QUIET_TIME } from './config'
 import { GoogleAnalyticsProvider } from './hooks/useGoogleAnalytics'
 
 enum STEPS {
@@ -65,7 +65,7 @@ const App = () => {
   }
 
   const close = () => {
-    sendMessage({ action: ACTIONS.CLOSE })
+    sendMessage({ action: ACTIONS.CLOSE, time: Date.now() + QUIET_TIME })
   }
 
   const setWalletAddress = (walletAddress: WalletAddress): void => {

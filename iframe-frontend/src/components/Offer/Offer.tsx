@@ -8,6 +8,8 @@ import PlatformLogo from '../PlatformLogo/PlatformLogo'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 import splitWordMaxFive from '../../utils/splitWordMaxFive'
 import { useGoogleAnalytics } from '../../hooks/useGoogleAnalytics'
+import { Oval } from 'react-loader-spinner'
+import { motion, AnimatePresence } from 'framer-motion'
 interface BringEventData {
     from: string
     action: string
@@ -125,11 +127,33 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
                     </button>
                 </div>
             </div>
+            <AnimatePresence>
+                {waiting ?
+                    <motion.div
+                        transition={{ ease: 'easeInOut' }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className={styles.waiting}>
+                        <div className={styles.message}>Waiting for you to sign in to your wallet</div>
+                        <Oval
+                            visible={true}
+                            height="60"
+                            width="60"
+                            strokeWidth="4"
+                            strokeWidthSecondary="4"
+                            color="#0A2EC0"
+                            secondaryColor=""
+                            ariaLabel="oval-loading"
+                        />
+                    </motion.div>
+                    : null}
+            </AnimatePresence>
             <OptOut
                 open={optOutOpen}
                 onClose={() => setOptOutOpen(false)}
             />
-        </div>
+        </div >
     )
 }
 

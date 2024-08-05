@@ -40,6 +40,8 @@
     --optout-close-button-color: #DADCE5;
     /* X button */
     --x-button-color: #B9BBBF;
+    /* Message */
+    --message-color: #DADCE5;
 }
 
 body {

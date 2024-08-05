@@ -45,6 +45,11 @@
     transition: .2s;
 }
 
+.message {
+    color: var(--optout-close-button-color);
+    text-align: center;
+}
+
 .btn:hover {
     background: #8FA5FF;
     color: #0F1429;
