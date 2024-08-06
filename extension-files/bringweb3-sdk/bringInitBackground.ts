@@ -156,7 +156,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint }: Configuration) =
         if (changeInfo.status !== 'complete' || tab.url === previousUrl) return;
         if (!tab.url) return;
         storage.set('previousUrl', tab.url)
-        console.log('fired');
+        console.log('fired:', tab.url);
 
         const { url } = tab;
 
@@ -180,12 +180,20 @@ const bringInitBackground = async ({ identifier, apiEndpoint }: Configuration) =
             addQuietDomain(match);
             return;
         }
-
-        const res = await chrome.tabs.sendMessage(tabId, {
-            action: 'INJECT',
-            token,
-            domain: url
-        });
+        try {
+            const res = await chrome.tabs.sendMessage(tabId, {
+                action: 'INJECT',
+                token,
+                domain: url
+            });
+        } catch (error) {
+            console.warn('error');
+            const res = await chrome.tabs.sendMessage(tabId, {
+                action: 'INJECT',
+                token,
+                domain: url
+            });
+        }
     })
 }
 
