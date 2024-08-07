@@ -97,8 +97,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
                 </div>
                 <span className={styles.sm_txt}>Receive up to <span className={styles.cashback_amount}>{parseFloat(info.maxCashback)}{info?.cashbackSymbol}</span> of your total spent in
                     <CryptoSymbolSelect
-                        options={['ADA']}
-                        // options={info.cryptoSymbols}
+                        options={info.cryptoSymbols}
                         select={tokenSymbol}
                         set={setTokenSymbol}
                     />

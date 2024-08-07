@@ -1,7 +1,7 @@
 import fetchDomains from "./utils/api/fetchDomains.js"
 import validateDomain from "./utils/api/validateDomain.js"
 import checkEvents from "./utils/api/checkEvents.js"
-import { Endpoint, ApiEndpoint } from "./utils/apiEndpoint.js"
+import { ApiEndpoint } from "./utils/apiEndpoint.js"
 
 import { UPDATE_CACHE_ALARM_NAME, CHECK_EVENTS_ALARM_NAME } from './utils/constants.js'
 import storage from "./utils/storage.js"

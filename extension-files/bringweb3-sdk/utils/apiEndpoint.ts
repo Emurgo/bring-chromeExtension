@@ -1,5 +1,3 @@
-// config.ts
-export type Endpoint = 'sandbox' | 'prod';
 
 export class ApiEndpoint {
   private static instance: ApiEndpoint | null = null;

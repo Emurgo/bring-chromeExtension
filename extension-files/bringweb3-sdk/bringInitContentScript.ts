@@ -38,6 +38,8 @@ const bringInitContentScript = async ({
 
     // Listen for message
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        console.log({ request });
+
         const { action } = request
 
         switch (action) {

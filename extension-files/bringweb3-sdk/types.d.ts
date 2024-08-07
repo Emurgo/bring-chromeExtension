@@ -1,5 +1,7 @@
 type WalletAddress = string | undefined
 
+type Endpoint = 'sandbox' | 'prod';
+
 type IFrame = HTMLIFrameElement | null
 
 interface Style {
