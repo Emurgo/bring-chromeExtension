@@ -2,7 +2,7 @@
     position: absolute;
     inset: 0;
     z-index: 2;
-    background: var(--optout-overlay-bg-color);
+    background: var(--overlay-bg);
 }
 
 .card {
@@ -17,12 +17,12 @@
     gap: 16px;
     width: 100%;
     min-height: 93px;
-    background-color: var(--optout-bg-color);
+    background-color: var(--optout-bg);
     box-shadow: 0px -2px 8px 0px rgba(255, 255, 255, 0.15);
 }
 
 .title {
-    color: var(--optout-close-button-color);
+    color: var(--optout-color);
     font-weight: 400;
 }
 
@@ -34,9 +34,11 @@
 }
 
 .btn {
-    background: var(--optout-button-bg-color);
-    color: var(--optout-button-color);
-    border: var(--optout-button-border-size) solid var(--optout-button-border-color);
+    background: var(--optout-btn-bg);
+    color: var(--optout-btn-color);
+    border-width: var(--optout-btn-border-w);
+    border-style: solid;
+    border-color: var(--optout-btn-border-color);
     border-radius: 4px;
     min-width: 100px;
     padding: 8px 20px;
@@ -46,7 +48,7 @@
 }
 
 .message {
-    color: var(--optout-close-button-color);
+    color: var(--optout-color);
     text-align: center;
 }
 
@@ -57,7 +59,7 @@
 
 .close_btn {
     background: transparent;
-    color: var(--optout-close-button-color);
+    color: var(--close-color);
     border: none;
     outline: none;
     font-size: 16px;

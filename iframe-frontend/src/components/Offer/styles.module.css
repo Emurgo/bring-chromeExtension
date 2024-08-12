@@ -47,7 +47,7 @@
 .btn {
     padding: 7.5px 12px;
     border-radius: 4px;
-    border-width: var(--primary-btn-border-size);
+    border-width: var(--primary-btn-border-w);
     border-color: var(--primary-btn-border-color);
     border-style: solid;
     cursor: pointer;
@@ -55,7 +55,7 @@
     font-size: 14px;
     font-weight: 600;
     color: var(--primary-btn-color);
-    background-color: var(--primary-btn-bg-color);
+    background-color: var(--primary-btn-bg);
 }
 
 .xMark:hover {
@@ -72,7 +72,7 @@
     padding: 7px 19px 26px 20px;
     margin-top: 10px;
     margin-bottom: 6px;
-    background-color: var(--details-bg-color);
+    background-color: var(--details-bg);
     border-radius: 8px;
     font-weight: 700;
     user-select: none;
@@ -84,7 +84,7 @@
     justify-content: center;
     align-items: center;
     height: 23px;
-    background: var(--wallet-background-color);
+    background: var(--wallet-bg);
     padding: 0 12px;
     border-radius: 4px;
 }
@@ -93,7 +93,9 @@
     color: var(--wallet-color);
     font-size: 10px;
     font-weight: 400;
-    border: var(--wallet-border-size) solid var(--wallet-border-color);
+    border-width: var(--wallet-border-w);
+    border-style: solid;
+    border-color: var(--wallet-border-color);
 }
 
 .btns_container {
@@ -103,7 +105,7 @@
 
 .action_btn {
     color: var(--secondary-btn-color);
-    background: var(--secondary-btn-bg-color);
+    background: var(--secondary-btn-bg);
     border: var(--secondary-btn-border-size) solid var(--secondary-btn-border-color);
     border-radius: 4px;
     font-weight: 500;
@@ -124,9 +126,9 @@
     gap: 12px;
     justify-content: center;
     align-items: center;
-    background: var(--optout-overlay-bg-color);
+    background: var(--overlay-bg);
 }
 
 .message {
-    color: var(--message-color);
+    color: var(--overlay-color);
 }

@@ -4,6 +4,7 @@ import CloseBtn from '../CloseBtn/CloseBtn'
 import PlatformLogo from '../PlatformLogo/PlatformLogo'
 import splitWordMaxFive from '../../utils/splitWordMaxFive'
 import { useGoogleAnalytics } from '../../hooks/useGoogleAnalytics'
+import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 
 interface ActivateProps {
     redirectUrl: string
@@ -18,6 +19,7 @@ const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName
     const { sendGaEvent } = useGoogleAnalytics()
 
     const redirectEvent = () => {
+        sendMessage({ action: ACTIONS.ACTIVATE })
         sendGaEvent('retailer_shop', {
             category: 'user_action',
             action: 'click',

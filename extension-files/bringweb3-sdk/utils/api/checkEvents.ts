@@ -3,22 +3,30 @@ import { ApiEndpoint } from "../apiEndpoint";
 interface CheckEventsProps {
     apiKey: string;
     walletAddress: string
+    cashbackUrl: string | undefined;
 }
 
-const checkEvents = async ({ apiKey, walletAddress }: CheckEventsProps) => {
+interface Body {
+    walletAddress: string;
+    cashbackUrl?: string;
+    test?: boolean
+}
+
+const checkEvents = async ({ apiKey, walletAddress, cashbackUrl }: CheckEventsProps) => {
     const endpoint = ApiEndpoint.getInstance().getApiEndpoint()
+    const body: Body = { walletAddress, test: true }
+    if (cashbackUrl) body.cashbackUrl = cashbackUrl;
+
     const res = await fetch(`${endpoint}/check-events`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'x-api-key': apiKey
         },
-        body: JSON.stringify({ walletAddress })
+        body: JSON.stringify(body)
     })
     const json = await res.json()
-    console.log(json);
 
-    // return await res.json()
     return json
 }
 

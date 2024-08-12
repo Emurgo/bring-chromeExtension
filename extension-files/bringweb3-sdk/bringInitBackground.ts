@@ -3,7 +3,7 @@ import validateDomain from "./utils/api/validateDomain.js"
 import checkEvents from "./utils/api/checkEvents.js"
 import { ApiEndpoint } from "./utils/apiEndpoint.js"
 
-import { UPDATE_CACHE_ALARM_NAME, CHECK_EVENTS_ALARM_NAME } from './utils/constants.js'
+import { UPDATE_CACHE_ALARM_NAME } from './utils/constants.js'
 import storage from "./utils/storage.js"
 
 const quietTime = 30 * 60 * 1000
@@ -50,17 +50,29 @@ const updateCache = async (apiKey: string) => {
     })
 }
 
-const checkWalletStatus = async (apiKey: string, walletAddress: WalletAddress) => {
-    if (!walletAddress) return
-    const res = await checkEvents({ apiKey, walletAddress })
-}
+const checkNotifications = async (apiKey: string, tabId: number, cashbackUrl: string | undefined, isAfterActivation?: boolean) => {
+    const falseReturn = { showNotification: false, token: '' };
 
-const initWalletStatus = async (apiKey: string, walletAddress: WalletAddress) => {
-    if (!walletAddress) return
-    checkWalletStatus(apiKey, walletAddress)
-    chrome.alarms.create(CHECK_EVENTS_ALARM_NAME, {
-        periodInMinutes: 60 * 24
-    })
+    const nextNotificationCheck = await storage.get('notificationCheck');
+
+    if (nextNotificationCheck?.check && Date.now() < nextNotificationCheck.check) return falseReturn;
+
+    const walletAddress = await getWalletAddress(tabId)
+
+    if (!walletAddress) return falseReturn;
+
+    const res = await checkEvents({ apiKey, walletAddress, cashbackUrl });
+    const notifications = {
+        check: isAfterActivation ? res.nextRequestTimestampActivated : res.nextRequestTimestampRegular,
+        nextRequestTimestampActivated: res.nextRequestTimestampActivated,
+        nextRequestTimestampRegular: res.nextRequestTimestampRegular
+    }
+    storage.set('notificationCheck', notifications);
+
+    return {
+        showNotification: res.showNotification as boolean,
+        token: res.token as String
+    };
 }
 
 const getDomain = (url: string) => {
@@ -97,21 +109,68 @@ const addQuietDomain = async (domain: string, time?: number) => {
     storage.set('quietDomains', quietDomains)
 }
 
+const getCashbackUrl = (cashbackUrl: string | undefined): string | undefined => {
+    return cashbackUrl ? chrome.runtime.getURL(cashbackUrl) : undefined;
+}
+
+const showNotification = async (identifier: string, tabId: number, cashbackPagePath: string | undefined): Promise<void> => {
+    const notification = await checkNotifications(identifier, tabId, getCashbackUrl(cashbackPagePath))
+
+    if (!notification.showNotification) return;
+
+    await chrome.tabs.sendMessage(tabId, {
+        action: 'INJECT',
+        token: notification.token,
+        page: 'notification',
+    });
+}
 
 interface Configuration {
     identifier: string
-    apiEndpoint: Endpoint
+    apiEndpoint: string
+    cashbackPagePath?: string
 }
-
-const bringInitBackground = async ({ identifier, apiEndpoint }: Configuration) => {
+/**
+ * Initializes the background script for the Bring extension.
+ *
+ * @async
+ * @function bringInitBackground
+ * @param {Object} configuration - The configuration object.
+ * @param {string} configuration.identifier - The identifier for the extension.
+ * @param {string} configuration.apiEndpoint - The API endpoint ('prod' or 'sandbox').
+ * @param {string} [configuration.cashbackPagePath] - Optional path to the cashback page.
+ * @throws {Error} Throws an error if identifier or apiEndpoint is missing, or if apiEndpoint is invalid.
+ * @returns {Promise<void>}
+ *
+ * @description
+ * This function sets up the background processes for the Bring extension. It initializes
+ * the API endpoint, sets up listeners for alarms, runtime messages, and tab updates.
+ * It handles various actions such as opting out, closing notifications, injecting content
+ * based on URL changes, and managing quiet domains.
+ *
+ * The function performs the following tasks:
+ * - Validates and sets the API endpoint
+ * - Updates the cache
+ * - Sets up listeners for alarms to update cache periodically
+ * - Handles runtime messages for opting out and closing notifications
+ * - Monitors tab updates to inject content or show notifications based on URL changes
+ * - Validates domains and manages quiet domains
+ *
+ * @example
+ * bringInitBackground({
+ *   identifier: 'my-extension-id',
+ *   apiEndpoint: 'sandbox',
+ *   cashbackPagePath: '/cashback.html'
+ * });
+ */
+const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }: Configuration) => {
     if (!identifier || !apiEndpoint) throw new Error('Missing configuration')
     if (!['prod', 'sandbox'].includes(apiEndpoint)) throw new Error('unknown apiEndpoint')
+
     ApiEndpoint.getInstance().setApiEndpoint(apiEndpoint)
-    // await storage.clear()
+
 
     updateCache(identifier)
-
-    initWalletStatus(identifier, await getWalletAddress())
 
     chrome.alarms.onAlarm.addListener(async (alarm) => {
         const { name } = alarm
@@ -119,9 +178,6 @@ const bringInitBackground = async ({ identifier, apiEndpoint }: Configuration) =
         switch (name) {
             case UPDATE_CACHE_ALARM_NAME:
                 updateCache(identifier)
-                break;
-            case CHECK_EVENTS_ALARM_NAME:
-                checkWalletStatus(identifier, await getWalletAddress())
                 break;
             default:
                 console.error('alarm with no use case:', name);
@@ -133,6 +189,12 @@ const bringInitBackground = async ({ identifier, apiEndpoint }: Configuration) =
         const { action, time } = request
 
         switch (action) {
+            case 'ACTIVATE':
+                const notificationCheck = await storage.get('notificationCheck')
+                if (!notificationCheck.check || !notificationCheck.nextRequestTimestampActivated) break;
+                notificationCheck.check = notificationCheck.nextRequestTimestampActivated;
+                storage.set('notificationCheck', notificationCheck)
+                break;
             case 'OPT_OUT':
                 storage.set('optOut', Date.now() + time)
                 break;
@@ -142,7 +204,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint }: Configuration) =
                 addQuietDomain(domain, time)
                 break;
             default:
-                console.log(`Unknown action: ${action}`);
+                console.warn(`Bring unknown action: ${action}`);
                 break;
         }
     })
@@ -150,7 +212,10 @@ const bringInitBackground = async ({ identifier, apiEndpoint }: Configuration) =
     chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
         const optOut = await storage.get('optOut');
 
-        if (optOut && optOut > Date.now()) return;
+        if (optOut && optOut > Date.now()) {
+            showNotification(identifier, tabId, cashbackPagePath);
+            return;
+        }
 
         const previousUrl = await storage.get('previousUrl');
         if (changeInfo.status !== 'complete' || tab.url === previousUrl) return;
@@ -162,10 +227,12 @@ const bringInitBackground = async ({ identifier, apiEndpoint }: Configuration) =
 
         const match = await getRelevantDomain(url);
 
-        if (!match || !match.length) return;
+        if (!match || !match.length) {
+            showNotification(identifier, tabId, cashbackPagePath)
+            return;
+        };
 
         const address = await getWalletAddress(tabId);
-        console.log({ address });
 
         const { token, isValid } = await validateDomain({
             apiKey: identifier,

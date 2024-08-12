@@ -1,4 +1,4 @@
-import getQueryParams from "./utils/getQueryParams";
+import getQueryParams from '../utils/getQueryParams'
 import { describe, it, expect } from 'vitest'
 
 describe('getQueryParams', () => {

@@ -4,47 +4,61 @@
     font-family: "Poppins", sans-serif;
 }
 
+
+/* OPTIONS PER COMPONENT */
+/* 
+    bg
+    color
+    border-w
+    border-color
+    border-radius
+    weight
+*/
+
 :root {
-    /* colors */
-    --primary-color: #0F1429;
+    /* popup */
+    --popup-bg: #0F1429;
     /* Primary Buttons */
-    --primary-btn-bg-color: #B2332D;
+    --primary-btn-bg: #B2332D;
     --primary-btn-color: white;
     --primary-btn-border-color: transparent;
-    --primary-btn-border-size: 0;
+    --primary-btn-border-w: 0;
     /* Secondary Buttons */
-    --secondary-btn-bg-color: #1B254A;
+    --secondary-btn-bg: #1B254A;
     --secondary-btn-color: #8FA5FF;
     --secondary-btn-border-color: gray;
     --secondary-btn-border-size: 0;
     /* Markdown files */
+    --markdown-bg: #161D3B;
     --markdown-color: #DADCE5;
-    --markdown-bg-color: #161D3B;
     --markdown-scrollbar-color: #DADCE5;
     /* WallerAddress */
     --wallet-color: #DADCE5;
-    --wallet-background-color: #161D3B;
+    --wallet-bg: #161D3B;
     --wallet-border-color: white;
-    --wallet-border-size: 0;
+    --wallet-border-w: 0;
     /* Details */
-    --details-bg-color: #161D3B;
+    --details-bg: #161D3B;
     --cashback-amount-color: #8FA5FF;
     /* Opt out */
-    --optout-overlay-bg-color: rgba(15, 20, 41, 0.95);
-    ;
-    --optout-bg-color: #0F1429;
-    --optout-button-bg-color: #1B254A;
-    --optout-button-border-color: gray;
-    --optout-button-border-size: 0;
-    --optout-button-color: #8FA5FF;
-    --optout-close-button-color: #DADCE5;
-    /* X button */
-    --x-button-color: #B9BBBF;
-    /* Message */
-    --message-color: #DADCE5;
+    --overlay-bg: rgba(15, 20, 41, 0.95);
+    --overlay-color: #DADCE5;
+
+    --optout-bg: #0F1429;
+    --optout-color: #DADCE5;
+
+    --optout-btn-bg: #1B254A;
+    --optout-btn-color: #8FA5FF;
+    --optout-btn-border-color: gray;
+    --optout-btn-border-w: 0;
+    /* X/Close/Cancel buttons */
+    --close-color: #B9BBBF;
+    /* Token */
+    --token-bg: transparent;
+    --token-color: #DADCE5;
 }
 
 body {
     margin: 0;
-    background: var(--primary-color);
+    background: var(--popup-bg);
 }

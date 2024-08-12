@@ -13,7 +13,7 @@
     justify-content: center;
     align-items: center;
     height: 23px;
-    background: var(--wallet-background-color);
+    background: var(--wallet-bg);
     padding: 0 12px;
     border-radius: 4px;
 }
@@ -22,7 +22,9 @@
     color: var(--wallet-color);
     font-size: 10px;
     font-weight: 400;
-    border: var(--wallet-border-size) solid var(--wallet-border-color);
+    border-width: var(--wallet-border-w);
+    border-style: solid;
+    border-color: var(--wallet-border-color);
 }
 
 .subcontainer {
@@ -42,8 +44,8 @@
 
 .activate_btn {
     color: var(--primary-btn-color);
-    background-color: var(--primary-btn-bg-color);
-    border-width: var(--primary-btn-border-size);
+    background-color: var(--primary-btn-bg);
+    border-width: var(--primary-btn-border-w);
     border-color: var(--primary-btn-border-color);
     border-style: solid;
     width: 290px;
@@ -60,7 +62,7 @@
     border-radius: 4px;
     max-height: 110px;
     color: var(--markdown-color);
-    background: var(--markdown-bg-color);
+    background: var(--markdown-bg);
     font-size: 12px;
     box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.05);
     overflow-y: scroll;

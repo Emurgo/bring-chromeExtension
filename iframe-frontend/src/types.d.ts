@@ -1,6 +1,7 @@
 declare enum ACTIONS {
     OPEN = 'OPEN',
     CLOSE = 'CLOSE',
+    ACTIVATE = 'ACTIVATE',
     PROMPT_LOGIN = 'PROMPT_LOGIN',
     OPT_OUT = 'OPT_OUT',
     ADD_KEYFRAMES = 'ADD_KEYFRAMES'

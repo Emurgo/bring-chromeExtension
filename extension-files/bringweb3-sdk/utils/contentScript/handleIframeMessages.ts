@@ -10,6 +10,7 @@ interface Props {
 const ACTIONS = {
     OPEN: 'OPEN',
     CLOSE: 'CLOSE',
+    ACTIVATE: 'ACTIVATE',
     PROMPT_LOGIN: 'PROMPT_LOGIN',
     OPT_OUT: 'OPT_OUT',
     ADD_KEYFRAMES: 'ADD_KEYFRAMES'
@@ -31,6 +32,9 @@ const handleIframeMessages = ({ event, iframeEl, promptLogin }: Props) => {
             break;
         case ACTIONS.PROMPT_LOGIN:
             promptLogin()
+            break;
+        case ACTIONS.ACTIVATE:
+            chrome.runtime.sendMessage({ action })
             break;
         case ACTIONS.OPT_OUT:
             chrome.runtime.sendMessage({ action, time })

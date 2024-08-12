@@ -3,5 +3,6 @@ import { bringInitBackground } from '@bringweb3/sdk'
 
 bringInitBackground({
     identifier: process.env.PLATFORM_IDENTIFIER,
-    apiEndpoint: 'sandbox' // 'sandbox' || 'prod'
+    apiEndpoint: 'sandbox', // 'sandbox' || 'prod'
+    // cashbackPagePath: '/wallet/cashback'
 })

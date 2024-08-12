@@ -1,4 +1,4 @@
-const set = async (key: string, value: string) => {
+const set = async (key: string, value: any) => {
     chrome.storage.local.set({ [key]: value });
 }
 

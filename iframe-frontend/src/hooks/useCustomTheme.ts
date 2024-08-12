@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { useSearchParams } from "./useSearchParams"
+import { themeNames } from "../utils/theme"
 
 const getThemeParams = (params: Record<string, string>) => {
     const theme: Record<string, string> = {}
@@ -21,7 +22,9 @@ const useCustomTheme = (): ThemeParamsResult => {
     useEffect(() => {
         // Apply custom theme
         Object.entries(theme).map(([key, value]) => {
-            document.documentElement.style.setProperty(`--${key}`, value)
+            if (themeNames[key]) {
+                document.documentElement.style.setProperty(themeNames[key], value)
+            }
         })
         setDone(true)
     }, [])
