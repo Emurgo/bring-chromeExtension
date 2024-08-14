@@ -17,7 +17,7 @@
     gap: 16px;
     width: 100%;
     min-height: 93px;
-    background-color: var(--optout-bg);
+    background: var(--optout-bg);
     box-shadow: 0px -2px 8px 0px rgba(255, 255, 255, 0.15);
 }
 
@@ -39,7 +39,7 @@
     border-width: var(--optout-btn-border-w);
     border-style: solid;
     border-color: var(--optout-btn-border-color);
-    border-radius: 4px;
+    border-radius: var(--optout-btn-radius);
     min-width: 100px;
     padding: 8px 20px;
     font-weight: 700;
@@ -53,8 +53,7 @@
 }
 
 .btn:hover {
-    background: #8FA5FF;
-    color: #0F1429;
+    scale: 1.05;
 }
 
 .close_btn {

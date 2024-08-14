@@ -13,7 +13,7 @@ bringInitContentScript({
         "casper-wallet:locked"
     ],
     customTheme: {
-        // detailsBg: 'black'
+        detailsBg: 'black'
     }
 });
 // TBD:

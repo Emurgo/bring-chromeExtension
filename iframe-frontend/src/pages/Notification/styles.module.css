@@ -14,11 +14,11 @@
 
 .link {
     text-decoration: none;
-    color: var(--primary-btn-color);
+    color: var(--notification-btn-color);
     text-align: center;
     width: 102px;
     padding: 5px 0;
     font-size: 12px;
-    border-radius: 4px;
-    background-color: var(--secondary-btn-bg);
+    border-radius: var(--notification-btn-radius);
+    background: var(--notification-btn-bg);
 }
