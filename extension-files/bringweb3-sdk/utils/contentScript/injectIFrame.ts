@@ -13,9 +13,9 @@ interface Props {
 
 const injectIFrame = ({ query, theme, iframeSrc }: Props): HTMLIFrameElement => {
     const params = getQueryParams({ query })
-    const customStyles = theme ? `&${getQueryParams({ query: theme, prefix: 'theme' })}` : ''
+    const customStyles = theme ? `&${getQueryParams({ query: theme, prefix: 't' })}` : ''
     const iframe = document.createElement('iframe');
-    iframe.id = "bringweb3-iframe";
+    iframe.id = `bringweb3-iframe:${chrome.runtime.id}`;
     iframe.src = `${iframeSrc}?${params}${customStyles}`;
     iframe.setAttribute('sandbox', "allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation")
     iframe.style.position = "fixed";

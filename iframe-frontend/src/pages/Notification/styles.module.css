@@ -19,6 +19,7 @@
     width: 102px;
     padding: 5px 0;
     font-size: 12px;
+    font-weight: 500;
     border-radius: var(--notification-btn-radius);
     background: var(--notification-btn-bg);
 }

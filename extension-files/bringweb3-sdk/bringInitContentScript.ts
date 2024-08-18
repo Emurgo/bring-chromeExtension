@@ -3,7 +3,7 @@ import handleIframeMessages from "./utils/contentScript/handleIframeMessages.js"
 import startListenersForWalletAddress from "./utils/contentScript/startLIstenersForWalletAddress.js";
 
 let iframeEl: IFrame = null
-
+let isIframeOpen = false
 
 interface Configuration {
     iframeEndpoint: string
@@ -63,7 +63,6 @@ const bringInitContentScript = async ({
 
     // Listen for message
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-        console.log(request);
 
         const { action } = request
 
@@ -76,9 +75,11 @@ const bringInitContentScript = async ({
                 return true
 
             case 'INJECT':
+                if (isIframeOpen) {
+                    return
+                }
                 const { token, page } = request;
-                console.log(`injecting to: ${request.domain}`);
-                console.log({ iframeEndpoint });
+                // console.log(`injecting to: ${request.domain}`);
 
                 iframeEl = injectIFrame({
                     query: { token },
@@ -86,6 +87,7 @@ const bringInitContentScript = async ({
                         `${iframeEndpoint}notification` : iframeEndpoint,
                     theme: customTheme
                 });
+                isIframeOpen = true
                 sendResponse({ status: 'success' });
                 return true
 

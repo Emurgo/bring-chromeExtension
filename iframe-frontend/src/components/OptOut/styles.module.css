@@ -19,6 +19,8 @@
     min-height: 93px;
     background: var(--optout-bg);
     box-shadow: 0px -2px 8px 0px rgba(255, 255, 255, 0.15);
+    border-top-left-radius: var(--optout-radius);
+    border-top-right-radius: var(--optout-radius);
 }
 
 .title {
@@ -34,15 +36,16 @@
 }
 
 .btn {
-    background: var(--optout-btn-bg);
-    color: var(--optout-btn-color);
-    border-width: var(--optout-btn-border-w);
+    background: var(--secondary-btn-bg);
+    color: var(--secondary-btn-color);
+    border-width: var(--secondary-btn-border-w);
     border-style: solid;
-    border-color: var(--optout-btn-border-color);
-    border-radius: var(--optout-btn-radius);
+    border-color: var(--secondary-btn-border-color);
+    border-radius: var(--secondary-btn-radius);
     min-width: 100px;
     padding: 8px 20px;
-    font-weight: 700;
+    font-weight: 500;
+    font-size: 13px;
     cursor: pointer;
     transition: .2s;
 }

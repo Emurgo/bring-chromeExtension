@@ -18,9 +18,6 @@ interface Notification {
 const Notification = () => {
     const data = useRouteLoaderData('root') as Notification
 
-    console.log({ data });
-
-
     useEffect(() => {
         sendMessage({ action: ACTIONS.OPEN, style: notificationIframeStyle })
     }, [])

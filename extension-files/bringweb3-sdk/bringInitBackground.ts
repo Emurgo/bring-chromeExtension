@@ -18,14 +18,14 @@ const getWalletAddress = async (tabId?: number): Promise<WalletAddress> => {
             tabId = tabs[0].id
         }
 
-        const res = await chrome.tabs.sendMessage(tabId, { action: 'GET_WALLET_ADDRESS' });
+        const res = await sendMessage(tabId, { action: 'GET_WALLET_ADDRESS' });
 
         if (res?.walletAddress && walletAddress !== res?.walletAddress) {
             walletAddress = res?.walletAddress
             await storage.set('walletAddress', walletAddress as string)
         }
     } catch (error) {
-        console.log("Can't update wallet address");
+        // console.log("Can't update wallet address");
     }
 
     return walletAddress
@@ -71,7 +71,7 @@ const checkNotifications = async (apiKey: string, tabId: number, cashbackUrl: st
 
     return {
         showNotification: res.showNotification as boolean,
-        token: res.token as String
+        token: res.token as string
     };
 }
 
@@ -113,17 +113,54 @@ const getCashbackUrl = (cashbackUrl: string | undefined): string | undefined => 
     return cashbackUrl ? chrome.runtime.getURL(cashbackUrl) : undefined;
 }
 
+interface Message {
+    action: 'INJECT' | 'GET_WALLET_ADDRESS'
+    domain?: string
+    token?: string
+    page?: string
+}
+
+const sendMessage = async (tabId: number, message: Message) => {
+    const maxRetries = 5;
+    const baseDelay = 1000; // 1 second
+
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+            // Check if tab still exists
+            const tabInfo = await chrome.tabs.get(tabId);
+            if (chrome.runtime.lastError) {
+                // console.warn("Tab no longer exists:", chrome.runtime.lastError);
+                return;
+            }
+
+            const res = await chrome.tabs.sendMessage(tabId, message);
+            // console.log("Message sent successfully");
+            return res;
+        } catch (error) {
+            // console.warn(`Attempt ${attempt + 1} failed:`, error);
+            if (attempt < maxRetries - 1) {
+                await new Promise(resolve => setTimeout(resolve, baseDelay * Math.pow(2, attempt)));
+            }
+        }
+    }
+}
+
 const showNotification = async (identifier: string, tabId: number, cashbackPagePath: string | undefined): Promise<void> => {
     const notification = await checkNotifications(identifier, tabId, getCashbackUrl(cashbackPagePath))
 
     if (!notification.showNotification) return;
-
-    await chrome.tabs.sendMessage(tabId, {
+    await sendMessage(tabId, {
         action: 'INJECT',
         token: notification.token,
         page: 'notification',
-    });
+    })
 }
+
+interface UrlDict {
+    [key: string]: string
+}
+
+const urlsDict: UrlDict = {}
 
 interface Configuration {
     identifier: string
@@ -213,22 +250,27 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
         const optOut = await storage.get('optOut');
 
         if (optOut && optOut > Date.now()) {
-            showNotification(identifier, tabId, cashbackPagePath);
+            await showNotification(identifier, tabId, cashbackPagePath);
             return;
         }
 
-        const previousUrl = await storage.get('previousUrl');
-        if (changeInfo.status !== 'complete' || tab.url === previousUrl) return;
         if (!tab.url) return;
-        storage.set('previousUrl', tab.url)
-        console.log('fired:', tab.url);
 
-        const { url } = tab;
+        const urlObj = new URL(tab.url)
+        const url = `${urlObj.hostname.replace('www.', '')}${urlObj.pathname}`
 
-        const match = await getRelevantDomain(url);
+        const previousUrl = urlsDict[tabId];
+
+        if (changeInfo.status !== 'complete' || url === previousUrl) return;
+
+        urlsDict[tabId] = url
+
+        // console.log('fired:', tab.url);
+
+        const match = await getRelevantDomain(tab.url);
 
         if (!match || !match.length) {
-            showNotification(identifier, tabId, cashbackPagePath)
+            await showNotification(identifier, tabId, cashbackPagePath)
             return;
         };
 
@@ -238,7 +280,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
             apiKey: identifier,
             query: {
                 domain: match,
-                url,
+                url: tab.url,
                 address
             }
         });
@@ -247,21 +289,15 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
             addQuietDomain(match);
             return;
         }
-        try {
-            const res = await chrome.tabs.sendMessage(tabId, {
-                action: 'INJECT',
-                token,
-                domain: url
-            });
-        } catch (error) {
-            console.warn('error');
-            const res = await chrome.tabs.sendMessage(tabId, {
-                action: 'INJECT',
-                token,
-                domain: url
-            });
-        }
+
+        sendMessage(tabId, {
+            action: 'INJECT',
+            token,
+            domain: url
+        });
     })
+
+    chrome.tabs.onRemoved.addListener(tabId => delete urlsDict[tabId])
 }
 
 export default bringInitBackground

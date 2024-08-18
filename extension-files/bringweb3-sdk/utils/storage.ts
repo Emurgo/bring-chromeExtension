@@ -11,15 +11,15 @@ const remove = async (key: string) => {
     chrome.storage.local.remove(key)
 }
 
-const clear = async () => {
-    chrome.storage.local.clear(() => {
-        console.log('Cache cleared successfully')
-    })
-}
+// const clear = async () => {
+//     chrome.storage.local.clear(() => {
+//         console.log('Cache cleared successfully')
+//     })
+// }
 
 export default {
     set,
     get,
     remove,
-    clear
+    // clear
 }

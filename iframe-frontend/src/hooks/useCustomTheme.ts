@@ -5,7 +5,7 @@ import { themeNames } from "../utils/theme"
 const getThemeParams = (params: Record<string, string>) => {
     const theme: Record<string, string> = {}
     Object.entries(params).map(([key, value]) => {
-        if (key.startsWith('theme_')) theme[key.replace('theme_', '')] = value
+        if (key.startsWith('t_')) theme[key.replace('t_', '')] = value
     })
     return theme
 }

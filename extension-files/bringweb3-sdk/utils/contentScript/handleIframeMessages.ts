@@ -27,7 +27,7 @@ const handleIframeMessages = ({ event, iframeEl, promptLogin }: Props) => {
             applyStyles(iframeEl, style)
             break;
         case ACTIONS.CLOSE:
-            if (iframeEl) iframeEl.style.display = 'none'
+            if (iframeEl) iframeEl.parentNode?.removeChild(iframeEl)
             if (time) chrome.runtime.sendMessage({ action, time })
             break;
         case ACTIONS.PROMPT_LOGIN:
@@ -43,7 +43,7 @@ const handleIframeMessages = ({ event, iframeEl, promptLogin }: Props) => {
             addKeyframes(keyFrames)
             break;
         default:
-            console.log('Non exist ACTION:', action);
+            // console.log('Non exist ACTION:', action);
             break;
     }
 }

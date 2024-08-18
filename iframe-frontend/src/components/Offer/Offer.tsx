@@ -84,9 +84,13 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
     return (
         <div className={styles.container}>
             <CloseBtn />
-            <div className={styles.wallet_container}>
-                {info?.walletAddress ? <div className={styles.wallet}>{splitWordMaxFive(info.walletAddress)}</div> : null}
-            </div>
+            {info?.walletAddress ?
+                <div className={styles.wallet_container}>
+                    <div className={styles.wallet}>{splitWordMaxFive(info.walletAddress)}</div>
+                </div>
+                :
+                <div className={styles.wallet_spacer} />
+            }
             <PlatformLogo
                 platformName={info.platformName}
             />
@@ -135,7 +139,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         className={styles.waiting}>
-                        <div className={styles.message}>Waiting for you to sign in to your wallet</div>
+                        <div className={styles.message}>Log into your wallet to proceed</div>
                         <Oval
                             visible={true}
                             height="60"

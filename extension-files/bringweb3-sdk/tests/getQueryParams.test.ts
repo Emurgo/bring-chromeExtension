@@ -18,6 +18,6 @@ describe('getQueryParams', () => {
         const query = { param1: 'value1', param2: 'value2' }
         const params = getQueryParams({ query, prefix: 'theme' })
 
-        expect(params).toEqual('theme_param1=value1&theme_param2=value2')
+        expect(params).toEqual('t_param1=value1&t_param2=value2')
     })
 })
