@@ -42,7 +42,7 @@ bringInitContentScript({
         detailsRadius: "8px",
         detailsBorderW: "0",
         detailsBorderColor: "transparent",
-        detailsCashbackColor: "#5DEB5A",
+        detailsCashbackColor: "linear-gradient(135deg, #5DEB5A 0%, #FDFC47 100%)",
         overlayBg: "#192E34E6",
         overlayColor: "#DADCE5",
         optoutBg: "#192E34",

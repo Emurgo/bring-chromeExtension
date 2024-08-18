@@ -43,6 +43,24 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
         }
     }
 
+    const formatCashback = (amount: number, symbol: string) => {
+        switch (symbol) {
+            case '%':
+                return (amount / 100).toLocaleString(undefined, {
+                    style: 'percent',
+                    maximumFractionDigits: 2
+                })
+            case '$':
+                return amount.toLocaleString(undefined, {
+                    style: 'currency',
+                    currency: 'USD',
+                    maximumFractionDigits: 2
+                })
+            default:
+                return `${symbol}${amount}`
+        }
+    }
+
     useEffect(() => {
         window.addEventListener("message", walletAddressUpdate)
 
@@ -99,7 +117,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
                     <img src="/icons/coins.svg" alt="coins" height={42} />
                     <h2 className={styles.subtitle}>Earn Crypto Cashback</h2>
                 </div>
-                <span className={styles.sm_txt}>Receive up to <span className={styles.cashback_amount}>{parseFloat(info.maxCashback)}{info?.cashbackSymbol}</span> of your total spent in
+                <span className={styles.sm_txt}>Receive up to <span className={styles.cashback_amount}>{formatCashback(+info.maxCashback, info.cashbackSymbol)}</span> of your total spent in
                     <CryptoSymbolSelect
                         options={info.cryptoSymbols}
                         select={tokenSymbol}
