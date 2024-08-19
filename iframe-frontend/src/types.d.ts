@@ -20,7 +20,7 @@ interface Info {
     name: string
     maxCashback: string
     cashbackSymbol: string
-    currency: string
+    cashbackCurrency: string
     backgroundColor: string
     retailerTermsUrl: string
     generalTermsUrl: string
