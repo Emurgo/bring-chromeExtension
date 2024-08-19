@@ -1,5 +1,7 @@
 export const sendMessage = (message: Message) => {
-    window.parent.postMessage({ type: 'test', from: 'bringweb3', ...message }, '*')
+    const searchParams = new URLSearchParams(window.location.search);
+    const extensionId = searchParams.get('extensionId');
+    window.parent.postMessage({ from: 'bringweb3', ...message, extensionId }, '*')
 }
 
 export enum ACTIONS {

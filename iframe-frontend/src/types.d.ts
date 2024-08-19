@@ -20,6 +20,7 @@ interface Info {
     name: string
     maxCashback: string
     cashbackSymbol: string
+    currency: string
     backgroundColor: string
     retailerTermsUrl: string
     generalTermsUrl: string
@@ -32,5 +33,6 @@ interface Message {
     action?: ACTIONS
     time?: number
     style?: Styles
+    id?: string
     keyFrames?: Styles[]
 }

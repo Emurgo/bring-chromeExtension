@@ -16,11 +16,16 @@ const ACTIONS = {
     ADD_KEYFRAMES: 'ADD_KEYFRAMES'
 }
 
+const UNION_ACTIONS = [ACTIONS.ACTIVATE]
+
 const handleIframeMessages = ({ event, iframeEl, promptLogin }: Props) => {
     const { data } = event
-    const { from, action, style, keyFrames, time } = data
+    const { from, action, style, keyFrames, time, extensionId } = data
 
     if (from !== 'bringweb3') return
+
+    // If the event comes from another extension that installed our package, ignore it (unless it ACTIVATE action)
+    if (extensionId !== chrome.runtime.id && !UNION_ACTIONS.includes(action)) return
 
     switch (action) {
         case ACTIONS.OPEN:

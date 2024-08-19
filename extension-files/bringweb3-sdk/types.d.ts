@@ -19,6 +19,7 @@ interface BringEvent {
         action: string
         style?: Style[]
         keyFrames?: KeyFrame[]
+        extensionId: string
         time?: number
     }
 }

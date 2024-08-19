@@ -17,6 +17,7 @@ bringInitContentScript({
         // fontFamily: "'Matemasie', system-ui",
 
         popupBg: "#192E34",
+        // popupShadow: "rgba(0, 0, 0, 0.56) 0px 22px 70px 4px",
 
         primaryBtnBg: "linear-gradient(135deg, #5DEB5A 0%, #FDFC47 100%)",
         primaryBtnColor: "#041417",
