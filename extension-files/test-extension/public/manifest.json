@@ -18,7 +18,6 @@
   "permissions": [
     "storage",
     "tabs",
-    "scripting",
     "alarms"
   ],
   "content_scripts": [
@@ -32,6 +31,6 @@
     }
   ],
   "host_permissions": [
-    "*://*/*"
+    "https://*.bringweb3.io/*"
   ]
 }
