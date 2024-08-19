@@ -7,7 +7,7 @@ interface Styles {
 export const iframeStyle: Styles = {
     animation: 'slideIn .3s ease-in-out',
     width: '540px',
-    height: `350px`,
+    height: `356px`,
     borderRadius: '20px',
     display: 'block',
     top: '10px'

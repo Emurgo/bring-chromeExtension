@@ -55,6 +55,8 @@
     /* Token */
     --token-bg: transparent;
     --token-color: #DADCE5;
+    --token-border-w: 2px;
+    --token-border-color: #DADCE5;
     /* Notification-btn */
     --notification-btn-color: white;
     --notification-btn-bg: #1B254A;

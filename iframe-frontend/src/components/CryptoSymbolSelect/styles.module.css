@@ -1,8 +1,9 @@
 .cashback_symbol {
     display: inline-block;
     margin-left: 8px;
-    /* border: 1px dashed #DADCE5; */
-    background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='4' ry='4' stroke='%23DADCE5FF' stroke-width='3' stroke-dasharray='2%2c 10' stroke-dashoffset='1' stroke-linecap='square'/%3e%3c/svg%3e");
+    border-width: var(--token-border-w);
+    border-style: dashed;
+    border-color: var(--token-border-color);
     color: var(--token-color);
     min-width: 80px;
     text-align: center;
@@ -14,7 +15,9 @@
 
 .select {
     background: var(--token-bg);
-    /* border: 1px dashed #DADCE5; */
+    border-width: var(--token-border-w);
+    border-style: dashed;
+    border-color: var(--token-border-color);
     color: var(--token-color);
     border: 0;
     margin-left: 8px;
@@ -25,5 +28,4 @@
     font-size: 13px;
     outline: none;
     cursor: pointer;
-    background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='4' ry='4' stroke='%23DADCE5FF' stroke-width='3' stroke-dasharray='2%2c 10' stroke-dashoffset='1' stroke-linecap='square'/%3e%3c/svg%3e");
 }
