@@ -1,5 +1,7 @@
 type WalletAddress = string | undefined
 
+type Endpoint = 'sandbox' | 'prod';
+
 type IFrame = HTMLIFrameElement | null
 
 interface Style {
@@ -17,6 +19,7 @@ interface BringEvent {
         action: string
         style?: Style[]
         keyFrames?: KeyFrame[]
+        extensionId: string
         time?: number
     }
 }

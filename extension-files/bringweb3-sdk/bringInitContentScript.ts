@@ -3,7 +3,7 @@ import handleIframeMessages from "./utils/contentScript/handleIframeMessages.js"
 import startListenersForWalletAddress from "./utils/contentScript/startLIstenersForWalletAddress.js";
 
 let iframeEl: IFrame = null
-
+let isIframeOpen = false
 
 interface Configuration {
     iframeEndpoint: string
@@ -13,8 +13,33 @@ interface Configuration {
     customTheme?: Style
 }
 
-
-
+/**
+ * Initializes the content script for the Bring extension.
+ * 
+ * @async
+ * @function bringInitContentScript
+ * @param {Object} configuration - The configuration object.
+ * @param {Function} configuration.getWalletAddress - A function that returns a Promise resolving to the wallet address.
+ * @param {Function} configuration.promptLogin - A function to prompt the user to login.
+ * @param {string[]} configuration.walletAddressListeners - An array of strings representing wallet address listeners.
+ * @param {Object} [configuration.customTheme] - Optional custom theme settings.
+ * @param {string} configuration.iframeEndpoint - The endpoint URL for the iframe.
+ * @throws {Error} Throws an error if any required configuration is missing.
+ * @returns {Promise<void>}
+ * 
+ * @description
+ * This function sets up event listeners for wallet address changes, iframe messages,
+ * and Chrome runtime messages. It handles actions such as getting the wallet address
+ * and injecting iframes based on received messages.
+ * 
+ * @example
+ * bringInitContentScript({
+ *   getWalletAddress: async () => '0x1234...',
+ *   promptLogin: () => { ... },
+ *   walletAddressListeners: ["listener1", "listener2"],
+ *   iframeEndpoint: 'https://example.com/iframe'
+ * });
+ */
 const bringInitContentScript = async ({
     getWalletAddress,
     promptLogin,
@@ -38,6 +63,7 @@ const bringInitContentScript = async ({
 
     // Listen for message
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+
         const { action } = request
 
         switch (action) {
@@ -45,21 +71,28 @@ const bringInitContentScript = async ({
             case 'GET_WALLET_ADDRESS':
                 getWalletAddress()
                     .then(walletAddress => sendResponse({ status: 'success', walletAddress }))
+                    .catch(err => sendResponse({ status: 'success', walletAddress: undefined }))
                 return true
 
             case 'INJECT':
-                const { token } = request;
-                console.log(`injecting to: ${request.domain}`);
+                if (isIframeOpen) {
+                    return
+                }
+                const { token, page } = request;
+                // console.log(`injecting to: ${request.domain}`);
+
                 iframeEl = injectIFrame({
                     query: { token },
-                    iframeSrc: iframeEndpoint,
+                    iframeSrc: page === 'notification' ?
+                        `${iframeEndpoint}notification` : iframeEndpoint,
                     theme: customTheme
                 });
+                isIframeOpen = true
                 sendResponse({ status: 'success' });
                 return true
 
             default:
-                console.error(`Unkown action: ${action}`);
+                console.error(`Unknown action: ${action}`);
                 break;
         }
     });

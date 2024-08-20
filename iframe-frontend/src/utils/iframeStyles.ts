@@ -3,16 +3,23 @@ interface Styles {
     [key: string]: string
 }
 
-const IFRAME_HEIGHT = 350
 
 export const iframeStyle: Styles = {
     animation: 'slideIn .3s ease-in-out',
     width: '540px',
-    height: `${IFRAME_HEIGHT}px`,
-    // border: '.5px solid gray',
+    height: `356px`,
     borderRadius: '20px',
     display: 'block',
     top: '10px'
+}
+
+export const notificationIframeStyle: Styles = {
+    animation: 'slideIn .3s ease-in-out',
+    width: '400px',
+    height: `50px`,
+    borderRadius: '10px',
+    display: 'block',
+    top: '40px'
 }
 
 export const keyFrames: Styles[] =

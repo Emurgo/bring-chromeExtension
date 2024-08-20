@@ -1,23 +1,19 @@
 import { useEffect, useState } from 'react'
-import { useSearchParams } from './hooks/useSearchParams'
-import verify from './api/verify'
-import { iframeStyle, keyFrames } from './utils/iframeStyles'
-import { sendMessage, ACTIONS } from './utils/sendMessage'
-import Offer from './components/Offer/Offer'
 import { motion, AnimatePresence, Variants } from 'framer-motion'
-import Activate from './components/Activate/Activate'
-import useCustomTheme from './hooks/useCustomTheme'
+import { useRouteLoaderData } from 'react-router-dom'
+import Offer from '../../components/Offer/Offer'
+import Activate from '../../components/Activate/Activate'
+import { QUIET_TIME } from '../../config'
+import { sendMessage, ACTIONS } from '../../utils/sendMessage'
+import { iframeStyle } from '../../utils/iframeStyles'
 
 enum STEPS {
   OFFER = 0,
   ACTIVATE = 1
 }
 
-const App = () => {
-  useCustomTheme()
-  const { getParam } = useSearchParams()
-  const [info, setInfo] = useState<Info | null>(null)
-  const [show, setShow] = useState(false)
+const Home = () => {
+  const [info, setInfo] = useState<Info>(useRouteLoaderData('root') as Info)
   const [step, setStep] = useState(STEPS.OFFER)
   const [direction, setDirection] = useState(1)
   const [redirectUrl, setRedirectUrl] = useState('')
@@ -38,32 +34,13 @@ const App = () => {
   }
 
   useEffect(() => {
-    sendMessage({ action: ACTIONS.ADD_KEYFRAMES, keyFrames })
-
-    const verifyAndShow = async () => {
-      try {
-        const res = await verify(getParam('token'))
-        if (res.status !== 200) throw `got ${res.status} code`
-        setInfo(res.info)
-        setShow(true)
-        open()
-
-        loadMarkdown(res.info.retailerTermsUrl, setRetailerMarkdown)
-        loadMarkdown(res.info.generalTermsUrl, setGeneralMarkdown)
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    verifyAndShow()
+    sendMessage({ action: ACTIONS.OPEN, style: iframeStyle })
+    loadMarkdown(info.retailerTermsUrl, setRetailerMarkdown)
+    loadMarkdown(info.generalTermsUrl, setGeneralMarkdown)
   }, [])
 
-  const open = () => {
-    sendMessage({ action: ACTIONS.OPEN, style: iframeStyle })
-  }
-
   const close = () => {
-    sendMessage({ action: ACTIONS.CLOSE })
+    sendMessage({ action: ACTIONS.CLOSE, time: Date.now() + QUIET_TIME })
   }
 
   const setWalletAddress = (walletAddress: WalletAddress): void => {
@@ -88,7 +65,6 @@ const App = () => {
     }),
   };
 
-  if (!show || !info) return null
 
   return (
     <>
@@ -126,6 +102,7 @@ const App = () => {
                   redirectUrl={redirectUrl}
                   platformName={info.platformName}
                   walletAddress={info.walletAddress}
+                  retailerName={info.name}
                 />
                 :
                 null
@@ -137,4 +114,4 @@ const App = () => {
   )
 }
 
-export default App
+export default Home

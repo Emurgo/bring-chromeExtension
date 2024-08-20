@@ -1,5 +1,5 @@
 'use strict';
-import { bringInitContentScript } from "@bringweb3/sdk";
+import { bringInitContentScript } from "@bringweb3/chrome-extension-kit";
 
 bringInitContentScript({
     iframeEndpoint: process.env.IFRAME_ENDPOINT,
@@ -13,13 +13,59 @@ bringInitContentScript({
         "casper-wallet:locked"
     ],
     customTheme: {
-        primaryColor: '#FF0000',
-        secondaryColor: '#00FF00',
-        backgroundColor: '#0000FF',
-        textColor: '#FFFFFF',
-        borderRadius: '10px',
-        fontSize: '16px',
-        fontFamily: 'Arial, sans-serif'
+        // fontUrl: 'https://fonts.googleapis.com/css2?family=Matemasie&display=swap',
+        // fontFamily: "'Matemasie', system-ui",
+
+        popupBg: "#192E34",
+        // popupShadow: "rgba(0, 0, 0, 0.56) 0px 22px 70px 4px",
+
+        primaryBtnBg: "linear-gradient(135deg, #5DEB5A 0%, #FDFC47 100%)",
+        primaryBtnColor: "#041417",
+        primaryBtnBorderColor: "transparent",
+        primaryBtnBorderW: "0",
+        primaryBtnRadius: "8px",
+
+        secondaryBtnBg: "transparent",
+        secondaryBtnColor: "white",
+        secondaryBtnBorderColor: "rgba(149, 176, 178, 0.50)",
+        secondaryBtnBorderW: "2px",
+        secondaryBtnRadius: "8px",
+
+        markdownBg: "#07131766",
+        markdownColor: "#DADCE5",
+        markdownBorderW: "0",
+        markdownRadius: "4px",
+        markdownBorderColor: "black",
+        markdownScrollbarColor: "#DADCE5",
+
+        walletColor: "white",
+        walletBg: "#33535B",
+        walletBorderColor: "white",
+        walletBorderW: "0",
+        walletRadius: "4px",
+
+        detailsBg: "#33535B",
+        detailsColor: "white",
+        detailsRadius: "8px",
+        detailsBorderW: "0",
+        detailsBorderColor: "transparent",
+        detailsCashbackColor: "linear-gradient(135deg, #5DEB5A 0%, #FDFC47 100%)",
+
+        overlayBg: "#192E34E6",
+        overlayColor: "#DADCE5",
+
+        optoutBg: "#192E34",
+        optoutColor: "white",
+        optoutRadius: "56px",
+
+        closeColor: "#B9BBBF",
+
+        tokenBg: "transparent",
+        tokenColor: "#DADCE5",
+
+        notificationBtnColor: "#041417",
+        notificationBtnBg: "linear-gradient(135deg, #5DEB5A 0%, #FDFC47 100%)",
+        notificationBtnRadius: "8px"
     }
 });
 // TBD:

@@ -12,10 +12,11 @@ interface Props {
 }
 
 const injectIFrame = ({ query, theme, iframeSrc }: Props): HTMLIFrameElement => {
-    const params = getQueryParams({ query })
-    const customStyles = theme ? `&${getQueryParams({ query: theme, prefix: 'theme' })}` : ''
+    const extensionId = chrome.runtime.id;
+    const params = getQueryParams({ query: { ...query, extensionId } })
+    const customStyles = theme ? `&${getQueryParams({ query: theme, prefix: 't' })}` : ''
     const iframe = document.createElement('iframe');
-    iframe.id = "bringweb3-iframe";
+    iframe.id = `bringweb3-iframe:${extensionId}`;
     iframe.src = `${iframeSrc}?${params}${customStyles}`;
     iframe.setAttribute('sandbox', "allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation")
     iframe.style.position = "fixed";
@@ -27,6 +28,7 @@ const injectIFrame = ({ query, theme, iframeSrc }: Props): HTMLIFrameElement => 
     iframe.style.borderRadius = "10px";
     iframe.style.border = "none";
     iframe.style.cssText += `z-index: 99999999999999 !important;`;
+    if (theme?.popupShadow) iframe.style.boxShadow = theme.popupShadow;
     document.documentElement.appendChild(iframe);
     return iframe
 }

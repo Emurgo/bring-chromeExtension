@@ -7,6 +7,9 @@ import CloseBtn from '../CloseBtn/CloseBtn'
 import PlatformLogo from '../PlatformLogo/PlatformLogo'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 import splitWordMaxFive from '../../utils/splitWordMaxFive'
+import { useGoogleAnalytics } from '../../hooks/useGoogleAnalytics'
+import { Oval } from 'react-loader-spinner'
+import { motion, AnimatePresence } from 'framer-motion'
 interface BringEventData {
     from: string
     action: string
@@ -26,6 +29,7 @@ interface Props {
 }
 
 const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Props) => {
+    const { sendGaEvent } = useGoogleAnalytics()
     const [tokenSymbol, setTokenSymbol] = useState(info.cryptoSymbols[0])
     const [optOutOpen, setOptOutOpen] = useState(false)
     const [waiting, setWaiting] = useState(false)
@@ -36,6 +40,26 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
         setWalletAddress(walletAddress)
         if (waiting) {
             activateAction()
+        }
+    }
+
+    const formatCashback = (amount: number, symbol: string, currency: string) => {
+        try {
+            if (symbol === '%') {
+                return (amount / 100).toLocaleString(undefined, {
+                    style: 'percent',
+                    maximumFractionDigits: 2
+                })
+            }
+
+            return amount.toLocaleString(undefined, {
+                style: 'currency',
+                currency: currency,
+                maximumFractionDigits: 2
+            })
+
+        } catch (error) {
+            return `${symbol}${amount}`
         }
     }
 
@@ -64,6 +88,12 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
                 tokenSymbol
             })
             if (res.status !== 200) throw `Got ${res.status} status`
+            sendGaEvent('retailer_activation', {
+                category: 'user_action',
+                action: 'click',
+                process: 'activate',
+                details: info.name
+            })
             setRedirectUrl(res.url)
             nextFn()
         } catch (error) {
@@ -74,9 +104,13 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
     return (
         <div className={styles.container}>
             <CloseBtn />
-            <div className={styles.wallet_container}>
-                {info?.walletAddress ? <div className={styles.wallet}>{splitWordMaxFive(info.walletAddress)}</div> : null}
-            </div>
+            {info?.walletAddress ?
+                <div className={styles.wallet_container}>
+                    <div className={styles.wallet}>{splitWordMaxFive(info.walletAddress)}</div>
+                </div>
+                :
+                <div className={styles.wallet_spacer} />
+            }
             <PlatformLogo
                 platformName={info.platformName}
             />
@@ -85,7 +119,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
                     <img src="/icons/coins.svg" alt="coins" height={42} />
                     <h2 className={styles.subtitle}>Earn Crypto Cashback</h2>
                 </div>
-                <span className={styles.sm_txt}>Receive up to <span className={styles.cashback_amount}>{parseFloat(info.maxCashback)}{info?.cashbackSymbol}</span> of your total spent in
+                <span className={styles.sm_txt}>Receive up to <span className={styles.cashback_amount}>{formatCashback(+info.maxCashback, info.cashbackSymbol, info.cashbackCurrency)}</span> of your total spent in
                     <CryptoSymbolSelect
                         options={info.cryptoSymbols}
                         select={tokenSymbol}
@@ -98,7 +132,14 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
                 <div className={styles.btns_container}>
                     <button
                         className={styles.action_btn}
-                        onClick={closeFn}
+                        onClick={() => {
+                            sendGaEvent('popup_close', {
+                                category: 'user_action',
+                                action: 'click',
+                                details: 'extension'
+                            })
+                            closeFn()
+                        }}
                     >
                         Cancel
                     </button>
@@ -110,11 +151,33 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
                     </button>
                 </div>
             </div>
+            <AnimatePresence>
+                {waiting ?
+                    <motion.div
+                        transition={{ ease: 'easeInOut' }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className={styles.waiting}>
+                        <div className={styles.message}>Log into your wallet to proceed</div>
+                        <Oval
+                            visible={true}
+                            height="60"
+                            width="60"
+                            strokeWidth="4"
+                            strokeWidthSecondary="4"
+                            color="#0A2EC0"
+                            secondaryColor=""
+                            ariaLabel="oval-loading"
+                        />
+                    </motion.div>
+                    : null}
+            </AnimatePresence>
             <OptOut
                 open={optOutOpen}
                 onClose={() => setOptOutOpen(false)}
             />
-        </div>
+        </div >
     )
 }
 

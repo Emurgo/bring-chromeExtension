@@ -2,28 +2,32 @@
     position: absolute;
     inset: 0;
     z-index: 2;
-    background: var(--optout-overlay-bg-color);
+    background: var(--overlay-bg);
 }
 
 .card {
     position: absolute;
     z-index: 3;
     bottom: 0;
-    padding: 22px 0;
+    /* padding: 22px 0; */
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: end;
-    gap: 16px;
+    justify-content: center;
+    gap: 15px;
     width: 100%;
-    min-height: 93px;
-    background-color: var(--optout-bg-color);
+    height: 137px;
+    background: var(--optout-bg);
     box-shadow: 0px -2px 8px 0px rgba(255, 255, 255, 0.15);
+    border-top-left-radius: var(--optout-radius);
+    border-top-right-radius: var(--optout-radius);
 }
 
 .title {
-    color: var(--optout-close-button-color);
+    color: var(--optout-color);
     font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
 }
 
 .container {
@@ -34,25 +38,32 @@
 }
 
 .btn {
-    background: var(--optout-button-bg-color);
-    color: var(--optout-button-color);
-    border: var(--optout-button-border-size) solid var(--optout-button-border-color);
-    border-radius: 4px;
-    min-width: 100px;
-    padding: 8px 20px;
-    font-weight: 700;
+    background: var(--secondary-btn-bg);
+    color: var(--secondary-btn-color);
+    border-width: var(--secondary-btn-border-w);
+    border-style: solid;
+    border-color: var(--secondary-btn-border-color);
+    border-radius: var(--secondary-btn-radius);
+    min-width: 106px;
+    height: 28px;
+    font-weight: 500;
+    font-size: 13px;
     cursor: pointer;
     transition: .2s;
 }
 
+.message {
+    color: var(--optout-color);
+    text-align: center;
+}
+
 .btn:hover {
-    background: #8FA5FF;
-    color: #0F1429;
+    scale: 1.05;
 }
 
 .close_btn {
     background: transparent;
-    color: var(--optout-close-button-color);
+    color: var(--close-color);
     border: none;
     outline: none;
     font-size: 16px;

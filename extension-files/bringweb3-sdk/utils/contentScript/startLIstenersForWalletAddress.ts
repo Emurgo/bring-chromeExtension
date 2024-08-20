@@ -9,20 +9,18 @@ const startListenersForWalletAddress = ({ walletAddressListeners, getWalletAddre
         const eventName = walletAddressListeners[i]
         if (!eventName) continue
         window.addEventListener(eventName, async (e) => {
-            console.log('NEW EVENT');
+            // console.log('NEW EVENT');
             // console.log(e.detail);
 
 
             if (!iframeEl) {
-                iframeEl = document.querySelector('#bringweb3-iframe')
+                iframeEl = document.querySelector(`#bringweb3-iframe:${chrome.runtime.id}`)
                 if (!iframeEl) return
             }
             if (!iframeEl.contentWindow) {
-                console.log('No contentWindow');
                 return
             }
             const address = await getWalletAddress()
-            console.log({ address });
 
             iframeEl.contentWindow.postMessage({ action: 'WALLET_ADDRESS_UPDATE', walletAddress: address }, '*')
         });

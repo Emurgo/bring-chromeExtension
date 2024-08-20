@@ -36,10 +36,10 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          publish: yarn publish
-          version: yarn version
+          publish: yarn release
           commit: "chore(release): version SDK package"
           title: "chore(release): version SDK package"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          

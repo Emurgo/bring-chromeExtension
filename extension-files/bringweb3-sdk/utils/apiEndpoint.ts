@@ -1,5 +1,3 @@
-// config.ts
-export type Endpoint = 'sandbox' | 'prod';
 
 export class ApiEndpoint {
   private static instance: ApiEndpoint | null = null;
@@ -15,7 +13,7 @@ export class ApiEndpoint {
     return ApiEndpoint.instance;
   }
 
-  public setApiEndpoint(endpoint: Endpoint): void {
+  public setApiEndpoint(endpoint: string): void {
     this.apiEndpoint = endpoint === 'prod'
       ? 'https://api.bringweb3.io/v1/extension'
       : 'https://sandbox-api.bringweb3.io/v1/extension';
