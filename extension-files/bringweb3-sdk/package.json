@@ -16,6 +16,10 @@
     "test": "vitest --coverage",
     "release": "yarn build & changeset publish"
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "devDependencies": {
     "@changesets/cli": "^2.27.7",
     "@types/chrome": "^0.0.268",
