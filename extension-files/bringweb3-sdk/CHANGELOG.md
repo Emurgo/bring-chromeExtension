@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.0.3
+
+### Patch Changes
+
+- 60cf2dc: Publish bug fixed
+
 ## 1.0.2
 
 ### Patch Changes
