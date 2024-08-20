@@ -1,10 +1,69 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+/* OPTIONS PER COMPONENT */
+/* 
+    bg
+    color
+    border-w
+    border-color
+    border-radius
+    weight
+*/
 
-* {
-    font-family: "Open Sans", sans-serif;
+:root {
+    /* popup */
+    --popup-bg: #0F1429;
+    /* Primary Buttons */
+    --primary-btn-bg: #B2332D;
+    --primary-btn-color: white;
+    --primary-btn-border-color: transparent;
+    --primary-btn-border-w: 0;
+    --primary-btn-radius: 4px;
+    /* Secondary Buttons */
+    --secondary-btn-bg: #1B254A;
+    --secondary-btn-color: #8FA5FF;
+    --secondary-btn-border-color: gray;
+    --secondary-btn-border-w: 0;
+    --secondary-btn-radius: 4px;
+    /* Markdown files */
+    --markdown-bg: #161D3B;
+    --markdown-color: #DADCE5;
+    --markdown-border-w: 0;
+    --markdown-radius: 4px;
+    --markdown-border-color: black;
+    --markdown-scrollbar-color: #DADCE5;
+    /* WalletAddress */
+    --wallet-color: #DADCE5;
+    --wallet-bg: #161D3B;
+    --wallet-border-color: white;
+    --wallet-border-w: 0;
+    --wallet-radius: 4px;
+    /* Details */
+    --details-bg: #161D3B;
+    --details-color: #DADCE5;
+    --details-radius: 8px;
+    --details-border-w: 0;
+    --details-border-color: transparent;
+    --details-cashback-color: #8FA5FF;
+    /* Overlay */
+    --overlay-bg: rgba(15, 20, 41, 0.95);
+    --overlay-color: #DADCE5;
+    /* Opt out */
+    --optout-bg: #0F1429;
+    --optout-color: #DADCE5;
+    --optout-radius: 0;
+    /* X/Close/Cancel buttons */
+    --close-color: #B9BBBF;
+    /* Token */
+    --token-bg: transparent;
+    --token-color: #DADCE5;
+    --token-border-w: 2px;
+    --token-border-color: #DADCE5;
+    /* Notification-btn */
+    --notification-btn-color: white;
+    --notification-btn-bg: #1B254A;
+    --notification-btn-radius: 4px;
 }
 
 body {
     margin: 0;
-    background: #0f2f34;
+    background: var(--popup-bg);
 }

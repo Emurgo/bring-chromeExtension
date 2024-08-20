@@ -1,10 +1,10 @@
 'use strict';
 
 const { merge } = require('webpack-merge');
-const path = require('path');
 
 const common = require('./webpack.common.js');
 const PATHS = require('./paths');
+const webpack = require('webpack');
 
 // Merge webpack configuration files
 const config = merge(common, {
@@ -12,19 +12,17 @@ const config = merge(common, {
     contentScript: PATHS.src + '/contentScript.js',
     background: PATHS.src + '/background.js',
   },
-  // resolve: {
-  //   symlinks: false,
-  //   modules: [
-  //     'node_modules',
-  //     path.resolve(__dirname, '..', '..', '..', 'bringweb3-sdk'),
-  //   ],
-  //   alias: {
-  //     '/utils': path.resolve(__dirname, '..', '..', '..', 'bringweb3-sdk', 'utils'),
-  //   }
-  // },
   watchOptions: {
-    ignored: /node_modules\/(?!bringweb3-sdk)/,
+    ignored: /node_modules\/(?!@bringweb3\/sdk)/,
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env': {
+        'PLATFORM_IDENTIFIER': JSON.stringify(process.env.PLATFORM_IDENTIFIER),
+        'IFRAME_ENDPOINT': JSON.stringify(process.env.IFRAME_ENDPOINT)
+      }
+    })
+  ]
 });
 
 module.exports = config;
