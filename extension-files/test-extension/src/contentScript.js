@@ -1,5 +1,5 @@
 'use strict';
-import { bringInitContentScript } from "@bringweb3/sdk";
+import { bringInitContentScript } from "@bringweb3/chrome-extension-kit";
 
 bringInitContentScript({
     iframeEndpoint: process.env.IFRAME_ENDPOINT,

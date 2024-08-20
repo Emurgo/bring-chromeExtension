@@ -1,5 +1,5 @@
 'use strict';
-import { bringInitBackground } from '@bringweb3/sdk'
+import { bringInitBackground } from '@bringweb3/chrome-extension-kit'
 
 bringInitBackground({
     identifier: process.env.PLATFORM_IDENTIFIER,
