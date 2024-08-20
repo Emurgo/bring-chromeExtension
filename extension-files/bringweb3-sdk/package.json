@@ -1,19 +1,20 @@
 {
   "name": "@bringweb3/chrome-extension-kit",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "license": "MIT",
-  "private": true,
+  "private": false,
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   },
   "scripts": {
     "watch": "tsup index.ts --format cjs,esm --dts --watch",
     "build": "tsup index.ts --format cjs,esm --dts --minify",
     "lint": "tsc",
-    "test": "vitest --coverage"
+    "test": "vitest --coverage",
+    "release": "yarn build & changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.7",
