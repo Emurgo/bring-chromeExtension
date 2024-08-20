@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.0.2
+
+### Patch Changes
+
+- 10a19e9: Remove testing flags
+
 ## 1.0.1
 
 ### Patch Changes
