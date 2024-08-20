@@ -265,8 +265,6 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
 
         urlsDict[tabId] = url
 
-        // console.log('fired:', tab.url);
-
         const match = await getRelevantDomain(tab.url);
 
         if (!match || !match.length) {
