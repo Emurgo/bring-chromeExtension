@@ -14,7 +14,7 @@
     "build": "tsup index.ts --format cjs,esm --dts --minify",
     "lint": "tsc",
     "test": "vitest --coverage",
-    "release": "yarn build & changeset publish"
+    "release": "yarn build && changeset publish"
   },
   "files": [
     "dist",
