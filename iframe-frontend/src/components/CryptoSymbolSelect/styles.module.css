@@ -3,7 +3,7 @@
     margin-left: 8px;
     border-width: var(--token-border-w);
     border-style: dashed;
-    border-color: var(--token-border-color);
+    border-color: var(--token-border-c);
     color: var(--token-color);
     min-width: 80px;
     text-align: center;
@@ -15,17 +15,17 @@
 
 .select {
     background: var(--token-bg);
+    font-size: var(--token-f-s);
+    font-weight: var(--token-f-w);
+    color: var(--token-f-c);
     border-width: var(--token-border-w);
     border-style: dashed;
-    border-color: var(--token-border-color);
-    color: var(--token-color);
+    border-color: var(--token-border-c);
     border: 0;
     margin-left: 8px;
     padding: 4px 9px;
     text-align: center;
     border-radius: 4px;
-    font-weight: 600;
-    font-size: 13px;
     outline: none;
     cursor: pointer;
 }

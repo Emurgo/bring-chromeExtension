@@ -14,7 +14,7 @@
 .icon {
     width: 16px;
     height: 16px;
-    background: var(--close-color);
+    background: var(--close-f-c);
 
     -webkit-mask-size: 100%;
     -webkit-mask-repeat: no-repeat;

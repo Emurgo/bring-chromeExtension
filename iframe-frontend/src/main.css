@@ -3,7 +3,7 @@
     bg
     color
     border-w
-    border-color
+    border-c
     border-radius
     weight
 */
@@ -13,53 +13,83 @@
     --popup-bg: #0F1429;
     /* Primary Buttons */
     --primary-btn-bg: #B2332D;
-    --primary-btn-color: white;
-    --primary-btn-border-color: transparent;
+    --primary-btn-f-c: white;
+    --primary-btn-f-w: 600;
+    --primary-btn-f-s: 14px;
+    --primary-btn-border-c: transparent;
     --primary-btn-border-w: 0;
     --primary-btn-radius: 4px;
     /* Secondary Buttons */
     --secondary-btn-bg: #1B254A;
-    --secondary-btn-color: #8FA5FF;
-    --secondary-btn-border-color: gray;
+    --secondary-btn-f-s: 12px;
+    --secondary-btn-f-w: 500;
+    --secondary-btn-f-c: #8FA5FF;
+    --secondary-btn-border-c: gray;
     --secondary-btn-border-w: 0;
     --secondary-btn-radius: 4px;
     /* Markdown files */
     --markdown-bg: #161D3B;
-    --markdown-color: #DADCE5;
+    --markdown-f-s: 12px;
+    --markdown-f-c: #DADCE5;
     --markdown-border-w: 0;
     --markdown-radius: 4px;
-    --markdown-border-color: black;
-    --markdown-scrollbar-color: #DADCE5;
+    --markdown-border-c: black;
+    --markdown-scrollbar-c: #DADCE5;
     /* WalletAddress */
-    --wallet-color: #DADCE5;
     --wallet-bg: #161D3B;
-    --wallet-border-color: white;
+    --wallet-f-s: 10px;
+    --wallet-f-w: 400;
+    --wallet-f-c: #DADCE5;
+    --wallet-border-c: white;
     --wallet-border-w: 0;
     --wallet-radius: 4px;
     /* Details */
     --details-bg: #161D3B;
-    --details-color: #DADCE5;
+    --details-title-f-s: 15px;
+    --details-title-f-w: 600;
+    --details-title-f-c: #DADCE5;
+    --details-subtitle-f-s: 14px;
+    --details-subtitle-f-w: 500;
+    --details-subtitle-f-c: #A8ADBF;
     --details-radius: 8px;
     --details-border-w: 0;
-    --details-border-color: transparent;
-    --details-cashback-color: #8FA5FF;
+    --details-border-c: transparent;
+    --details-amount-f-c: #8FA5FF;
+    --details-amount-f-w: 700;
     /* Overlay */
     --overlay-bg: rgba(15, 20, 41, 0.95);
-    --overlay-color: #DADCE5;
+    --overlay-f-s: 13px;
+    --overlay-f-w: 400;
+    --overlay-f-c: #DADCE5;
+    /* Overlay loader */
+    --loader-bg: #0A2EC0;
     /* Opt out */
     --optout-bg: #0F1429;
-    --optout-color: #DADCE5;
+    --optout-f-s: 14px;
+    --optout-f-w: 400;
+    --optout-f-c: #DADCE5;
     --optout-radius: 0;
     /* X/Close/Cancel buttons */
-    --close-color: #B9BBBF;
+    --close-f-s: 9px;
+    --close-f-w: 300;
+    --close-f-c: #B9BBBF;
     /* Token */
     --token-bg: transparent;
-    --token-color: #DADCE5;
+    --token-f-s: 13px;
+    --token-f-w: 600;
+    --token-f-c: #DADCE5;
     --token-border-w: 2px;
-    --token-border-color: #DADCE5;
-    /* Notification-btn */
-    --notification-btn-color: white;
+    --token-border-c: #DADCE5;
+    /* Notification-popup */
+    --notification-f-s: 14px;
+    --notification-f-w: 500;
+    --notification-f-c: white;
     --notification-btn-bg: #1B254A;
+    --notification-btn-f-s: 12px;
+    --notification-btn-f-w: 500;
+    --notification-btn-f-c: white;
+    --notification-btn-border-w: 0;
+    --notification-btn-border-c: transparent;
     --notification-btn-radius: 4px;
 }
 
