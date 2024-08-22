@@ -1,5 +1,12 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.0.4
+
+### Patch Changes
+
+- 4ab2e4b: package.json update
+- 4ab2e4b: Fix issue with popup after activation, add version to iframe
+
 ## 1.0.3
 
 ### Patch Changes
