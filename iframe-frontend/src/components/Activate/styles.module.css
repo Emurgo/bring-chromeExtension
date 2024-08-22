@@ -19,12 +19,12 @@
 }
 
 .wallet {
-    color: var(--wallet-color);
-    font-size: 10px;
-    font-weight: 400;
+    color: var(--wallet-f-c);
+    font-size: var(--wallet-f-s);
+    font-weight: var(--wallet-f-w);
     border-width: var(--wallet-border-w);
     border-style: solid;
-    border-color: var(--wallet-border-color);
+    border-color: var(--wallet-border-c);
 }
 
 .subcontainer {
@@ -44,17 +44,17 @@
 }
 
 .activate_btn {
-    color: var(--primary-btn-color);
+    font-size: var(--primary-btn-f-s);
+    font-weight: var(--primary-btn-f-w);
+    color: var(--primary-btn-f-c);
     background: var(--primary-btn-bg);
     border-width: var(--primary-btn-border-w);
-    border-color: var(--primary-btn-border-color);
     border-style: solid;
+    border-color: var(--primary-btn-border-c);
     border-radius: var(--primary-btn-radius);
     width: 290px;
     height: 36px;
     line-height: 36px;
-    font-weight: 600;
-    font-size: 14px;
     text-align: center;
     text-decoration: none;
 }
@@ -64,11 +64,11 @@
     border-radius: var(--markdown-radius);
     border-width: var(--markdown-border-w);
     border-style: solid;
-    border-color: var(--markdown-border-color);
+    border-color: var(--markdown-border-c);
     max-height: 102px;
-    color: var(--markdown-color);
+    color: var(--markdown-f-c);
     background: var(--markdown-bg);
-    font-size: 12px;
+    font-size: var(--markdown-f-s);
     box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.05);
     overflow-y: scroll;
     margin-bottom: 25px;

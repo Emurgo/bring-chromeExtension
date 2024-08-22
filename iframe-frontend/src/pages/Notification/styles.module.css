@@ -4,22 +4,26 @@
     min-height: 50px;
     align-items: center;
     justify-content: flex-start;
-    color: white;
     padding-left: 8px;
 }
 
 .notification_details {
-    font-size: 14px;
+    font-size: var(--notification-f-s);
+    font-weight: var(--notification-f-w);
+    color: var(--notification-f-c);
 }
 
 .link {
     text-decoration: none;
-    color: var(--notification-btn-color);
+    font-size: var(--notification-btn-f-s);
+    font-weight: var(--notification-btn-f-w);
+    color: var(--notification-btn-f-c);
     text-align: center;
     width: 102px;
     padding: 5px 0;
-    font-size: 12px;
-    font-weight: 500;
     border-radius: var(--notification-btn-radius);
+    border-width: var(--notification-btn-border-w);
+    border-style: var(--notification-btn-border-c);
+    border-color: transparent;
     background: var(--notification-btn-bg);
 }

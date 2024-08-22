@@ -256,8 +256,9 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
 
         if (!tab.url) return;
 
-        const urlObj = new URL(tab.url)
-        const url = `${urlObj.hostname.replace('www.', '')}${urlObj.pathname}`
+        const url = tab.url.replace('www.', '')
+        // const urlObj = new URL(tab.url)
+        // const url = `${urlObj.hostname.replace('www.', '')}${urlObj.pathname}`
 
         const previousUrl = urlsDict[tabId];
 
