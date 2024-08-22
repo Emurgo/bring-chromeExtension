@@ -24,9 +24,9 @@
 }
 
 .title {
-    color: var(--optout-color);
-    font-weight: 400;
-    font-size: 14px;
+    font-size: var(--optout-f-s);
+    font-weight: var(--optout-f-w);
+    color: var(--optout-f-c);
     line-height: 16px;
 }
 
@@ -39,35 +39,39 @@
 
 .btn {
     background: var(--secondary-btn-bg);
-    color: var(--secondary-btn-color);
+    color: var(--secondary-btn-f-c);
+    font-size: var(--secondary-btn-f-s);
+    font-weight: var(--secondary-btn-f-w);
     border-width: var(--secondary-btn-border-w);
     border-style: solid;
-    border-color: var(--secondary-btn-border-color);
+    border-color: var(--secondary-btn-border-c);
     border-radius: var(--secondary-btn-radius);
     min-width: 106px;
     height: 28px;
-    font-weight: 500;
-    font-size: 13px;
     cursor: pointer;
     transition: .2s;
 }
 
-.message {
-    color: var(--optout-color);
-    text-align: center;
+.btn:hover,
+.btn:visited {
+    background: var(--secondary-btn-f-c);
+    color: var(--secondary-btn-bg);
 }
 
-.btn:hover {
-    scale: 1.05;
+.message {
+    font-size: var(--optout-f-s);
+    font-weight: var(--optout-f-w);
+    color: var(--optout-f-c);
+    text-align: center;
 }
 
 .close_btn {
     background: transparent;
-    color: var(--close-color);
+    color: var(--close-f-c);
+    font-size: var(--close-f-s);
+    font-weight: var(--close-f-w);
     border: none;
     outline: none;
-    font-size: 16px;
     cursor: pointer;
-    font-size: 9px;
     line-height: 16px;
 }

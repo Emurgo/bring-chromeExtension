@@ -10,15 +10,12 @@ import splitWordMaxFive from '../../utils/splitWordMaxFive'
 import { useGoogleAnalytics } from '../../hooks/useGoogleAnalytics'
 import { Oval } from 'react-loader-spinner'
 import { motion, AnimatePresence } from 'framer-motion'
+
 interface BringEventData {
     from: string
     action: string
     walletAddress: WalletAddress
 }
-
-// interface BringEvent {
-//     data: BringEventData
-// }
 
 interface Props {
     info: Info
@@ -166,7 +163,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
                             width="60"
                             strokeWidth="4"
                             strokeWidthSecondary="4"
-                            color="#0A2EC0"
+                            color="var(--loader-bg)"
                             secondaryColor=""
                             ariaLabel="oval-loading"
                         />

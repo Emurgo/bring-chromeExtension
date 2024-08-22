@@ -1,5 +1,5 @@
 import getQueryParams from "../getQueryParams";
-
+import getVersion from "../getVersion";
 interface Query {
     [key: string]: string
 
@@ -13,7 +13,7 @@ interface Props {
 
 const injectIFrame = ({ query, theme, iframeSrc }: Props): HTMLIFrameElement => {
     const extensionId = chrome.runtime.id;
-    const params = getQueryParams({ query: { ...query, extensionId } })
+    const params = getQueryParams({ query: { ...query, extensionId, v: getVersion() } })
     const customStyles = theme ? `&${getQueryParams({ query: theme, prefix: 't' })}` : ''
     const iframe = document.createElement('iframe');
     iframe.id = `bringweb3-iframe:${extensionId}`;
