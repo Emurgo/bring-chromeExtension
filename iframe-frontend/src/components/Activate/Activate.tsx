@@ -37,7 +37,7 @@ const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName
                 <PlatformLogo
                     platformName={platformName}
                 />
-                <p className={styles.p}>Once your purchase is approved, you'll be notified.<br />It can take up to <b><u>48 hours.</u></b></p>
+                <p className={styles.p}>Once your purchase is approved, you'll be notified.<br />It can take up to <u className={styles.bold}>48 hours.</u></p>
             </div>
             <Markdown className={styles.markdown}>
                 {`${retailerMarkdown}${generalMarkdown}`}

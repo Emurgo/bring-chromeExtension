@@ -277,7 +277,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
 
         const { token, isValid } = await validateDomain({
             apiKey: identifier,
-            query: {
+            body: {
                 domain: match,
                 url: tab.url,
                 address
@@ -285,7 +285,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
         });
 
         if (!isValid) {
-            addQuietDomain(match);
+            if (isValid === false) addQuietDomain(match);
             return;
         }
 
