@@ -37,10 +37,18 @@
 }
 
 .p {
-    font-size: 14px;
+    font-size: var(--activate-title-f-s);
+    font-weight: var(--activate-title-f-W);
+    color: var(--activate-title-f-c);
     margin: 0;
     line-height: 18px;
     text-align: center;
+}
+
+.bold {
+    font-size: var(--activate-title-bold-f-s);
+    font-weight: var(--activate-title-bold-f-w);
+    color: var(--activate-title-bold-f-c);
 }
 
 .activate_btn {

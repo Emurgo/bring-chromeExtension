@@ -14,10 +14,10 @@ interface Body {
 
 const checkEvents = async ({ apiKey, walletAddress, cashbackUrl }: CheckEventsProps) => {
     const endpoint = ApiEndpoint.getInstance().getApiEndpoint()
-    const body: Body = { walletAddress }
+    const body: Body = { walletAddress, test: true }
     if (cashbackUrl) body.cashbackUrl = cashbackUrl;
 
-    const res = await fetch(`${endpoint}/check-events`, {
+    const res = await fetch(`${endpoint}/check/notification`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

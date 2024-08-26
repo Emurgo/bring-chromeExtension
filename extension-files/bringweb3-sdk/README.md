@@ -205,7 +205,13 @@ bringInitContentScript({
         notificationBtnFC: "#041417",
         notificationBtnBorderW: "0",
         notificationBtnBorderC: "transparent",
-        notificationBtnRadius: "8px"
+        notificationBtnRadius: "8px",
+        activateTitleFS: "--activate-title-f-s",
+        activateTitleFW: "--activate-title-f-w",
+        activateTitleFC: "--activate-title-f-c",
+        activateTitleBoldFS: "--activate-title-bold-f-s",
+        activateTitleBoldFW: "--activate-title-bold-f-w",
+        activateTitleBoldFC: "--activate-title-bold-f-c",
     }
 });
 ```

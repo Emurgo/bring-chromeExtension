@@ -72,5 +72,11 @@ export const themeNames: ThemeNames = {
     notificationBtnFC: "--notification-btn-f-c",
     notificationBtnBorderW: "--notification-btn-border-w",
     notificationBtnBorderC: "--notification-btn-border-c",
-    notificationBtnRadius: "--notification-btn-radius"
+    notificationBtnRadius: "--notification-btn-radius",
+    activateTitleFS: "--activate-title-f-s",
+    activateTitleFW: "--activate-title-f-w",
+    activateTitleFC: "--activate-title-f-c",
+    activateTitleBoldFS: "--activate-title-bold-f-s",
+    activateTitleBoldFW: "--activate-title-bold-f-w",
+    activateTitleBoldFC: "--activate-title-bold-f-c",
 }

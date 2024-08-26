@@ -86,7 +86,14 @@ const theme = {
     notificationBtnFC: "#041417",
     notificationBtnBorderW: "0",
     notificationBtnBorderC: "transparent",
-    notificationBtnRadius: "8px"
+    notificationBtnRadius: "8px",
+    // Activate title
+    activateTitleFS: "14px",
+    activateTitleFW: "400",
+    activateTitleFC: "#fff",
+    activateTitleBoldFS: "14px",
+    activateTitleBoldFW: "700",
+    activateTitleBoldFC: "#fff",
 }
 
 bringInitContentScript({
