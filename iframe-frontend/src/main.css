@@ -91,6 +91,13 @@
     --notification-btn-border-w: 0;
     --notification-btn-border-c: transparent;
     --notification-btn-radius: 4px;
+    /* Activate title */
+    --activate-title-f-s: 14px;
+    --activate-title-f-w: 400;
+    --activate-title-f-c: #fff;
+    --activate-title-bold-f-s: 14px;
+    --activate-title-bold-f-w: 700;
+    --activate-title-bold-f-c: #fff;
 }
 
 body {

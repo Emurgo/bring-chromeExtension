@@ -3,7 +3,7 @@ import getQueryParams from "../getQueryParams";
 
 interface ValidateDomainProps {
     apiKey: string,
-    query: {
+    body: {
         url: string,
         domain: string,
         address: WalletAddress,
@@ -11,14 +11,16 @@ interface ValidateDomainProps {
     }
 }
 
-const validateDomain = async ({ apiKey, query }: ValidateDomainProps) => {
+const validateDomain = async ({ apiKey, body }: ValidateDomainProps) => {
     const endpoint = ApiEndpoint.getInstance().getApiEndpoint()
-    const params = getQueryParams({ query: { ...query, country: 'us' } })
 
-    const res = await fetch(`${endpoint}/token?${params.toString()}`, {
+    const res = await fetch(`${endpoint}/check/popup`, {
+        method: 'POST',
         headers: {
+            'Content-Type': 'application/json',
             'x-api-key': apiKey
-        }
+        },
+        body: JSON.stringify(body)
     })
     const json = await res.json()
     // console.log({ json });
