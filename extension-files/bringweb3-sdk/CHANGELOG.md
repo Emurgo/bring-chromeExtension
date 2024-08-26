@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.0.5
+
+### Patch Changes
+
+- e5daa89: Change endpoints and add some customTheme options
+
 ## 1.0.4
 
 ### Patch Changes
