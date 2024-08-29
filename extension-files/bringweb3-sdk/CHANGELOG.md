@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.0.7
+
+### Patch Changes
+
+- 37fdf9c: Add prefix to all storage keys
+
 ## 1.0.6
 
 ### Patch Changes
