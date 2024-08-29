@@ -81,6 +81,8 @@ const getDomain = (url: string) => {
 
 const getRelevantDomain = async (url: string | undefined) => {
     const relevantDomains = await storage.get('relevantDomains')
+    console.log({ relevantDomains });
+
     if (!url || !relevantDomains || !relevantDomains.length) return ''
     const domain = getDomain(url)
     for (const relevantDomain of relevantDomains) {
@@ -269,6 +271,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
         urlsDict[tabId] = url
 
         const match = await getRelevantDomain(tab.url);
+        console.log({ match });
 
         if (!match || !match.length) {
             await showNotification(identifier, tabId, cashbackPagePath)
