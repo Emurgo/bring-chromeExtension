@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.0.8
+
+### Patch Changes
+
+- f529db6: Fix bug with storage naming
+
 ## 1.0.7
 
 ### Patch Changes
