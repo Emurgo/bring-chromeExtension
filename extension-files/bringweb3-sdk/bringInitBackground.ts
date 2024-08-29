@@ -48,6 +48,7 @@ const updateCache = async (apiKey: string) => {
     chrome.alarms.create(UPDATE_CACHE_ALARM_NAME, {
         delayInMinutes: delay
     })
+    return res.relevantDomains
 }
 
 const checkNotifications = async (apiKey: string, tabId: number, cashbackUrl: string | undefined, isAfterActivation?: boolean) => {
@@ -79,9 +80,12 @@ const getDomain = (url: string) => {
     return url.replace(/^(https?:\/\/)?(www\.)?/, '');
 }
 
-const getRelevantDomain = async (url: string | undefined) => {
-    const relevantDomains = await storage.get('relevantDomains')
-    console.log({ relevantDomains });
+const getRelevantDomain = async (url: string | undefined, apiKey: string) => {
+    let relevantDomains = await storage.get('relevantDomains')
+
+    if (relevantDomains === undefined) {
+        relevantDomains = await updateCache(apiKey)
+    }
 
     if (!url || !relevantDomains || !relevantDomains.length) return ''
     const domain = getDomain(url)
@@ -240,7 +244,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
                 storage.set('optOut', Date.now() + time)
                 break;
             case 'CLOSE':
-                const domain = await getRelevantDomain(sender.tab?.url || sender.origin)
+                const domain = await getRelevantDomain(sender.tab?.url || sender.origin, identifier)
                 if (!domain) break;
                 addQuietDomain(domain, time)
                 break;
@@ -270,8 +274,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
 
         urlsDict[tabId] = url
 
-        const match = await getRelevantDomain(tab.url);
-        console.log({ match });
+        const match = await getRelevantDomain(tab.url, identifier);
 
         if (!match || !match.length) {
             await showNotification(identifier, tabId, cashbackPagePath)
