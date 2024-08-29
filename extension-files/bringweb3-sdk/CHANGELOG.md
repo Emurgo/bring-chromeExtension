@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.0.6
+
+### Patch Changes
+
+- feec7cb: Handle unwanted messages from inside the extension
+
 ## 1.0.5
 
 ### Patch Changes
