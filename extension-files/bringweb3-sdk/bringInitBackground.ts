@@ -223,7 +223,9 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
     })
 
     chrome.runtime.onMessage.addListener(async (request, sender) => {
-        const { action, time } = request
+        const { action, time, from } = request
+
+        if (from !== 'bringweb3') return
 
         switch (action) {
             case 'ACTIVATE':
