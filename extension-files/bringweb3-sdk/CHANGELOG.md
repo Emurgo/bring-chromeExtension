@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.0.9
+
+### Patch Changes
+
+- 2496cd3: Fix refetch on case someone clear the storage
+
 ## 1.0.8
 
 ### Patch Changes
