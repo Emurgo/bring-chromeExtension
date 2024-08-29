@@ -1,14 +1,14 @@
 const set = async (key: string, value: any) => {
-    chrome.storage.local.set({ [key]: value });
+    chrome.storage.local.set({ [`bring_${key}`]: value });
 }
 
 const get = async (key: string) => {
-    const data = await chrome.storage.local.get(key)
+    const data = await chrome.storage.local.get(`bring_${key}`)
     return data[key]
 }
 
 const remove = async (key: string) => {
-    chrome.storage.local.remove(key)
+    chrome.storage.local.remove(`bring_${key}`)
 }
 
 // const clear = async () => {
