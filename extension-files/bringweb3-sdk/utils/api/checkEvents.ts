@@ -14,7 +14,7 @@ interface Body {
 
 const checkEvents = async ({ apiKey, walletAddress, cashbackUrl }: CheckEventsProps) => {
     const endpoint = ApiEndpoint.getInstance().getApiEndpoint()
-    const body: Body = { walletAddress, test: true }
+    const body: Body = { walletAddress }
     if (cashbackUrl) body.cashbackUrl = cashbackUrl;
 
     const res = await fetch(`${endpoint}/check/notification`, {

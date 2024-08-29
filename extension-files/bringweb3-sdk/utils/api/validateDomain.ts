@@ -1,5 +1,5 @@
 import { ApiEndpoint } from "../apiEndpoint";
-import getQueryParams from "../getQueryParams";
+// import getQueryParams from "../getQueryParams";
 
 interface ValidateDomainProps {
     apiKey: string,
