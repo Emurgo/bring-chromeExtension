@@ -4,7 +4,7 @@ const set = async (key: string, value: any) => {
 
 const get = async (key: string) => {
     const data = await chrome.storage.local.get(`bring_${key}`)
-    return data[key]
+    return data[`bring_${key}`]
 }
 
 const remove = async (key: string) => {
