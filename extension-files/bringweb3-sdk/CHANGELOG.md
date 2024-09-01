@@ -1,5 +1,12 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.0.10
+
+### Patch Changes
+
+- 924bba7: Set default alarm timing
+- 006224d: Add compitabillity for storage API V2
+
 ## 1.0.9
 
 ### Patch Changes
