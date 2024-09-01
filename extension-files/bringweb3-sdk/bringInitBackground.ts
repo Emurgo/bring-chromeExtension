@@ -46,7 +46,7 @@ const updateCache = async (apiKey: string) => {
     const delay = calcDelay(nextUpdateTimestamp)
 
     chrome.alarms.create(UPDATE_CACHE_ALARM_NAME, {
-        delayInMinutes: delay
+        delayInMinutes: delay || 60 * 24 * 2
     })
     return res.relevantDomains
 }
