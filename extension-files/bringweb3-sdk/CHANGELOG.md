@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.0.11
+
+### Patch Changes
+
+- 2eb1803: Fix iframe id
+
 ## 1.0.10
 
 ### Patch Changes
