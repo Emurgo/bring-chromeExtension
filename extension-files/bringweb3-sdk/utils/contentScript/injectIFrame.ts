@@ -13,10 +13,13 @@ interface Props {
 
 const injectIFrame = ({ query, theme, iframeSrc }: Props): HTMLIFrameElement => {
     const extensionId = chrome.runtime.id;
+    const iframeId = `bringweb3-iframe-${extensionId}`;
+    const element = document.getElementById(iframeId)
+    if (element) return element as HTMLIFrameElement;
     const params = getQueryParams({ query: { ...query, extensionId, v: getVersion() } })
     const customStyles = theme ? `&${getQueryParams({ query: theme, prefix: 't' })}` : ''
     const iframe = document.createElement('iframe');
-    iframe.id = `bringweb3-iframe:${extensionId}`;
+    iframe.id = iframeId;
     iframe.src = `${iframeSrc}?${params}${customStyles}`;
     iframe.setAttribute('sandbox', "allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation")
     iframe.style.position = "fixed";
