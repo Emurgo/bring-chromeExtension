@@ -36,6 +36,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
         if (action !== 'WALLET_ADDRESS_UPDATE') return
         setWalletAddress(walletAddress)
         if (waiting) {
+            setWaiting(false)
             activateAction()
         }
     }
