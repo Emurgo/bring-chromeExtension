@@ -14,7 +14,7 @@ const startListenersForWalletAddress = ({ walletAddressListeners, getWalletAddre
 
 
             if (!iframeEl) {
-                iframeEl = document.querySelector(`#bringweb3-iframe:${chrome.runtime.id}`)
+                iframeEl = document.querySelector(`#bringweb3-iframe-${chrome.runtime.id}`)
                 if (!iframeEl) return
             }
             if (!iframeEl.contentWindow) {
