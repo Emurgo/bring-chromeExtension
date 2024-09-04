@@ -29,14 +29,14 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
     const { sendGaEvent } = useGoogleAnalytics()
     const [tokenSymbol, setTokenSymbol] = useState(info.cryptoSymbols[0])
     const [optOutOpen, setOptOutOpen] = useState(false)
-    const [waiting, setWaiting] = useState(false)
+    const [status, setStatus] = useState('idle')
 
     const activateAction = async () => {
         try {
             const { platformName, retailerId, url } = info
             let { walletAddress } = info
             if (!walletAddress) {
-                setWaiting(true)
+                setStatus('waiting')
                 sendMessage({ action: ACTIONS.PROMPT_LOGIN })
                 return
             }
@@ -65,22 +65,23 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
         const { walletAddress, action } = e.data
         if (action !== 'WALLET_ADDRESS_UPDATE') return
         setWalletAddress(walletAddress)
-        console.log({ waiting });
+        console.log({ waiting: status });
 
-        if (waiting) {
+        if (status === 'waiting') {
             console.log('BRING: out of waiting block');
-            setWaiting(false)
+            setStatus('done')
             activateAction()
         }
     }
 
     useEffect(() => {
+        if (status === 'done') return
         window.addEventListener("message", walletAddressUpdate)
 
         return () => {
             window.removeEventListener("message", walletAddressUpdate)
         }
-    }, [waiting])
+    }, [status])
 
     const formatCashback = (amount: number, symbol: string, currency: string) => {
         try {
@@ -153,7 +154,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
                 </div>
             </div>
             <AnimatePresence>
-                {waiting ?
+                {status === 'waiting' ?
                     <motion.div
                         transition={{ ease: 'easeInOut' }}
                         initial={{ opacity: 0 }}
