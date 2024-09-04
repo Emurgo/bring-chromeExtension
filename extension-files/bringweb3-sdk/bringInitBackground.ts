@@ -229,28 +229,40 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
     })
 
     chrome.runtime.onMessage.addListener(async (request, sender) => {
-        const { action, time, from } = request
 
-        if (from !== 'bringweb3') return
+        if (request?.from !== 'bringweb3') return
+
+        const { action } = request
 
         switch (action) {
-            case 'ACTIVATE':
+            case 'ACTIVATE': {
                 const notificationCheck = await storage.get('notificationCheck')
                 if (!notificationCheck.check || !notificationCheck.nextRequestTimestampActivated) break;
                 notificationCheck.check = notificationCheck.nextRequestTimestampActivated;
                 storage.set('notificationCheck', notificationCheck)
                 break;
-            case 'OPT_OUT':
+            }
+            case 'OPT_OUT': {
+                const { time } = request
                 storage.set('optOut', Date.now() + time)
                 break;
-            case 'CLOSE':
+            }
+            case 'CLOSE': {
+                const { time } = request
                 const domain = await getRelevantDomain(sender.tab?.url || sender.origin, identifier)
                 if (!domain) break;
                 addQuietDomain(domain, time)
                 break;
-            default:
+            }
+            case 'WALLET_ADDRESS_UPDATE': {
+                const { walletAddress } = request
+                storage.set('walletAddress', walletAddress as string)
+                break;
+            }
+            default: {
                 console.warn(`Bring unknown action: ${action}`);
                 break;
+            }
         }
     })
 

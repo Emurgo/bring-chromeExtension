@@ -23,6 +23,7 @@ const startListenersForWalletAddress = ({ walletAddressListeners, getWalletAddre
             const address = await getWalletAddress()
 
             iframeEl.contentWindow.postMessage({ action: 'WALLET_ADDRESS_UPDATE', walletAddress: address }, '*')
+            chrome.runtime.sendMessage({ action: 'WALLET_ADDRESS_UPDATE', from: 'bringweb3', walletAddress: 'address' })
         });
     }
 }
