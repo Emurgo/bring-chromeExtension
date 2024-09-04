@@ -31,10 +31,10 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
     const [optOutOpen, setOptOutOpen] = useState(false)
     const [status, setStatus] = useState<'idle' | 'waiting' | 'done'>('idle')
 
-    const activateAction = useCallback(async () => {
+    const activateAction = async (walletAddress?: string) => {
         try {
             const { platformName, retailerId, url } = info
-            let { walletAddress } = info
+            walletAddress = info.walletAddress || walletAddress
             if (!walletAddress) {
                 setStatus('waiting')
                 sendMessage({ action: ACTIONS.PROMPT_LOGIN })
@@ -59,7 +59,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
         } catch (error) {
             console.error(error);
         }
-    }, [status, info])
+    }
 
     const walletAddressUpdate = useCallback((e: MessageEvent<BringEventData>) => {
         const { walletAddress, action } = e.data
@@ -70,7 +70,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
         if (status === 'waiting') {
             console.log('BRING: out of waiting block');
             setStatus('done')
-            activateAction()
+            activateAction(walletAddress)
         }
     }, [status, setWalletAddress, activateAction])
 
@@ -131,7 +131,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
                 </span>
             </div>
             <div className={styles.action_container}>
-                <button onClick={activateAction} className={styles.btn}>Let's go</button>
+                <button onClick={() => activateAction()} className={styles.btn}>Let's go</button>
                 <div className={styles.btns_container}>
                     <button
                         className={styles.action_btn}
