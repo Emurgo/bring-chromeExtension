@@ -82,7 +82,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
         return () => {
             window.removeEventListener("message", walletAddressUpdate)
         }
-    }, [status, activateAction])
+    }, [status, activateAction, info])
 
     const formatCashback = (amount: number, symbol: string, currency: string) => {
         try {
