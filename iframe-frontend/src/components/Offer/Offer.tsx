@@ -29,14 +29,14 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
     const { sendGaEvent } = useGoogleAnalytics()
     const [tokenSymbol, setTokenSymbol] = useState(info.cryptoSymbols[0])
     const [optOutOpen, setOptOutOpen] = useState(false)
-    const [waiting, setWaiting] = useState(false)
+    const [status, setStatus] = useState<'idle' | 'waiting' | 'done'>('idle')
 
-    const activateAction = async () => {
+    const activateAction = async (walletAddress?: string) => {
         try {
             const { platformName, retailerId, url } = info
-            let { walletAddress } = info
+            walletAddress = info.walletAddress || walletAddress
             if (!walletAddress) {
-                setWaiting(true)
+                setStatus('waiting')
                 sendMessage({ action: ACTIONS.PROMPT_LOGIN })
                 return
             }
@@ -65,20 +65,24 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
         const { walletAddress, action } = e.data
         if (action !== 'WALLET_ADDRESS_UPDATE') return
         setWalletAddress(walletAddress)
-        if (waiting) {
+        console.log({ waiting: status });
+
+        if (status === 'waiting') {
             console.log('BRING: out of waiting block');
-            setWaiting(false)
-            activateAction()
+            setStatus('done')
+            activateAction(walletAddress)
         }
-    }, [setWalletAddress, waiting, activateAction])
+    }, [status, setWalletAddress, activateAction])
 
     useEffect(() => {
+        if (status === 'done') return
+
         window.addEventListener("message", walletAddressUpdate)
 
         return () => {
             window.removeEventListener("message", walletAddressUpdate)
         }
-    }, [])
+    }, [status, activateAction, info])
 
     const formatCashback = (amount: number, symbol: string, currency: string) => {
         try {
@@ -127,7 +131,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
                 </span>
             </div>
             <div className={styles.action_container}>
-                <button onClick={activateAction} className={styles.btn}>Let's go</button>
+                <button onClick={() => activateAction()} className={styles.btn}>Let's go</button>
                 <div className={styles.btns_container}>
                     <button
                         className={styles.action_btn}
@@ -151,7 +155,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
                 </div>
             </div>
             <AnimatePresence>
-                {waiting ?
+                {status === 'waiting' ?
                     <motion.div
                         transition={{ ease: 'easeInOut' }}
                         initial={{ opacity: 0 }}
