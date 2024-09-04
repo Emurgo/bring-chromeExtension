@@ -1,7 +1,7 @@
 import styles from './styles.module.css'
 import activate from '../../api/activate'
 import OptOut from '../OptOut/OptOut'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import CryptoSymbolSelect from '../CryptoSymbolSelect/CryptoSymbolSelect'
 import CloseBtn from '../CloseBtn/CloseBtn'
 import PlatformLogo from '../PlatformLogo/PlatformLogo'
@@ -31,46 +31,6 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
     const [optOutOpen, setOptOutOpen] = useState(false)
     const [waiting, setWaiting] = useState(false)
 
-    const walletAddressUpdate = (e: MessageEvent<BringEventData>) => {
-        const { walletAddress, action } = e.data
-        if (action !== 'WALLET_ADDRESS_UPDATE') return
-        setWalletAddress(walletAddress)
-        setWaiting(false)
-        if (waiting) {
-            console.log('BRING: out of waiting block');
-
-            activateAction()
-        }
-    }
-
-    const formatCashback = (amount: number, symbol: string, currency: string) => {
-        try {
-            if (symbol === '%') {
-                return (amount / 100).toLocaleString(undefined, {
-                    style: 'percent',
-                    maximumFractionDigits: 2
-                })
-            }
-
-            return amount.toLocaleString(undefined, {
-                style: 'currency',
-                currency: currency,
-                maximumFractionDigits: 2
-            })
-
-        } catch (error) {
-            return `${symbol}${amount}`
-        }
-    }
-
-    useEffect(() => {
-        window.addEventListener("message", walletAddressUpdate)
-
-        return () => {
-            window.removeEventListener("message", walletAddressUpdate)
-        }
-    }, [])
-
     const activateAction = async () => {
         try {
             const { platformName, retailerId, url } = info
@@ -98,6 +58,45 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
             nextFn()
         } catch (error) {
             console.error(error);
+        }
+    }
+
+    const walletAddressUpdate = useCallback((e: MessageEvent<BringEventData>) => {
+        const { walletAddress, action } = e.data
+        if (action !== 'WALLET_ADDRESS_UPDATE') return
+        setWalletAddress(walletAddress)
+        if (waiting) {
+            console.log('BRING: out of waiting block');
+            setWaiting(false)
+            activateAction()
+        }
+    }, [setWalletAddress, waiting, activateAction])
+
+    useEffect(() => {
+        window.addEventListener("message", walletAddressUpdate)
+
+        return () => {
+            window.removeEventListener("message", walletAddressUpdate)
+        }
+    }, [])
+
+    const formatCashback = (amount: number, symbol: string, currency: string) => {
+        try {
+            if (symbol === '%') {
+                return (amount / 100).toLocaleString(undefined, {
+                    style: 'percent',
+                    maximumFractionDigits: 2
+                })
+            }
+
+            return amount.toLocaleString(undefined, {
+                style: 'currency',
+                currency: currency,
+                maximumFractionDigits: 2
+            })
+
+        } catch (error) {
+            return `${symbol}${amount}`
         }
     }
 
