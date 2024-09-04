@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.0.12
+
+### Patch Changes
+
+- 5851f3b: Update address after login
+
 ## 1.0.11
 
 ### Patch Changes
