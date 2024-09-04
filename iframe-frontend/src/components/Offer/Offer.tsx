@@ -72,7 +72,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
             setStatus('done')
             activateAction()
         }
-    }, [status, setWalletAddress])
+    }, [status, setWalletAddress, activateAction])
 
     useEffect(() => {
         if (status === 'done') return
@@ -82,7 +82,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
         return () => {
             window.removeEventListener("message", walletAddressUpdate)
         }
-    }, [status])
+    }, [status, activateAction])
 
     const formatCashback = (amount: number, symbol: string, currency: string) => {
         try {
