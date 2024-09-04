@@ -1,7 +1,7 @@
 import styles from './styles.module.css'
 import activate from '../../api/activate'
 import OptOut from '../OptOut/OptOut'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import CryptoSymbolSelect from '../CryptoSymbolSelect/CryptoSymbolSelect'
 import CloseBtn from '../CloseBtn/CloseBtn'
 import PlatformLogo from '../PlatformLogo/PlatformLogo'
@@ -61,7 +61,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
         }
     }
 
-    const walletAddressUpdate = useCallback((e: MessageEvent<BringEventData>) => {
+    const walletAddressUpdate = (e: MessageEvent<BringEventData>) => {
         const { walletAddress, action } = e.data
         if (action !== 'WALLET_ADDRESS_UPDATE') return
         setWalletAddress(walletAddress)
@@ -72,7 +72,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
             setWaiting(false)
             activateAction()
         }
-    }, [setWalletAddress, waiting, activateAction])
+    }
 
     useEffect(() => {
         window.addEventListener("message", walletAddressUpdate)
@@ -80,7 +80,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
         return () => {
             window.removeEventListener("message", walletAddressUpdate)
         }
-    }, [])
+    }, [waiting])
 
     const formatCashback = (amount: number, symbol: string, currency: string) => {
         try {
