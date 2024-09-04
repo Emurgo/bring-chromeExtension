@@ -29,7 +29,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
     const { sendGaEvent } = useGoogleAnalytics()
     const [tokenSymbol, setTokenSymbol] = useState(info.cryptoSymbols[0])
     const [optOutOpen, setOptOutOpen] = useState(false)
-    const [status, setStatus] = useState('idle')
+    const [status, setStatus] = useState<'idle' | 'waiting' | 'done'>('idle')
 
     const activateAction = async () => {
         try {
@@ -61,21 +61,23 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
         }
     }
 
-    const walletAddressUpdate = (e: MessageEvent<BringEventData>) => {
-        const { walletAddress, action } = e.data
-        if (action !== 'WALLET_ADDRESS_UPDATE') return
-        setWalletAddress(walletAddress)
-        console.log({ waiting: status });
-
-        if (status === 'waiting') {
-            console.log('BRING: out of waiting block');
-            setStatus('done')
-            activateAction()
-        }
-    }
 
     useEffect(() => {
         if (status === 'done') return
+
+        const walletAddressUpdate = (e: MessageEvent<BringEventData>) => {
+            const { walletAddress, action } = e.data
+            if (action !== 'WALLET_ADDRESS_UPDATE') return
+            setWalletAddress(walletAddress)
+            console.log({ waiting: status });
+
+            if (status === 'waiting') {
+                console.log('BRING: out of waiting block');
+                setStatus('done')
+                activateAction()
+            }
+        }
+
         window.addEventListener("message", walletAddressUpdate)
 
         return () => {
