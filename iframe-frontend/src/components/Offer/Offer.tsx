@@ -1,7 +1,7 @@
 import styles from './styles.module.css'
 import activate from '../../api/activate'
 import OptOut from '../OptOut/OptOut'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import CryptoSymbolSelect from '../CryptoSymbolSelect/CryptoSymbolSelect'
 import CloseBtn from '../CloseBtn/CloseBtn'
 import PlatformLogo from '../PlatformLogo/PlatformLogo'
@@ -61,22 +61,21 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
         }
     }
 
+    const walletAddressUpdate = useCallback((e: MessageEvent<BringEventData>) => {
+        const { walletAddress, action } = e.data
+        if (action !== 'WALLET_ADDRESS_UPDATE') return
+        setWalletAddress(walletAddress)
+        console.log({ waiting: status });
+
+        if (status === 'waiting') {
+            console.log('BRING: out of waiting block');
+            setStatus('done')
+            activateAction()
+        }
+    }, [status, setWalletAddress])
 
     useEffect(() => {
         if (status === 'done') return
-
-        const walletAddressUpdate = (e: MessageEvent<BringEventData>) => {
-            const { walletAddress, action } = e.data
-            if (action !== 'WALLET_ADDRESS_UPDATE') return
-            setWalletAddress(walletAddress)
-            console.log({ waiting: status });
-
-            if (status === 'waiting') {
-                console.log('BRING: out of waiting block');
-                setStatus('done')
-                activateAction()
-            }
-        }
 
         window.addEventListener("message", walletAddressUpdate)
 
