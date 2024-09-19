@@ -9,14 +9,16 @@ interface Props {
     query: Query
     theme?: Style
     iframeSrc: string
+    themeMode: string
+    text: 'upper' | 'lower'
 }
 
-const injectIFrame = ({ query, theme, iframeSrc }: Props): HTMLIFrameElement => {
+const injectIFrame = ({ query, theme, themeMode, text, iframeSrc }: Props): HTMLIFrameElement => {
     const extensionId = chrome.runtime.id;
     const iframeId = `bringweb3-iframe-${extensionId}`;
     const element = document.getElementById(iframeId)
     if (element) return element as HTMLIFrameElement;
-    const params = getQueryParams({ query: { ...query, extensionId, v: getVersion() } })
+    const params = getQueryParams({ query: { ...query, extensionId, v: getVersion(), themeMode, textMode: text } })
     const customStyles = theme ? `&${getQueryParams({ query: theme, prefix: 't' })}` : ''
     const iframe = document.createElement('iframe');
     iframe.id = iframeId;

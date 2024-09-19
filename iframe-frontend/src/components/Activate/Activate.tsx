@@ -5,6 +5,8 @@ import PlatformLogo from '../PlatformLogo/PlatformLogo'
 import splitWordMaxFive from '../../utils/splitWordMaxFive'
 import { useGoogleAnalytics } from '../../hooks/useGoogleAnalytics'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage'
+import { useRouteLoaderData } from 'react-router-dom'
+import toCaseString from '../../utils/toCaseString'
 
 interface ActivateProps {
     redirectUrl: string
@@ -16,6 +18,7 @@ interface ActivateProps {
 }
 
 const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName, retailerName, walletAddress }: ActivateProps) => {
+    const { textMode } = useRouteLoaderData('root') as LoaderData
     const { sendGaEvent } = useGoogleAnalytics()
 
     const redirectEvent = () => {
@@ -47,7 +50,7 @@ const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName
                 onClick={redirectEvent}
                 href={redirectUrl}
                 target='_top'
-            >Activate</a>
+            >{toCaseString('Activate', textMode)}</a>
         </div>
     )
 }

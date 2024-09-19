@@ -10,6 +10,8 @@ import splitWordMaxFive from '../../utils/splitWordMaxFive'
 import { useGoogleAnalytics } from '../../hooks/useGoogleAnalytics'
 import { Oval } from 'react-loader-spinner'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useRouteLoaderData } from 'react-router-dom'
+import toCaseString from '../../utils/toCaseString'
 
 interface BringEventData {
     from: string
@@ -27,6 +29,7 @@ interface Props {
 
 const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Props) => {
     const { sendGaEvent } = useGoogleAnalytics()
+    const { iconsPath, textMode } = useRouteLoaderData('root') as LoaderData
     const [tokenSymbol, setTokenSymbol] = useState(info.cryptoSymbols[0])
     const [optOutOpen, setOptOutOpen] = useState(false)
     const [status, setStatus] = useState<'idle' | 'waiting' | 'done'>('idle')
@@ -119,7 +122,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
             />
             <div className={styles.details}>
                 <div className={styles.subtitle_container}>
-                    <img src="/icons/coins.svg" alt="coins" height={42} />
+                    <img src={`${iconsPath}/coins.svg`} alt="cashback icon" />
                     <h2 className={styles.subtitle}>Earn Crypto Cashback</h2>
                 </div>
                 <span className={styles.sm_txt}>Receive up to <span className={styles.cashback_amount}>{formatCashback(+info.maxCashback, info.cashbackSymbol, info.cashbackCurrency)}</span> of your total spent in
@@ -131,7 +134,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
                 </span>
             </div>
             <div className={styles.action_container}>
-                <button onClick={() => activateAction()} className={styles.btn}>Let's go</button>
+                <button onClick={() => activateAction()} className={styles.btn}>{toCaseString("Let's go", textMode)}</button>
                 <div className={styles.btns_container}>
                     <button
                         className={styles.action_btn}
@@ -144,13 +147,13 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
                             closeFn()
                         }}
                     >
-                        Cancel
+                        {toCaseString("Cancel", textMode)}
                     </button>
                     <button
                         className={styles.action_btn}
                         onClick={() => setOptOutOpen(true)}
                     >
-                        Turn off
+                        {toCaseString("Turn off", textMode)}
                     </button>
                 </div>
             </div>

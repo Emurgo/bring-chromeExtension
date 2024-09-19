@@ -63,6 +63,7 @@ export const themeNames: ThemeNames = {
     tokenFC: "--token-f-c",
     tokenBorderW: "--token-border-w",
     tokenBorderC: "--token-border-c",
+    tokenRadius: "--token-radius",
     notificationFS: "--notification-f-s",
     notificationFW: "--notification-f-w",
     notificationFC: "--notification-f-c",
