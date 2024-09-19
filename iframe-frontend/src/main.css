@@ -48,6 +48,8 @@
     --details-title-f-s: 15px;
     --details-title-f-w: 600;
     --details-title-f-c: #DADCE5;
+    --details-icon-w: #DADCE5;
+    --details-icon-h: #DADCE5;
     --details-subtitle-f-s: 14px;
     --details-subtitle-f-w: 500;
     --details-subtitle-f-c: #A8ADBF;
@@ -80,6 +82,7 @@
     --token-f-c: #DADCE5;
     --token-border-w: 2px;
     --token-border-c: #DADCE5;
+    --token-radius: 4px;
     /* Notification-popup */
     --notification-f-s: 14px;
     --notification-f-w: 500;

@@ -29,6 +29,12 @@ interface Info {
     url: string
 }
 
+interface LoaderData extends Info {
+    iconsPath: string
+    themeMode: 'light' | 'dark'
+    textMode: 'upper' | 'lower'
+}
+
 interface Message {
     action?: ACTIONS
     time?: number

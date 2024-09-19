@@ -1,3 +1,5 @@
+import { useRouteLoaderData } from "react-router-dom"
+
 interface Props {
     platformName: string
     width?: number
@@ -6,9 +8,11 @@ interface Props {
 }
 
 const PlatformLogo = ({ platformName, size = 'md', width = 108, height }: Props) => {
+    const { themeMode } = useRouteLoaderData('root') as LoaderData
+
     return (
         <img
-            src={`/images/logos/${platformName}_${size}.svg`}
+            src={`${themeMode}/images/logos/${platformName}/${size}.svg`}
             alt="platform logo"
             width={width}
             height={height}

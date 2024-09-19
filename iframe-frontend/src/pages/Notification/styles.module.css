@@ -23,7 +23,7 @@
     padding: 5px 0;
     border-radius: var(--notification-btn-radius);
     border-width: var(--notification-btn-border-w);
-    border-style: var(--notification-btn-border-c);
-    border-color: transparent;
+    border-style: solid;
+    border-color: var(--notification-btn-border-c);
     background: var(--notification-btn-bg);
 }
