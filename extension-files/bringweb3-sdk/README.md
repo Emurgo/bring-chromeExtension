@@ -28,7 +28,7 @@ When a user visits supported online retailer websites, the Crypto Cashback syste
 ## Prerequisites
 
 - Node.js >= 14
-- Chrome extension manifest >= V3 with required permissions
+- Chrome extension manifest >= V2 with required permissions
 - Obtain an identifier key from [Bringweb3](https://bringweb3.io/#contact)
 - Provide a specific logo for the specific outlet
 
@@ -120,7 +120,10 @@ bringInitContentScript({
     getWalletAddress: async () => await new Promise(resolve => setTimeout(() => resolve('<USER_WALLET_ADDRESS>'), 200)),// Async function that returns the current user's wallet address
     promptLogin: () => {...}, // Function that prompts a UI element asking the user to login
     walletAddressListeners: ["customEvent:addressChanged"], // A list of custom events that dispatched when the user's wallet address had changed
-    customTheme: {
+    themeMode: 'light' // 'light' | 'dark',
+    text:'lower' // 'lower' | 'upper'
+    darkTheme: {...}, // Same as lightTheme
+    lightTheme: {
         // font
         fontUrl: 'https://fonts.googleapis.com/css2?family=Matemasie&display=swap',
         fontFamily: "'Matemasie', system-ui",
@@ -195,6 +198,7 @@ bringInitContentScript({
         tokenFC: "#DADCE5",
         tokenBorderW: "2px",
         tokenBorderC: "#DADCE5",
+        tokenRadius: "8px",
         // Notification popup
         notificationFS: "14px",
         notificationFW: "500",
@@ -206,12 +210,12 @@ bringInitContentScript({
         notificationBtnBorderW: "0",
         notificationBtnBorderC: "transparent",
         notificationBtnRadius: "8px",
-        activateTitleFS: "--activate-title-f-s",
-        activateTitleFW: "--activate-title-f-w",
-        activateTitleFC: "--activate-title-f-c",
-        activateTitleBoldFS: "--activate-title-bold-f-s",
-        activateTitleBoldFW: "--activate-title-bold-f-w",
-        activateTitleBoldFC: "--activate-title-bold-f-c",
+        activateTitleFS: "14px",
+        activateTitleFW: "600",
+        activateTitleFC: "white",
+        activateTitleBoldFS: "14px",
+        activateTitleBoldFW: "700",
+        activateTitleBoldFC: "white",
     }
 });
 ```

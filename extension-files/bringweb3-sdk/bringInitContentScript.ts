@@ -28,6 +28,7 @@ interface Configuration {
  * @param {Object} [configuration.lightTheme] - Optional light theme settings.
  * @param {Object} [configuration.darkTheme] - Optional dark theme settings.
  * @param {string} configuration.theme - The chosen theme, light | dark.
+ * @param {string} configuration.text - The chosen case for some of the texts, upper | lower.
  * @param {string} configuration.iframeEndpoint - The endpoint URL for the iframe.
  * @throws {Error} Throws an error if any required configuration is missing.
  * @returns {Promise<void>}
@@ -43,6 +44,10 @@ interface Configuration {
  *   promptLogin: () => { ... },
  *   walletAddressListeners: ["listener1", "listener2"],
  *   iframeEndpoint: 'https://example.com/iframe'
+ *   theme: 'light',
+ *   text: 'lower',
+ *   lightTheme: { ... },
+ *   darkTheme: { ... }
  * });
  */
 const bringInitContentScript = async ({
