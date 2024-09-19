@@ -1,5 +1,15 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.1.0
+
+### Minor Changes
+
+- 1599073: Add dark theme option
+
+### Patch Changes
+
+- 1599073: tabs chrome API listeners, suport for manifest V2
+
 ## 1.0.12
 
 ### Patch Changes
