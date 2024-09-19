@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.1.1
+
+### Patch Changes
+
+- 2029dac: update README according to last changes
+
 ## 1.1.0
 
 ### Minor Changes
