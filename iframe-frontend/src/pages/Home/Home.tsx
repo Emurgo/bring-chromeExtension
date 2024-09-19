@@ -13,7 +13,7 @@ enum STEPS {
 }
 
 const Home = () => {
-  const [info, setInfo] = useState<Info>(useRouteLoaderData('root') as Info)
+  const [info, setInfo] = useState<Info>(useRouteLoaderData('root') as LoaderData)
   const [step, setStep] = useState(STEPS.OFFER)
   const [direction, setDirection] = useState(1)
   const [redirectUrl, setRedirectUrl] = useState('')

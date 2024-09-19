@@ -10,7 +10,10 @@ interface Configuration {
     getWalletAddress: () => Promise<WalletAddress>
     promptLogin: () => Promise<WalletAddress>
     walletAddressListeners: string[]
-    customTheme?: Style
+    lightTheme?: Style
+    darkTheme?: Style
+    theme: string
+    text: 'upper' | 'lower'
 }
 
 /**
@@ -22,7 +25,9 @@ interface Configuration {
  * @param {Function} configuration.getWalletAddress - A function that returns a Promise resolving to the wallet address.
  * @param {Function} configuration.promptLogin - A function to prompt the user to login.
  * @param {string[]} configuration.walletAddressListeners - An array of strings representing wallet address listeners.
- * @param {Object} [configuration.customTheme] - Optional custom theme settings.
+ * @param {Object} [configuration.lightTheme] - Optional light theme settings.
+ * @param {Object} [configuration.darkTheme] - Optional dark theme settings.
+ * @param {string} configuration.theme - The chosen theme, light | dark.
  * @param {string} configuration.iframeEndpoint - The endpoint URL for the iframe.
  * @throws {Error} Throws an error if any required configuration is missing.
  * @returns {Promise<void>}
@@ -44,7 +49,10 @@ const bringInitContentScript = async ({
     getWalletAddress,
     promptLogin,
     walletAddressListeners,
-    customTheme,
+    lightTheme,
+    darkTheme,
+    theme,
+    text,
     iframeEndpoint
 }: Configuration) => {
     if (!getWalletAddress || !promptLogin || !walletAddressListeners?.length || !iframeEndpoint) throw new Error('Missing configuration')
@@ -79,13 +87,14 @@ const bringInitContentScript = async ({
                     return
                 }
                 const { token, page } = request;
-                // console.log(`injecting to: ${request.domain}`);
 
                 iframeEl = injectIFrame({
                     query: { token },
                     iframeSrc: page === 'notification' ?
                         `${iframeEndpoint}notification` : iframeEndpoint,
-                    theme: customTheme
+                    theme: theme === 'dark' ? darkTheme : lightTheme,
+                    themeMode: theme || 'light',
+                    text
                 });
                 isIframeOpen = true
                 sendResponse({ status: 'success' });

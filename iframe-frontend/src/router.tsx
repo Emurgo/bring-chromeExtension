@@ -10,10 +10,19 @@ import loadFont from './utils/loadFont.ts'
 const rootLoader = async ({ request }: { request: Request }) => {
     sendMessage({ action: ACTIONS.ADD_KEYFRAMES, keyFrames })
     const searchParams = new URL(request.url).searchParams
+    const textMode = searchParams.get('textMode') || 'lower'
+    console.log({ textMode });
+
+    const themeMode = searchParams.get('themeMode') || 'light'
     loadFont(searchParams.get('t_fontUrl'), searchParams.get('t_fontFamily'))
     const res = await verify(searchParams.get('token'))
     if (res.status !== 200) throw `got ${res.status} code`
-    return res.info
+    return {
+        ...res.info,
+        iconsPath: `/${themeMode}/icons/${res.info.platformName.toUpperCase() || 'DEFAULT'}`,
+        themeMode,
+        textMode
+    }
 }
 
 const router = createBrowserRouter([
@@ -22,6 +31,7 @@ const router = createBrowserRouter([
         loader: rootLoader,
         id: "root",
         errorElement: <></>,
+        shouldRevalidate: () => false,
         children: [
             {
                 path: '/',

@@ -1,16 +1,17 @@
 .cashback_symbol {
     display: inline-block;
     margin-left: 8px;
+    background: var(--token-bg);
     border-width: var(--token-border-w);
     border-style: dashed;
     border-color: var(--token-border-c);
-    color: var(--token-color);
+    color: var(--token-f-c);
     min-width: 80px;
     text-align: center;
     padding: 4px 9px;
-    border-radius: 4px;
-    font-weight: 600;
-    font-size: 13px;
+    border-radius: var(--token-radius);
+    font-size: var(--token-f-s);
+    font-weight: var(--token-f-w);
 }
 
 .select {
@@ -25,7 +26,7 @@
     margin-left: 8px;
     padding: 4px 9px;
     text-align: center;
-    border-radius: 4px;
+    border-radius: var(--token-radius);
     outline: none;
     cursor: pointer;
 }

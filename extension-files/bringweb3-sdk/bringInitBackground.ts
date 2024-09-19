@@ -126,30 +126,43 @@ interface Message {
     page?: string
 }
 
-const sendMessage = async (tabId: number, message: Message) => {
+const sendMessage = (tabId: number, message: Message): Promise<any> => {
     const maxRetries = 5;
     const baseDelay = 1000; // 1 second
+    // console.log('Start send message');
 
-    for (let attempt = 0; attempt < maxRetries; attempt++) {
-        try {
-            // Check if tab still exists
-            const tabInfo = await chrome.tabs.get(tabId);
-            if (chrome.runtime.lastError) {
-                // console.warn("Tab no longer exists:", chrome.runtime.lastError);
-                return;
-            }
+    return new Promise((resolve, reject) => {
+        const attemptSend = (attempt: number) => {
+            // Check if tab exists using a more compatible method
+            chrome.tabs.get(tabId, (tab) => {
+                if (chrome.runtime.lastError) {
+                    // console.warn("Tab no longer exists:", chrome.runtime.lastError.message);
+                    reject(new Error(chrome.runtime.lastError.message));
+                    return;
+                }
 
-            const res = await chrome.tabs.sendMessage(tabId, message);
-            // console.log("Message sent successfully");
-            return res;
-        } catch (error) {
-            // console.warn(`Attempt ${attempt + 1} failed:`, error);
-            if (attempt < maxRetries - 1) {
-                await new Promise(resolve => setTimeout(resolve, baseDelay * Math.pow(2, attempt)));
-            }
-        }
-    }
-}
+                // console.log({ tab });
+
+                // Send message
+                chrome.tabs.sendMessage(tabId, message, (response) => {
+                    if (chrome.runtime.lastError) {
+                        // console.warn(`Attempt ${attempt + 1} failed:`, chrome.runtime.lastError.message);
+                        if (attempt < maxRetries - 1) {
+                            setTimeout(() => attemptSend(attempt + 1), baseDelay * Math.pow(2, attempt));
+                        } else {
+                            reject(new Error(chrome.runtime.lastError.message));
+                        }
+                    } else {
+                        // console.log("Message sent successfully");
+                        resolve(response);
+                    }
+                });
+            });
+        };
+
+        attemptSend(0);
+    });
+};
 
 const showNotification = async (identifier: string, tabId: number, cashbackPagePath: string | undefined): Promise<void> => {
     const notification = await checkNotifications(identifier, tabId, getCashbackUrl(cashbackPagePath))
@@ -277,8 +290,6 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
         if (!tab.url) return;
 
         const url = tab.url.replace('www.', '')
-        // const urlObj = new URL(tab.url)
-        // const url = `${urlObj.hostname.replace('www.', '')}${urlObj.pathname}`
 
         const previousUrl = urlsDict[tabId];
 

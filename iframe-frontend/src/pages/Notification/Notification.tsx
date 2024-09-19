@@ -5,10 +5,12 @@ import CloseBtn from '../../components/CloseBtn/CloseBtn'
 import { useEffect } from 'react'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 import { notificationIframeStyle } from '../../utils/iframeStyles'
+import toCaseString from '../../utils/toCaseString'
 
 interface Notification {
     platformName: string
     cashbackUrl: string
+    textMode: 'upper' | 'lower'
     info: {
         new: boolean
         eligible: boolean
@@ -27,8 +29,7 @@ const Notification = () => {
             <PlatformLogo
                 platformName={data.platformName}
                 size='sm'
-                width={45}
-                height={34}
+                width={40}
             />
             <div className={styles.notification_details}>New cashback reward</div>
             <a
@@ -36,7 +37,7 @@ const Notification = () => {
                 href={data.cashbackUrl}
                 target='_blank'
             >
-                Details
+                {toCaseString('Details', data.textMode)}
             </a>
             <CloseBtn />
         </div>
