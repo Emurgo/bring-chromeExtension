@@ -8,12 +8,12 @@ interface Query {
 interface Props {
     query: Query
     theme?: Style
-    iframeSrc: string
+    iframeUrl: string
     themeMode: string
     text: 'upper' | 'lower'
 }
 
-const injectIFrame = ({ query, theme, themeMode, text, iframeSrc }: Props): HTMLIFrameElement => {
+const injectIFrame = ({ query, theme, themeMode, text, iframeUrl }: Props): HTMLIFrameElement => {
     const extensionId = chrome.runtime.id;
     const iframeId = `bringweb3-iframe-${extensionId}`;
     const element = document.getElementById(iframeId)
@@ -22,7 +22,7 @@ const injectIFrame = ({ query, theme, themeMode, text, iframeSrc }: Props): HTML
     const customStyles = theme ? `&${getQueryParams({ query: theme, prefix: 't' })}` : ''
     const iframe = document.createElement('iframe');
     iframe.id = iframeId;
-    iframe.src = `${iframeSrc}?${params}${customStyles}`;
+    iframe.src = `${iframeUrl}?${params}${customStyles}`;
     iframe.setAttribute('sandbox', "allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation")
     iframe.style.position = "fixed";
     iframe.scrolling = "no";
