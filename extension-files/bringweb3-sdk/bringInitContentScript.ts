@@ -29,7 +29,6 @@ interface Configuration {
  * @param {Object} [configuration.darkTheme] - Optional dark theme settings.
  * @param {string} configuration.theme - The chosen theme, light | dark.
  * @param {string} configuration.text - The chosen case for some of the texts, upper | lower.
- * @param {string} configuration.iframeEndpoint - The endpoint URL for the iframe.
  * @throws {Error} Throws an error if any required configuration is missing.
  * @returns {Promise<void>}
  * 
@@ -43,7 +42,6 @@ interface Configuration {
  *   getWalletAddress: async () => '0x1234...',
  *   promptLogin: () => { ... },
  *   walletAddressListeners: ["listener1", "listener2"],
- *   iframeEndpoint: 'https://example.com/iframe'
  *   theme: 'light',
  *   text: 'lower',
  *   lightTheme: { ... },
@@ -58,9 +56,8 @@ const bringInitContentScript = async ({
     darkTheme,
     theme,
     text,
-    iframeEndpoint
 }: Configuration) => {
-    if (!getWalletAddress || !promptLogin || !walletAddressListeners?.length || !iframeEndpoint) throw new Error('Missing configuration')
+    if (!getWalletAddress || !promptLogin || !walletAddressListeners?.length) throw new Error('Missing configuration')
 
     startListenersForWalletAddress({
         walletAddressListeners,
@@ -91,12 +88,12 @@ const bringInitContentScript = async ({
                 if (isIframeOpen) {
                     return
                 }
-                const { token, page } = request;
+                const { token, iframeUrl } = request;
+                console.log({ iframeUrl });
 
                 iframeEl = injectIFrame({
                     query: { token },
-                    iframeSrc: page === 'notification' ?
-                        `${iframeEndpoint}notification` : iframeEndpoint,
+                    iframeUrl,
                     theme: theme === 'dark' ? darkTheme : lightTheme,
                     themeMode: theme || 'light',
                     text
