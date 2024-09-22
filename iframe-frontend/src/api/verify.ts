@@ -9,7 +9,7 @@ interface VerifyResponse {
 }
 
 const verify = async (token: Token): Promise<VerifyResponse> => {
-    const res = await fetch(`${API_URL}/verify`, {
+    const res = await fetch(`${API_URL}/extension/verify`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
