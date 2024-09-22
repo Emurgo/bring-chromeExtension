@@ -116,7 +116,6 @@ bringInitBackground({
 import { bringInitContentScript } from "@bringweb3/chrome-extension-kit";
 
 bringInitContentScript({
-    iframeEndpoint: process.env.IFRAME_ENDPOINT,
     getWalletAddress: async () => await new Promise(resolve => setTimeout(() => resolve('<USER_WALLET_ADDRESS>'), 200)),// Async function that returns the current user's wallet address
     promptLogin: () => {...}, // Function that prompts a UI element asking the user to login
     walletAddressListeners: ["customEvent:addressChanged"], // A list of custom events that dispatched when the user's wallet address had changed

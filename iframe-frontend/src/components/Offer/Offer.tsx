@@ -68,7 +68,6 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
         const { walletAddress, action } = e.data
         if (action !== 'WALLET_ADDRESS_UPDATE') return
         setWalletAddress(walletAddress)
-        console.log({ waiting: status });
 
         if (status === 'waiting') {
             console.log('BRING: out of waiting block');
