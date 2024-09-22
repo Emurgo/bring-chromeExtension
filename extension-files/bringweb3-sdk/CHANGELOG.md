@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.1.2
+
+### Patch Changes
+
+- 621cd7a: Remove the need for iframeEndpoint
+
 ## 1.1.1
 
 ### Patch Changes
