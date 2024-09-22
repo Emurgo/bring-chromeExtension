@@ -9,7 +9,7 @@ interface ActivateProps {
 }
 
 const activate = async (body: ActivateProps) => {
-    const res = await fetch(`${API_URL}/platforms/activate`, {
+    const res = await fetch(`${API_URL}/activate`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
