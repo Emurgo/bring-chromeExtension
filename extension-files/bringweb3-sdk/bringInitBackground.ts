@@ -52,7 +52,7 @@ const updateCache = async (apiKey: string) => {
 }
 
 const checkNotifications = async (apiKey: string, tabId: number, cashbackUrl: string | undefined, isAfterActivation?: boolean) => {
-    const falseReturn = { showNotification: false, token: '' };
+    const falseReturn = { showNotification: false, token: '', iframeUrl: '' };
 
     const nextNotificationCheck = await storage.get('notificationCheck');
 
@@ -72,7 +72,8 @@ const checkNotifications = async (apiKey: string, tabId: number, cashbackUrl: st
 
     return {
         showNotification: res.showNotification as boolean,
-        token: res.token as string
+        token: res.token as string,
+        iframeUrl: res.iframeUrl as string
     };
 }
 
@@ -123,7 +124,7 @@ interface Message {
     action: 'INJECT' | 'GET_WALLET_ADDRESS'
     domain?: string
     token?: string
-    page?: string
+    iframeUrl?: string
 }
 
 const sendMessage = (tabId: number, message: Message): Promise<any> => {
@@ -171,7 +172,7 @@ const showNotification = async (identifier: string, tabId: number, cashbackPageP
     await sendMessage(tabId, {
         action: 'INJECT',
         token: notification.token,
-        page: 'notification',
+        iframeUrl: notification.iframeUrl
     })
 }
 
@@ -306,7 +307,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
 
         const address = await getWalletAddress(tabId);
 
-        const { token, isValid } = await validateDomain({
+        const { token, isValid, iframeUrl } = await validateDomain({
             apiKey: identifier,
             body: {
                 domain: match,
@@ -323,7 +324,8 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
         sendMessage(tabId, {
             action: 'INJECT',
             token,
-            domain: url
+            domain: url,
+            iframeUrl
         });
     })
 
