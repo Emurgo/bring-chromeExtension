@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.1.3
+
+### Patch Changes
+
+- 5225ca7: Update README
+
 ## 1.1.2
 
 ### Patch Changes
