@@ -1,0 +1,69 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Start All Projects",
+            "dependsOn": [
+                "Watch SDK",
+                "Watch Test Extension",
+                "Dev Iframe Frontend"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Watch SDK",
+            "type": "shell",
+            "command": "yarn",
+            "args": [
+                "watch"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/extension-files/bringweb3-sdk"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "group": "watch"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Watch Test Extension",
+            "type": "shell",
+            "command": "yarn",
+            "args": [
+                "watch"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/extension-files/test-extension"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "group": "watch"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Dev Iframe Frontend",
+            "type": "shell",
+            "command": "yarn",
+            "args": [
+                "dev"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/iframe-frontend"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "group": "watch"
+            },
+            "problemMatcher": []
+        }
+    ]
+}
