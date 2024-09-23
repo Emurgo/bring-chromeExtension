@@ -4,7 +4,7 @@ import addKeyframes from "./addKeyFrames"
 interface Props {
     event: BringEvent
     iframeEl: IFrame
-    promptLogin: () => Promise<WalletAddress>
+    promptLogin: () => Promise<void>
 }
 
 const ACTIONS = {

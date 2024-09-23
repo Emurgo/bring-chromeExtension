@@ -8,7 +8,7 @@ let isIframeOpen = false
 interface Configuration {
     iframeEndpoint: string
     getWalletAddress: () => Promise<WalletAddress>
-    promptLogin: () => Promise<WalletAddress>
+    promptLogin: () => Promise<void>
     walletAddressListeners: string[]
     lightTheme?: Style
     darkTheme?: Style

@@ -11,7 +11,7 @@
     "access": "public"
   },
   "scripts": {
-    "watch": "tsup index.ts --format cjs,esm --dts --watch",
+    "watch": "tsup index.ts --env.IFRAME_URL=http://localhost:5173 --format cjs,esm --dts --watch",
     "build": "tsup index.ts --format cjs,esm --dts --minify",
     "lint": "tsc",
     "test": "vitest --coverage",
@@ -28,5 +28,6 @@
     "tsup": "^8.2.1",
     "typescript": "^5.5.3",
     "vitest": "^2.0.5"
-  }
+  },
+  "dependencies": {}
 }

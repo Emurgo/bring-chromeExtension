@@ -22,7 +22,7 @@ const injectIFrame = ({ query, theme, themeMode, text, iframeUrl }: Props): HTML
     const customStyles = theme ? `&${getQueryParams({ query: theme, prefix: 't' })}` : ''
     const iframe = document.createElement('iframe');
     iframe.id = iframeId;
-    iframe.src = `${iframeUrl}?${params}${customStyles}`;
+    iframe.src = `${process.env.IFRAME_URL || iframeUrl}?${params}${customStyles}`;
     iframe.setAttribute('sandbox', "allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation")
     iframe.style.position = "fixed";
     iframe.scrolling = "no";
