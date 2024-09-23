@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.1.4
+
+### Patch Changes
+
+- 3687ff7: fix return type of promptLogin to be void
+
 ## 1.1.3
 
 ### Patch Changes
