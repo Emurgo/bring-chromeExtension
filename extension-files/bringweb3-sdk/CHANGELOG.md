@@ -1,5 +1,12 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.1.6
+
+### Patch Changes
+
+- 6a226ff: add new option for updating the wallet address with walletAddressUpdateCallback
+- 6365df0: update README
+
 ## 1.1.5
 
 ### Patch Changes
