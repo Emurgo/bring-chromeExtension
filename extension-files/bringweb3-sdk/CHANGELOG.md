@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.1.5
+
+### Patch Changes
+
+- c41a6b2: fix customEvent listener
+
 ## 1.1.4
 
 ### Patch Changes
