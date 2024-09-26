@@ -145,7 +145,7 @@ const sendMessage = (tabId: number, message: Message): Promise<any> => {
                 // console.log({ tab });
 
                 // Send message
-                chrome.tabs.sendMessage(tabId, message, (response) => {
+                chrome.tabs.sendMessage(tabId, { ...message, from: 'bringweb3' }, (response) => {
                     if (chrome.runtime.lastError) {
                         // console.warn(`Attempt ${attempt + 1} failed:`, chrome.runtime.lastError.message);
                         if (attempt < maxRetries - 1) {

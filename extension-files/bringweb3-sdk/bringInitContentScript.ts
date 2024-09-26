@@ -8,8 +8,9 @@ let isIframeOpen = false
 interface Configuration {
     iframeEndpoint: string
     getWalletAddress: () => Promise<WalletAddress>
+    walletAddressUpdateCallback?: (callback: () => void) => void
+    walletAddressListeners?: string[]
     promptLogin: () => Promise<void>
-    walletAddressListeners: string[]
     lightTheme?: Style
     darkTheme?: Style
     theme: string
@@ -24,7 +25,8 @@ interface Configuration {
  * @param {Object} configuration - The configuration object.
  * @param {Function} configuration.getWalletAddress - A function that returns a Promise resolving to the wallet address.
  * @param {Function} configuration.promptLogin - A function to prompt the user to login.
- * @param {string[]} configuration.walletAddressListeners - An array of strings representing wallet address listeners.
+ * @param {string[]} configuration.walletAddressListeners - An optional array of strings representing wallet address listeners.
+ * @param {Function} [configuration.walletAddressUpdateCallback] - An optional callback function for wallet address updates.
  * @param {Object} [configuration.lightTheme] - Optional light theme settings.
  * @param {Object} [configuration.darkTheme] - Optional dark theme settings.
  * @param {string} configuration.theme - The chosen theme, light | dark.
@@ -52,15 +54,17 @@ const bringInitContentScript = async ({
     getWalletAddress,
     promptLogin,
     walletAddressListeners,
+    walletAddressUpdateCallback,
     lightTheme,
     darkTheme,
     theme,
     text,
 }: Configuration) => {
-    if (!getWalletAddress || !promptLogin || !walletAddressListeners?.length) throw new Error('Missing configuration')
+    if (!getWalletAddress || !promptLogin || (!walletAddressListeners?.length && typeof walletAddressUpdateCallback !== 'function')) throw new Error('Missing configuration')
 
     startListenersForWalletAddress({
         walletAddressListeners,
+        walletAddressUpdateCallback,
         getWalletAddress,
         iframeEl
     })
@@ -73,6 +77,7 @@ const bringInitContentScript = async ({
 
     // Listen for message
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        if (request?.from !== 'bringweb3') return
 
         const { action } = request
 
