@@ -34,7 +34,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
     const [optOutOpen, setOptOutOpen] = useState(false)
     const [status, setStatus] = useState<'idle' | 'waiting' | 'done'>('idle')
 
-    const activateAction = async (walletAddress?: string) => {
+    const activateAction = useCallback(async (walletAddress?: string) => {
         try {
             const { platformName, retailerId, url } = info
             walletAddress = info.walletAddress || walletAddress
@@ -62,7 +62,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
         } catch (error) {
             console.error(error);
         }
-    }
+    }, [info, nextFn, sendGaEvent, setRedirectUrl, tokenSymbol])
 
     const walletAddressUpdate = useCallback((e: MessageEvent<BringEventData>) => {
         const { walletAddress, action } = e.data
