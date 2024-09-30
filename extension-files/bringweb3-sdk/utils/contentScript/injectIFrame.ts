@@ -2,7 +2,6 @@ import getQueryParams from "../getQueryParams";
 import getVersion from "../getVersion";
 interface Query {
     [key: string]: string
-
 }
 
 interface Props {
@@ -11,18 +10,20 @@ interface Props {
     iframeUrl: string
     themeMode: string
     text: 'upper' | 'lower'
+    page: string | undefined
 }
 
-const injectIFrame = ({ query, theme, themeMode, text, iframeUrl }: Props): HTMLIFrameElement => {
+const injectIFrame = ({ query, theme, themeMode, text, iframeUrl, page }: Props): HTMLIFrameElement => {
     const extensionId = chrome.runtime.id;
     const iframeId = `bringweb3-iframe-${extensionId}`;
     const element = document.getElementById(iframeId)
+    const iframeHost = process.env.IFRAME_URL ? `${process.env.IFRAME_URL}${page ? '/' + page : ''}` : iframeUrl
     if (element) return element as HTMLIFrameElement;
     const params = getQueryParams({ query: { ...query, extensionId, v: getVersion(), themeMode, textMode: text } })
     const customStyles = theme ? `&${getQueryParams({ query: theme, prefix: 't' })}` : ''
     const iframe = document.createElement('iframe');
     iframe.id = iframeId;
-    iframe.src = `${process.env.IFRAME_URL || iframeUrl}?${params}${customStyles}`;
+    iframe.src = `${iframeHost}?${params}${customStyles}`;
     iframe.setAttribute('sandbox', "allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation")
     iframe.style.position = "fixed";
     iframe.scrolling = "no";
