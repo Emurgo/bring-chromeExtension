@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.1.7
+
+### Patch Changes
+
+- a9c3010: fix bug with all_frames parameter and improve url extraction logic
+
 ## 1.1.6
 
 ### Patch Changes
