@@ -2,7 +2,7 @@ import fetchDomains from "./utils/api/fetchDomains.js"
 import validateDomain from "./utils/api/validateDomain.js"
 import checkEvents from "./utils/api/checkEvents.js"
 import { ApiEndpoint } from "./utils/apiEndpoint.js"
-
+import getDomain from "./utils/getDomain.js"
 import { UPDATE_CACHE_ALARM_NAME } from './utils/constants.js'
 import storage from "./utils/storage.js"
 
@@ -77,10 +77,6 @@ const checkNotifications = async (apiKey: string, tabId: number, cashbackUrl: st
     };
 }
 
-const getDomain = (url: string) => {
-    return url.replace(/^(https?:\/\/)?(www\.)?/, '');
-}
-
 const getRelevantDomain = async (url: string | undefined, apiKey: string) => {
     let relevantDomains = await storage.get('relevantDomains')
 
@@ -125,6 +121,7 @@ interface Message {
     domain?: string
     token?: string
     iframeUrl?: string
+    page?: string
 }
 
 const sendMessage = (tabId: number, message: Message): Promise<any> => {
@@ -171,6 +168,7 @@ const showNotification = async (identifier: string, tabId: number, cashbackPageP
     if (!notification.showNotification) return;
     await sendMessage(tabId, {
         action: 'INJECT',
+        page: 'notification',
         token: notification.token,
         iframeUrl: notification.iframeUrl
     })
@@ -290,7 +288,8 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
 
         if (!tab.url) return;
 
-        const url = tab.url.replace('www.', '')
+        // const url = tab.url.replace('www.', '')
+        const url = getDomain(tab.url)
 
         const previousUrl = urlsDict[tabId];
 

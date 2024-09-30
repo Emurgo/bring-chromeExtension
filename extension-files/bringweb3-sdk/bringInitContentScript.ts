@@ -1,7 +1,7 @@
 import injectIFrame from "./utils/contentScript/injectIFrame.js";
 import handleIframeMessages from "./utils/contentScript/handleIframeMessages.js";
 import startListenersForWalletAddress from "./utils/contentScript/startLIstenersForWalletAddress.js";
-
+import getDomain from "./utils/getDomain.js";
 let iframeEl: IFrame = null
 let isIframeOpen = false
 
@@ -60,6 +60,9 @@ const bringInitContentScript = async ({
     theme,
     text,
 }: Configuration) => {
+    if (window.self !== window.top) {
+        return
+    }
     if (!getWalletAddress || !promptLogin || (!walletAddressListeners?.length && typeof walletAddressUpdateCallback !== 'function')) throw new Error('Missing configuration')
 
     startListenersForWalletAddress({
@@ -90,18 +93,18 @@ const bringInitContentScript = async ({
                 return true
 
             case 'INJECT':
-                if (isIframeOpen) {
+                if (request.domain !== getDomain(location.href) || isIframeOpen) {
                     return
                 }
                 const { token, iframeUrl } = request;
-                console.log({ iframeUrl });
 
                 iframeEl = injectIFrame({
                     query: { token },
                     iframeUrl,
                     theme: theme === 'dark' ? darkTheme : lightTheme,
                     themeMode: theme || 'light',
-                    text
+                    text,
+                    page: request.page
                 });
                 isIframeOpen = true
                 sendResponse({ status: 'success' });
