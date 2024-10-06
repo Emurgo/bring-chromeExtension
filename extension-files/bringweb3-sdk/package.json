@@ -10,6 +10,10 @@
   "publishConfig": {
     "access": "public"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Bring-Web3-LTD/chromeExtension.git"
+  },
   "scripts": {
     "watch": "tsup index.ts --env.IFRAME_URL=http://localhost:5173 --format cjs,esm --dts --watch",
     "build": "tsup index.ts --format cjs,esm --dts --minify",
