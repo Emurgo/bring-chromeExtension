@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.1.8
+
+### Patch Changes
+
+- d36d608: Add github repo
+
 ## 1.1.7
 
 ### Patch Changes
