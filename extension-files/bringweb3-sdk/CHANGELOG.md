@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.1.9
+
+### Patch Changes
+
+- 99de5c7: fix issue with process object is undefined
+
 ## 1.1.8
 
 ### Patch Changes
