@@ -38,7 +38,7 @@
 
 .p {
     font-size: var(--activate-title-f-s);
-    font-weight: var(--activate-title-f-W);
+    font-weight: var(--activate-title-f-w);
     color: var(--activate-title-f-c);
     margin: 0;
     line-height: 18px;

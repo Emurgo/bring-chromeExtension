@@ -6,7 +6,6 @@ let iframeEl: IFrame = null
 let isIframeOpen = false
 
 interface Configuration {
-    iframeEndpoint: string
     getWalletAddress: () => Promise<WalletAddress>
     walletAddressUpdateCallback?: (callback: () => void) => void
     walletAddressListeners?: string[]
