@@ -41,7 +41,6 @@
 }
 
 .btn {
-    padding: 7.5px 12px;
     background: var(--primary-btn-bg);
     color: var(--primary-btn-f-c);
     border-radius: var(--primary-btn-radius);
@@ -52,6 +51,7 @@
     border-style: solid;
     cursor: pointer;
     width: 290px;
+    height: 36px;
 }
 
 .xMark:hover {
