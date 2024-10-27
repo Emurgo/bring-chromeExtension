@@ -55,7 +55,7 @@ export const GoogleAnalyticsProvider: FC<{ measurementId: string; children: Reac
       return
     }
 
-    const params: { [key: string]: any } = {
+    const params: { [key: string]: unknown } = {
       ...event,
       platform,
       source: 'extension'
