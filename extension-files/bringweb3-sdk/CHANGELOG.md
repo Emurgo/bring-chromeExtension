@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.1.10
+
+### Patch Changes
+
+- d418551: update bringInitContentScript interface
+
 ## 1.1.9
 
 ### Patch Changes
