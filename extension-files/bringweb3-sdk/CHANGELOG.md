@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.1.11
+
+### Patch Changes
+
+- 4138ff6: allow localhost for dev mode
+
 ## 1.1.10
 
 ### Patch Changes
