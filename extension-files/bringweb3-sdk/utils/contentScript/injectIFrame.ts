@@ -17,7 +17,7 @@ const injectIFrame = ({ query, theme, themeMode, text, iframeUrl, page }: Props)
     const extensionId = chrome.runtime.id;
     const iframeId = `bringweb3-iframe-${extensionId}`;
     const element = document.getElementById(iframeId)
-    const iframeHost = typeof process !== 'undefined' && process?.env?.IFRAME_URL ? `${process.env.IFRAME_URL}${page ? '/' + page : ''}` : iframeUrl
+    const iframeHost = process?.env?.IFRAME_URL ? `${process.env.IFRAME_URL}${page ? '/' + page : ''}` : iframeUrl
     if (element) return element as HTMLIFrameElement;
     const params = getQueryParams({ query: { ...query, extensionId, v: getVersion(), themeMode, textMode: text } })
     const customStyles = theme ? `&${getQueryParams({ query: theme, prefix: 't' })}` : ''

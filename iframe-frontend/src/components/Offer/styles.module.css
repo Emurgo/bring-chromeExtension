@@ -132,7 +132,7 @@
     gap: 24px;
     justify-content: center;
     align-items: center;
-    background: var(--overlay-bg);
+    background: var(--overlay-waiting-bg, var(--overlay-bg));
 }
 
 .message {

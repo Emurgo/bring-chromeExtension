@@ -30,7 +30,11 @@
     /* Markdown files */
     --markdown-bg: #161D3B;
     --markdown-f-s: 12px;
+    --markdown-f-w: 400;
     --markdown-f-c: #DADCE5;
+    --markdown-title-f-s: 12px;
+    --markdown-title-f-w: 600;
+    --markdown-title-f-c: #DADCE5;
     --markdown-border-w: 0;
     --markdown-radius: 4px;
     --markdown-border-c: black;
