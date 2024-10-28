@@ -69,17 +69,26 @@
 
 .markdown {
     padding: 4px 12px;
+    width: calc(438px - 24px);
     border-radius: var(--markdown-radius);
     border-width: var(--markdown-border-w);
     border-style: solid;
     border-color: var(--markdown-border-c);
-    max-height: 102px;
+    height: 102px;
+    font-size: var(--markdown-f-s);
+    font-weight: var(--markdown-f-w);
     color: var(--markdown-f-c);
     background: var(--markdown-bg);
-    font-size: var(--markdown-f-s);
     box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.05);
     overflow-y: scroll;
     margin-bottom: 25px;
+    line-height: 22px;
+}
+
+.markdown h3 {
+    font-size: var(--markdown-title-f-s, var(--markdown-f-s));
+    font-weight: var(--markdown-title-f-w, var(--markdown-f-w));
+    color: var(--markdown-title-f-c, var(--markdown-f-c));
 }
 
 .markdown::-webkit-scrollbar {

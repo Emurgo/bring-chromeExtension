@@ -20,7 +20,11 @@ export const themeNames: ThemeNames = {
     secondaryBtnRadius: "--secondary-btn-radius",
     markdownBg: "--markdown-bg",
     markdownFS: "--markdown-f-s",
+    markdownFW: "--markdown-f-w",
     markdownFC: "--markdown-f-c",
+    markdownTitleFS: "--markdown-title-f-s",
+    markdownTitleFW: "--markdown-title-f-w",
+    markdownTitleFC: "--markdown-title-f-c",
     markdownBorderW: "--markdown-border-w",
     markdownRadius: "--markdown-radius",
     markdownBorderC: "--markdown-border-c",
@@ -45,6 +49,7 @@ export const themeNames: ThemeNames = {
     detailsAmountFC: "--details-amount-f-c",
     detailsAmountFW: "--details-amount-f-w",
     overlayBg: "--overlay-bg",
+    overlayWaitingBg: "--overlay-waiting-bg",
     overlayFS: "--overlay-f-s",
     overlayFW: "--overlay-f-w",
     overlayFC: "--overlay-f-c",
@@ -80,4 +85,5 @@ export const themeNames: ThemeNames = {
     activateTitleBoldFS: "--activate-title-bold-f-s",
     activateTitleBoldFW: "--activate-title-bold-f-w",
     activateTitleBoldFC: "--activate-title-bold-f-c",
+    xBtnFC: "--x-btn-f-c"
 }
