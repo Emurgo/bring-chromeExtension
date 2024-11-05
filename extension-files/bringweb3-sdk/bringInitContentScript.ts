@@ -95,10 +95,13 @@ const bringInitContentScript = async ({
                 if (request.domain !== getDomain(location.href) || isIframeOpen) {
                     return
                 }
-                const { token, iframeUrl } = request;
+                const { token, iframeUrl, userId } = request;
+
+                const query: { [key: string]: string } = { token }
+                if (userId) query['userId'] = userId
 
                 iframeEl = injectIFrame({
-                    query: { token },
+                    query,
                     iframeUrl,
                     theme: theme === 'dark' ? darkTheme : lightTheme,
                     themeMode: theme || 'light',

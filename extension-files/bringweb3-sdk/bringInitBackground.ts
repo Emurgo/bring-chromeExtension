@@ -122,6 +122,17 @@ interface Message {
     token?: string
     iframeUrl?: string
     page?: string
+    userId?: string | undefined
+}
+
+const getUserId = async (): Promise<string | undefined> => {
+    let userId = await storage.get('id')
+    const address = await getWalletAddress()
+    if (!address && !userId) {
+        userId = Math.random().toString(36).substring(2)
+        storage.set('id', userId)
+    }
+    return userId
 }
 
 const sendMessage = (tabId: number, message: Message): Promise<any> => {
@@ -170,7 +181,8 @@ const showNotification = async (identifier: string, tabId: number, cashbackPageP
         action: 'INJECT',
         page: 'notification',
         token: notification.token,
-        iframeUrl: notification.iframeUrl
+        iframeUrl: notification.iframeUrl,
+        userId: await getUserId()
     })
 }
 
@@ -223,7 +235,6 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
     if (!['prod', 'sandbox'].includes(apiEndpoint)) throw new Error('unknown apiEndpoint')
 
     ApiEndpoint.getInstance().setApiEndpoint(apiEndpoint)
-
 
     updateCache(identifier)
 
@@ -319,12 +330,13 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
             if (isValid === false) addQuietDomain(match);
             return;
         }
-
+        const userId = await getUserId()
         sendMessage(tabId, {
             action: 'INJECT',
             token,
             domain: url,
-            iframeUrl
+            iframeUrl,
+            userId
         });
     })
 
