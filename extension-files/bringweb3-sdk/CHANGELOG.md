@@ -1,5 +1,12 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.1.12
+
+### Patch Changes
+
+- 62d9402: fix getDomain function - won't remove www
+- 9f2701c: Add userId
+
 ## 1.1.11
 
 ### Patch Changes
