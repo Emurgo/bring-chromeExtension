@@ -133,7 +133,12 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
                 </span>
             </div>
             <div className={styles.action_container}>
-                <button onClick={() => activateAction()} className={styles.btn}>{toCaseString("Let's go", textMode)}</button>
+                <button
+                    onClick={() => activateAction()}
+                    className={styles.btn}
+                >
+                    {toCaseString("Let's go", textMode)}
+                </button>
                 <div className={styles.btns_container}>
                     <button
                         className={styles.action_btn}
