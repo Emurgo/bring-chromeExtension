@@ -81,6 +81,13 @@
     margin-bottom: 9px;
 }
 
+.top_container {
+    display: flex;
+    align-self: flex-start;
+    justify-content: center;
+    gap: 7px;
+}
+
 .wallet_container {
     display: flex;
     align-self: flex-start;

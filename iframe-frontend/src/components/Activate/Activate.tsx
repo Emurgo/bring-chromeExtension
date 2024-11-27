@@ -7,6 +7,7 @@ import { useGoogleAnalytics } from '../../hooks/useGoogleAnalytics'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 import { useRouteLoaderData } from 'react-router-dom'
 import toCaseString from '../../utils/toCaseString'
+import SwitchBtn from '../SwitchBtn/SwitchBtn'
 
 interface ActivateProps {
     redirectUrl: string
@@ -18,11 +19,13 @@ interface ActivateProps {
 }
 
 const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName, retailerName, walletAddress }: ActivateProps) => {
-    const { textMode } = useRouteLoaderData('root') as LoaderData
+    const { textMode, url } = useRouteLoaderData('root') as LoaderData
     const { sendGaEvent } = useGoogleAnalytics()
 
     const redirectEvent = () => {
-        sendMessage({ action: ACTIONS.ACTIVATE })
+        console.log('POPUP', { url });
+
+        sendMessage({ action: ACTIONS.ACTIVATE, url })
         sendGaEvent('retailer_shop', {
             category: 'user_action',
             action: 'click',
@@ -33,8 +36,11 @@ const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName
     return (
         <div className={styles.container}>
             <CloseBtn />
-            <div className={styles.wallet_container}>
-                {walletAddress ? <div className={styles.wallet}>{splitWordMaxFive(walletAddress)}</div> : null}
+            <div className={styles.top_container}>
+                <div className={styles.wallet_container}>
+                    <span className={styles.wallet}>{splitWordMaxFive(walletAddress as string)}</span>
+                </div>
+                <SwitchBtn />
             </div>
             <div className={styles.subcontainer}>
                 <PlatformLogo

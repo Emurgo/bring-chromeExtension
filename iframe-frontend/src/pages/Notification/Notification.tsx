@@ -6,6 +6,7 @@ import { useEffect } from 'react'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 import { notificationIframeStyle } from '../../utils/iframeStyles'
 import toCaseString from '../../utils/toCaseString'
+import useTimeout from '../../hooks/useTimeout'
 
 interface Notification {
     platformName: string
@@ -20,9 +21,23 @@ interface Notification {
 const Notification = () => {
     const data = useRouteLoaderData('root') as Notification
 
+    const { start, clear } = useTimeout({
+        callback: () => sendMessage({ action: ACTIONS.ERASE_NOTIFICATION }),
+        delay: 60 * 1000
+    })
+
     useEffect(() => {
         sendMessage({ action: ACTIONS.OPEN, style: notificationIframeStyle })
-    }, [])
+        start()
+        return () => {
+            clear()
+        }
+    }, [clear, start])
+
+    const notificationSeen = () => {
+        clear()
+        sendMessage({ action: ACTIONS.ERASE_NOTIFICATION })
+    }
 
     return (
         <div className={styles.container}>
@@ -35,11 +50,14 @@ const Notification = () => {
             <a
                 className={styles.link}
                 href={data.cashbackUrl}
+                onClick={notificationSeen}
                 target='_blank'
             >
                 {toCaseString('Details', data.textMode)}
             </a>
-            <CloseBtn />
+            <CloseBtn
+                callback={notificationSeen}
+            />
         </div>
     )
 }

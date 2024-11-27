@@ -16,6 +16,7 @@ const rootLoader = async ({ request }: Props) => {
     const textMode = searchParams.get('textMode') || 'lower'
     const themeMode = searchParams.get('themeMode') || 'light'
     const userId = searchParams.get('userId')
+    const switchWallet = (searchParams.get('switchWallet') || 'false')?.toLowerCase() === 'true'
 
     // Load chosen font
     loadFont(searchParams.get('t_fontUrl'), searchParams.get('t_fontFamily'))
@@ -27,6 +28,7 @@ const rootLoader = async ({ request }: Props) => {
         ...res.info,
         themeMode,
         textMode,
+        switchWallet,
         iconsPath: `/${themeMode}/icons/${res.info.platformName.toUpperCase() || 'DEFAULT'}`,
         variant: selectVariant(userId || res.info.walletAddress || '')
     }

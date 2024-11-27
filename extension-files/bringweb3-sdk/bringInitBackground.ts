@@ -1,35 +1,16 @@
 import fetchDomains from "./utils/api/fetchDomains.js"
 import validateDomain from "./utils/api/validateDomain.js"
-import checkEvents from "./utils/api/checkEvents.js"
 import { ApiEndpoint } from "./utils/apiEndpoint.js"
 import getDomain from "./utils/getDomain.js"
 import { UPDATE_CACHE_ALARM_NAME } from './utils/constants.js'
 import storage from "./utils/storage.js"
-
-const quietTime = 30 * 60 * 1000
-
-const getWalletAddress = async (tabId?: number): Promise<WalletAddress> => {
-    let walletAddress: WalletAddress = await storage.get('walletAddress')
-
-    try {
-        if (!tabId) {
-            const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
-            if (!tabs || !tabs[0] || !tabs[0].id) return walletAddress;
-            tabId = tabs[0].id
-        }
-
-        const res = await sendMessage(tabId, { action: 'GET_WALLET_ADDRESS' });
-
-        if (res?.walletAddress && walletAddress !== res?.walletAddress) {
-            walletAddress = res?.walletAddress
-            await storage.set('walletAddress', walletAddress as string)
-        }
-    } catch (error) {
-        // console.log("Can't update wallet address");
-    }
-
-    return walletAddress
-}
+import handleActivate from "./utils/background/activate.js"
+import addQuietDomain from "./utils/background/addQuietDomain.js"
+import { getOptOut, setOptOut } from "./utils/background/optOut.js"
+import getWalletAddress from "./utils/background/getWalletAddress.js"
+import sendMessage from "./utils/background/sendMessage.js"
+import getUserId from "./utils/background/getUserId.js"
+import showNotification from "./utils/background/showNotification.js"
 
 const calcDelay = (timestamp: number) => {
     const now = Date.now()
@@ -49,32 +30,6 @@ const updateCache = async (apiKey: string) => {
         delayInMinutes: delay || 60 * 24 * 2
     })
     return res.relevantDomains
-}
-
-const checkNotifications = async (apiKey: string, tabId: number, cashbackUrl: string | undefined, isAfterActivation?: boolean) => {
-    const falseReturn = { showNotification: false, token: '', iframeUrl: '' };
-
-    const nextNotificationCheck = await storage.get('notificationCheck');
-
-    if (nextNotificationCheck?.check && Date.now() < nextNotificationCheck.check) return falseReturn;
-
-    const walletAddress = await getWalletAddress(tabId)
-
-    if (!walletAddress) return falseReturn;
-
-    const res = await checkEvents({ apiKey, walletAddress, cashbackUrl });
-    const notifications = {
-        check: isAfterActivation ? res.nextRequestTimestampActivated : res.nextRequestTimestampRegular,
-        nextRequestTimestampActivated: res.nextRequestTimestampActivated,
-        nextRequestTimestampRegular: res.nextRequestTimestampRegular
-    }
-    storage.set('notificationCheck', notifications);
-
-    return {
-        showNotification: res.showNotification as boolean,
-        token: res.token as string,
-        iframeUrl: res.iframeUrl as string
-    };
 }
 
 const getRelevantDomain = async (url: string | undefined, apiKey: string) => {
@@ -97,93 +52,6 @@ const getRelevantDomain = async (url: string | undefined, apiKey: string) => {
         }
     }
     return ''
-}
-
-const addQuietDomain = async (domain: string, time?: number) => {
-    if (!time) time = quietTime
-
-    let quietDomains = await storage.get('quietDomains')
-
-    if (typeof quietDomains === 'object') {
-        quietDomains[domain] = Date.now() + time
-    } else {
-        quietDomains = { [domain]: Date.now() + quietTime }
-    }
-    storage.set('quietDomains', quietDomains)
-}
-
-const getCashbackUrl = (cashbackUrl: string | undefined): string | undefined => {
-    return cashbackUrl ? chrome.runtime.getURL(cashbackUrl) : undefined;
-}
-
-interface Message {
-    action: 'INJECT' | 'GET_WALLET_ADDRESS'
-    domain?: string
-    token?: string
-    iframeUrl?: string
-    page?: string
-    userId?: string | undefined
-}
-
-const getUserId = async (): Promise<string | undefined> => {
-    let userId = await storage.get('id')
-    const address = await getWalletAddress()
-    if (!address && !userId) {
-        userId = Math.random().toString(36).substring(2)
-        storage.set('id', userId)
-    }
-    return userId
-}
-
-const sendMessage = (tabId: number, message: Message): Promise<any> => {
-    const maxRetries = 5;
-    const baseDelay = 1000; // 1 second
-    // console.log('Start send message');
-
-    return new Promise((resolve, reject) => {
-        const attemptSend = (attempt: number) => {
-            // Check if tab exists using a more compatible method
-            chrome.tabs.get(tabId, (tab) => {
-                if (chrome.runtime.lastError) {
-                    // console.warn("Tab no longer exists:", chrome.runtime.lastError.message);
-                    reject(new Error(chrome.runtime.lastError.message));
-                    return;
-                }
-
-                // console.log({ tab });
-
-                // Send message
-                chrome.tabs.sendMessage(tabId, { ...message, from: 'bringweb3' }, (response) => {
-                    if (chrome.runtime.lastError) {
-                        // console.warn(`Attempt ${attempt + 1} failed:`, chrome.runtime.lastError.message);
-                        if (attempt < maxRetries - 1) {
-                            setTimeout(() => attemptSend(attempt + 1), baseDelay * Math.pow(2, attempt));
-                        } else {
-                            reject(new Error(chrome.runtime.lastError.message));
-                        }
-                    } else {
-                        // console.log("Message sent successfully");
-                        resolve(response);
-                    }
-                });
-            });
-        };
-
-        attemptSend(0);
-    });
-};
-
-const showNotification = async (identifier: string, tabId: number, cashbackPagePath: string | undefined): Promise<void> => {
-    const notification = await checkNotifications(identifier, tabId, getCashbackUrl(cashbackPagePath))
-
-    if (!notification.showNotification) return;
-    await sendMessage(tabId, {
-        action: 'INJECT',
-        page: 'notification',
-        token: notification.token,
-        iframeUrl: notification.iframeUrl,
-        userId: await getUserId()
-    })
 }
 
 interface UrlDict {
@@ -225,7 +93,7 @@ interface Configuration {
  *
  * @example
  * bringInitBackground({
- *   identifier: 'my-extension-id',
+ *   identifier: '<bring_identifier>',
  *   apiEndpoint: 'sandbox',
  *   cashbackPagePath: '/cashback.html'
  * });
@@ -251,7 +119,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
         }
     })
 
-    chrome.runtime.onMessage.addListener(async (request, sender) => {
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         if (request?.from !== 'bringweb3') return
 
@@ -259,48 +127,58 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
 
         switch (action) {
             case 'ACTIVATE': {
-                const notificationCheck = await storage.get('notificationCheck')
-                if (!notificationCheck.check || !notificationCheck.nextRequestTimestampActivated) break;
-                notificationCheck.check = notificationCheck.nextRequestTimestampActivated;
-                storage.set('notificationCheck', notificationCheck)
-                break;
+                const { url, extensionId } = request
+                handleActivate(url, extensionId, identifier, cashbackPagePath).then(() => sendResponse());
+                return true;
+            }
+            case 'GET_OPT_OUT': {
+                getOptOut().then(res => sendResponse(res))
+                return true;
             }
             case 'OPT_OUT': {
                 const { time } = request
-                storage.set('optOut', Date.now() + time)
-                break;
+                setOptOut(time).then(res => sendResponse(res))
+                return true;
             }
             case 'CLOSE': {
                 const { time } = request
-                const domain = await getRelevantDomain(sender.tab?.url || sender.origin, identifier)
-                if (!domain) break;
-                addQuietDomain(domain, time)
-                break;
+                getRelevantDomain(sender.tab?.url || sender.origin, identifier)
+                    .then(domain => {
+                        if (!domain) return true;
+                        addQuietDomain(domain, time)
+                    })
+                return true;
             }
             case 'WALLET_ADDRESS_UPDATE': {
                 const { walletAddress } = request
                 storage.set('walletAddress', walletAddress as string)
-                break;
+                return true;
             }
+            case 'ERASE_NOTIFICATION':
+                storage.remove('notification').then(() => sendResponse())
+                return true
             default: {
                 console.warn(`Bring unknown action: ${action}`);
-                break;
+                return true;
             }
         }
     })
 
     chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+
+        if (!tab?.url?.startsWith('http') || !tab.url) return;
+
+        const url = getDomain(tab.url)
+
         const optOut = await storage.get('optOut');
 
         if (optOut && optOut > Date.now()) {
-            await showNotification(identifier, tabId, cashbackPagePath);
+            await showNotification(identifier, tabId, cashbackPagePath, url);
             return;
+        } else if (optOut) {
+            storage.remove('optOut')
+            storage.remove('optOutKey')
         }
-
-        if (!tab.url) return;
-
-        // const url = tab.url.replace('www.', '')
-        const url = getDomain(tab.url)
 
         const previousUrl = urlsDict[tabId];
 
@@ -311,7 +189,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
         const match = await getRelevantDomain(tab.url, identifier);
 
         if (!match || !match.length) {
-            await showNotification(identifier, tabId, cashbackPagePath)
+            await showNotification(identifier, tabId, cashbackPagePath, url)
             return;
         };
 

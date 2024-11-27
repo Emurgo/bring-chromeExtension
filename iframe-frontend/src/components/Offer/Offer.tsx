@@ -1,13 +1,15 @@
 import styles from './styles.module.css'
-import activate from '../../api/activate'
-import OptOut from '../OptOut/OptOut'
+
 import { useCallback, useEffect, useState } from 'react'
+import { useGoogleAnalytics } from '../../hooks/useGoogleAnalytics'
+import OptOut from '../OptOut/OptOut'
+import activate from '../../api/activate'
 import CryptoSymbolSelect from '../CryptoSymbolSelect/CryptoSymbolSelect'
 import CloseBtn from '../CloseBtn/CloseBtn'
 import PlatformLogo from '../PlatformLogo/PlatformLogo'
+import SwitchBtn from '../SwitchBtn/SwitchBtn'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 import splitWordMaxFive from '../../utils/splitWordMaxFive'
-import { useGoogleAnalytics } from '../../hooks/useGoogleAnalytics'
 import { Oval } from 'react-loader-spinner'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouteLoaderData } from 'react-router-dom'
@@ -110,8 +112,11 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
         <div className={styles.container}>
             <CloseBtn />
             {info?.walletAddress ?
-                <div className={styles.wallet_container}>
-                    <div className={styles.wallet}>{splitWordMaxFive(info.walletAddress)}</div>
+                <div className={styles.top_container}>
+                    <div className={styles.wallet_container}>
+                        <span className={styles.wallet}>{splitWordMaxFive(info.walletAddress)}</span>
+                    </div>
+                    <SwitchBtn />
                 </div>
                 :
                 <div className={styles.wallet_spacer} />
