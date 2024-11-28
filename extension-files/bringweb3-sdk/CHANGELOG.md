@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.2.2
+
+### Patch Changes
+
+- d5a3509: Fix listeners without sendResponse
+
 ## 1.2.1
 
 ### Patch Changes
