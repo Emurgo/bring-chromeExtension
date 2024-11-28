@@ -95,6 +95,7 @@ const bringInitContentScript = async ({
 
             case 'INJECT':
                 if ((request.domain !== getDomain(location.href)) || isIframeOpen) {
+                    sendResponse({ status: 'Domain already changed' });
                     return true
                 }
                 const { token, iframeUrl, userId } = request;
