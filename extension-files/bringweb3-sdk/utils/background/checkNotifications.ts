@@ -26,7 +26,9 @@ const checkNotifications = async (apiKey: string, tabId?: number, cashbackUrl?: 
         expiration: res.expiration as number
     }
 
-    await storage.set('notification', notification)
+    if (notification.showNotification) {
+        await storage.set('notification', notification)
+    }
 
     return notification
 }
