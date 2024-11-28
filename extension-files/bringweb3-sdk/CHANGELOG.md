@@ -1,5 +1,16 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.2.0
+
+### Minor Changes
+
+- b12a7e5: Switch wallet feature
+
+### Patch Changes
+
+- b12a7e5: More consistent quiet domains after activations
+- b12a7e5: Fix notification not showing problem
+
 ## 1.1.12
 
 ### Patch Changes
