@@ -146,16 +146,19 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
                     .then(domain => {
                         if (!domain) return true;
                         addQuietDomain(domain, time)
+                        sendResponse({ message: 'domain added to quiet list' })
                     })
                 return true;
             }
             case 'WALLET_ADDRESS_UPDATE': {
                 const { walletAddress } = request
                 storage.set('walletAddress', walletAddress as string)
+                    .then(() => sendResponse(walletAddress))
                 return true;
             }
             case 'ERASE_NOTIFICATION':
                 storage.remove('notification').then(() => sendResponse())
+                sendResponse({ message: 'notification erased successfully' })
                 return true
             default: {
                 console.warn(`Bring unknown action: ${action}`);
