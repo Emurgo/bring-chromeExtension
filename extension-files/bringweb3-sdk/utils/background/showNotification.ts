@@ -23,7 +23,6 @@ const show = async (tabId: number, notification: Notification, domain: string) =
 
 const showNotification = async (identifier: string, tabId: number, cashbackPagePath: string | undefined, domain: string): Promise<void> => {
     const notificationFromStorage = await storage.get('notification')
-    console.log({ notificationFromStorage });
 
     if (notificationFromStorage?.expiration < Date.now()) {
         await storage.remove('notification')

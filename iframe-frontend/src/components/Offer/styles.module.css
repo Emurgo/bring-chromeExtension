@@ -127,23 +127,3 @@
     height: 28px;
     cursor: pointer;
 }
-
-.waiting {
-    position: absolute;
-    z-index: 2;
-    width: 100vw;
-    height: 100vh;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    justify-content: center;
-    align-items: center;
-    background: var(--overlay-waiting-bg, var(--overlay-bg));
-}
-
-.message {
-    font-size: var(--overlay-f-s);
-    font-weight: var(--overlay-f-w);
-    color: var(--overlay-f-c);
-}

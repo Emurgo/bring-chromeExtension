@@ -7,7 +7,7 @@ import { useGoogleAnalytics } from '../../hooks/useGoogleAnalytics'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 import { useRouteLoaderData } from 'react-router-dom'
 import toCaseString from '../../utils/toCaseString'
-import SwitchBtn from '../SwitchBtn/SwitchBtn'
+// import SwitchBtn from '../SwitchBtn/SwitchBtn'
 
 interface ActivateProps {
     redirectUrl: string
@@ -40,7 +40,7 @@ const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName
                 <div className={styles.wallet_container}>
                     <span className={styles.wallet}>{splitWordMaxFive(walletAddress as string)}</span>
                 </div>
-                <SwitchBtn />
+                {/* <SwitchBtn /> */}
             </div>
             <div className={styles.subcontainer}>
                 <PlatformLogo
