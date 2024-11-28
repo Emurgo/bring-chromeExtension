@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.2.1
+
+### Patch Changes
+
+- accb774: Save notification only if need to show it
+
 ## 1.2.0
 
 ### Minor Changes
