@@ -13,7 +13,8 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_title": "Test Extension"
+    "default_title": "Test Extension",
+    "default_popup": "popup.html"
   },
   "permissions": [
     "storage",

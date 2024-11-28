@@ -13,7 +13,8 @@ interface Configuration {
     lightTheme?: Style
     darkTheme?: Style
     theme: string
-    text: 'upper' | 'lower'
+    text: 'upper' | 'lower',
+    switchWallet: boolean
 }
 
 /**
@@ -58,6 +59,7 @@ const bringInitContentScript = async ({
     darkTheme,
     theme,
     text,
+    switchWallet = false
 }: Configuration) => {
     if (window.self !== window.top) {
         return
@@ -92,10 +94,11 @@ const bringInitContentScript = async ({
                 return true
 
             case 'INJECT':
-                if (request.domain !== getDomain(location.href) || isIframeOpen) {
-                    return
+                if ((request.domain !== getDomain(location.href)) || isIframeOpen) {
+                    return true
                 }
                 const { token, iframeUrl, userId } = request;
+                console.log({ token, iframeUrl, userId });
 
                 const query: { [key: string]: string } = { token }
                 if (userId) query['userId'] = userId
@@ -106,6 +109,7 @@ const bringInitContentScript = async ({
                     theme: theme === 'dark' ? darkTheme : lightTheme,
                     themeMode: theme || 'light',
                     text,
+                    switchWallet,
                     page: request.page
                 });
                 isIframeOpen = true

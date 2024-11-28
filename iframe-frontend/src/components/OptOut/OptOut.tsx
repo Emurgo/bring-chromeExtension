@@ -1,6 +1,6 @@
 import styles from './styles.module.css'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGoogleAnalytics } from '../../hooks/useGoogleAnalytics';
 
@@ -13,21 +13,28 @@ const options = [
     { label: '24 hours', time: 24 * 60 * 60 * 1000 },
     { label: '7 days', time: 7 * 24 * 60 * 60 * 1000 },
     { label: '30 days', time: 30 * 24 * 60 * 60 * 1000 },
-    { label: 'forever', time: Infinity },
+    { label: 'forever', time: Number.MAX_SAFE_INTEGER },
 ]
+
+const dict = {
+    '24 hours': '24Hours',
+    '7 days': '7Days',
+    '30 days': '30Days',
+    'forever': 'forever'
+}
 
 const OptOut = ({ open, onClose }: Props) => {
     const { sendGaEvent } = useGoogleAnalytics()
     const [isOpted, setIsOpted] = useState(false)
     const popupRef = useRef<HTMLDivElement>(null);
 
-    const handleClose = (): void => {
+    const handleClose = useCallback((): void => {
         if (isOpted) {
             sendMessage({ action: ACTIONS.CLOSE })
         } else {
             onClose()
         }
-    }
+    }, [isOpted, onClose])
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -41,10 +48,12 @@ const OptOut = ({ open, onClose }: Props) => {
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [onClose, isOpted]);
+    }, [onClose, isOpted, handleClose]);
 
     const handleOptOut = (time: number, label: string) => {
-        sendMessage({ action: ACTIONS.OPT_OUT, time })
+        console.log({ dict, label, value: dict[label as keyof typeof dict] });
+
+        sendMessage({ action: ACTIONS.OPT_OUT, time, key: dict[label as keyof typeof dict] })
         setIsOpted(true)
         sendGaEvent('opt_out', {
             category: 'user_action',

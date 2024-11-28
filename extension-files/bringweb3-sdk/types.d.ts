@@ -21,5 +21,7 @@ interface BringEvent {
         keyFrames?: KeyFrame[]
         extensionId: string
         time?: number
+        key?: string
+        url?: string
     }
 }

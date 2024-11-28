@@ -1,15 +1,16 @@
 import styles from './styles.module.css'
-import activate from '../../api/activate'
-import OptOut from '../OptOut/OptOut'
+
 import { useCallback, useEffect, useState } from 'react'
+import { useGoogleAnalytics } from '../../hooks/useGoogleAnalytics'
+import OptOut from '../OptOut/OptOut'
+import activate from '../../api/activate'
 import CryptoSymbolSelect from '../CryptoSymbolSelect/CryptoSymbolSelect'
 import CloseBtn from '../CloseBtn/CloseBtn'
 import PlatformLogo from '../PlatformLogo/PlatformLogo'
+import SwitchBtn from '../SwitchBtn/SwitchBtn'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 import splitWordMaxFive from '../../utils/splitWordMaxFive'
-import { useGoogleAnalytics } from '../../hooks/useGoogleAnalytics'
-import { Oval } from 'react-loader-spinner'
-import { motion, AnimatePresence } from 'framer-motion'
+import LoadingOverlay from '../LoadingOverlay/LoadingOverlay'
 import { useRouteLoaderData } from 'react-router-dom'
 import toCaseString from '../../utils/toCaseString'
 
@@ -110,8 +111,13 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
         <div className={styles.container}>
             <CloseBtn />
             {info?.walletAddress ?
-                <div className={styles.wallet_container}>
-                    <div className={styles.wallet}>{splitWordMaxFive(info.walletAddress)}</div>
+                <div className={styles.top_container}>
+                    <div className={styles.wallet_container}>
+                        <span className={styles.wallet}>{splitWordMaxFive(info.walletAddress)}</span>
+                    </div>
+                    <SwitchBtn
+                        callback={() => setStatus('waiting')}
+                    />
                 </div>
                 :
                 <div className={styles.wallet_spacer} />
@@ -161,28 +167,9 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
                     </button>
                 </div>
             </div>
-            <AnimatePresence>
-                {status === 'waiting' ?
-                    <motion.div
-                        transition={{ ease: 'easeInOut' }}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className={styles.waiting}>
-                        <div className={styles.message}>Log into your wallet to proceed</div>
-                        <Oval
-                            visible={true}
-                            height="60"
-                            width="60"
-                            strokeWidth="4"
-                            strokeWidthSecondary="4"
-                            color="var(--loader-bg)"
-                            secondaryColor=""
-                            ariaLabel="oval-loading"
-                        />
-                    </motion.div>
-                    : null}
-            </AnimatePresence>
+            <LoadingOverlay
+                open={status === 'waiting'}
+            />
             <OptOut
                 open={optOutOpen}
                 onClose={() => setOptOutOpen(false)}

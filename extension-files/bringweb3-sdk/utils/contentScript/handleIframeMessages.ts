@@ -13,14 +13,15 @@ const ACTIONS = {
     ACTIVATE: 'ACTIVATE',
     PROMPT_LOGIN: 'PROMPT_LOGIN',
     OPT_OUT: 'OPT_OUT',
-    ADD_KEYFRAMES: 'ADD_KEYFRAMES'
+    ADD_KEYFRAMES: 'ADD_KEYFRAMES',
+    ERASE_NOTIFICATION: 'ERASE_NOTIFICATION'
 }
 
 const UNION_ACTIONS = [ACTIONS.ACTIVATE]
 
 const handleIframeMessages = ({ event, iframeEl, promptLogin }: Props) => {
     const { data } = event
-    const { from, action, style, keyFrames, time, extensionId } = data
+    const { from, action, style, keyFrames, time, extensionId, url } = data
 
     if (from !== 'bringweb3') return
 
@@ -39,11 +40,13 @@ const handleIframeMessages = ({ event, iframeEl, promptLogin }: Props) => {
             promptLogin()
             break;
         case ACTIONS.ACTIVATE:
-            chrome.runtime.sendMessage({ action, from: "bringweb3" })
+            chrome.runtime.sendMessage({ action, from: "bringweb3", url, extensionId })
             break;
         case ACTIONS.OPT_OUT:
             chrome.runtime.sendMessage({ action, time, from: "bringweb3" })
             break;
+        case ACTIONS.ERASE_NOTIFICATION:
+            chrome.runtime.sendMessage({ action, from: "bringweb3" })
         case ACTIONS.ADD_KEYFRAMES:
             addKeyframes(keyFrames)
             break;

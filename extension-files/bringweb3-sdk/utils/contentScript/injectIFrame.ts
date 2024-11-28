@@ -11,15 +11,16 @@ interface Props {
     themeMode: string
     text: 'upper' | 'lower'
     page: string | undefined
+    switchWallet: boolean
 }
 
-const injectIFrame = ({ query, theme, themeMode, text, iframeUrl, page }: Props): HTMLIFrameElement => {
+const injectIFrame = ({ query, theme, themeMode, text, iframeUrl, page, switchWallet }: Props): HTMLIFrameElement => {
     const extensionId = chrome.runtime.id;
     const iframeId = `bringweb3-iframe-${extensionId}`;
     const element = document.getElementById(iframeId)
     const iframeHost = process?.env?.IFRAME_URL ? `${process.env.IFRAME_URL}${page ? '/' + page : ''}` : iframeUrl
     if (element) return element as HTMLIFrameElement;
-    const params = getQueryParams({ query: { ...query, extensionId, v: getVersion(), themeMode, textMode: text } })
+    const params = getQueryParams({ query: { ...query, extensionId, v: getVersion(), themeMode, textMode: text, switchWallet: String(switchWallet) } })
     const customStyles = theme ? `&${getQueryParams({ query: theme, prefix: 't' })}` : ''
     const iframe = document.createElement('iframe');
     iframe.id = iframeId;
