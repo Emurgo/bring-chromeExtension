@@ -44,10 +44,11 @@ export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, pl
         });
 
         sendPageViewEvent();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [measurementId]);
 
     const sendPageViewEvent = (): void => {
+        console.log('IFRAME, PAGE_VIEW');
+
         if (window.origin.includes('localhost')) {
             return
         }

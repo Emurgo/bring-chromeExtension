@@ -3,7 +3,11 @@ import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 import { useGoogleAnalytics } from '../../hooks/useGoogleAnalytics'
 import { QUIET_TIME } from '../../config'
 
-const CloseBtn = () => {
+interface Props {
+    callback?: () => void
+}
+
+const CloseBtn = ({ callback }: Props) => {
     const { sendGaEvent } = useGoogleAnalytics()
 
     const close = () => {
@@ -17,7 +21,10 @@ const CloseBtn = () => {
 
     return (
         <button
-            onClick={close}
+            onClick={() => {
+                close()
+                callback && callback()
+            }}
             className={styles.btn}
         >
             <div

@@ -7,7 +7,8 @@ declare global {
         ACTIVATE = 'ACTIVATE',
         PROMPT_LOGIN = 'PROMPT_LOGIN',
         OPT_OUT = 'OPT_OUT',
-        ADD_KEYFRAMES = 'ADD_KEYFRAMES'
+        ADD_KEYFRAMES = 'ADD_KEYFRAMES',
+        ERASE_NOTIFICATION = 'ERASE_NOTIFICATION'
     }
 
     interface Styles {
@@ -37,6 +38,7 @@ declare global {
         themeMode: 'light' | 'dark'
         textMode: 'upper' | 'lower'
         variant: VariantKey
+        switchWallet: boolean
     }
 
     interface Message {
@@ -45,6 +47,8 @@ declare global {
         style?: Styles
         id?: string
         keyFrames?: Styles[]
+        key?: string
+        url?: string
     }
 
     interface GoogleAnalyticsContextType {

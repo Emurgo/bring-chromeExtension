@@ -37,6 +37,7 @@ const Home = () => {
     sendMessage({ action: ACTIONS.OPEN, style: iframeStyle })
     loadMarkdown(info.retailerTermsUrl, setRetailerMarkdown)
     loadMarkdown(info.generalTermsUrl, setGeneralMarkdown)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const close = () => {

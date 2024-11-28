@@ -1,0 +1,11 @@
+.switch_btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    outline: none;
+    height: 23px;
+    padding: 0;
+    cursor: pointer;
+}
