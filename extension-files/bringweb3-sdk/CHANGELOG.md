@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.2.3
+
+### Patch Changes
+
+- aabb80e: update docs
+
 ## 1.2.2
 
 ### Patch Changes
