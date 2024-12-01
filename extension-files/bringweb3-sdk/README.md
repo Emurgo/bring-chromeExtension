@@ -16,6 +16,7 @@
 - [Example](#example)
   - [background.js](#backgroundjs)
   - [contentScript.js](#contentscriptjs)
+  - [Turnoff settings](#turnoff-settings)
 - [Contact us](#contact-us)
 
 ## Description
@@ -120,6 +121,7 @@ bringInitContentScript({
     promptLogin: () => {...}, // Function that prompts a UI element asking the user to login
     walletAddressListeners: ["customEvent:addressChanged"], // An optional list of custom events that dispatched when the user's wallet address had changed, don't add it if you are using walletAddressUpdateCallback
     walletAddressUpdateCallback: (callback)=>{...}, //an optional function that runs when the user's wallet address had changed and execute the callback, don't add it if you are using walletAddressUpdateCallback
+    switchWallet: true // Add switch wallet button, this requires also a UI for changing wallet address.
     themeMode: 'light' // 'light' | 'dark',
     text:'lower' // 'lower' | 'upper'
     darkTheme: {...}, // Same as lightTheme
@@ -219,6 +221,19 @@ bringInitContentScript({
     }
 });
 ```
+### Turnoff settings 
+```javascript
+import { getTurnOff, setTurnOff } from "@bringweb3/chrome-extension-kit";
+
+// Get state example
+const current = await getTurnOff()
+console.log(current) // true | false
+
+// Set state example
+const res = await setTurnOff(true)
+console.log(res) // true
+```
+
 
 ## Contact us
 
