@@ -39,12 +39,17 @@ export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, pl
             },
             gtagOptions: {
                 anonymize_ip: true,
-                cookie_update: false
+                cookie_update: false,
+                platform,
+                testId: TEST_ID,
+                testVariant,
+                source: 'extension',
+                walletAddress
             }
         });
 
-        sendPageViewEvent();
-    }, [measurementId]);
+        // sendPageViewEvent();
+    }, [measurementId, platform, testVariant, walletAddress]);
 
     const sendPageViewEvent = (): void => {
         console.log('IFRAME, PAGE_VIEW');
