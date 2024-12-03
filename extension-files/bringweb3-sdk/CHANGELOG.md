@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.2.4
+
+### Patch Changes
+
+- 9d66cdc: Fix frequent updates for relevant domains
+
 ## 1.2.3
 
 ### Patch Changes
