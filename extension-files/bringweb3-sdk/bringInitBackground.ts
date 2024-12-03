@@ -104,7 +104,9 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
 
     ApiEndpoint.getInstance().setApiEndpoint(apiEndpoint)
 
-    updateCache(identifier)
+    if (! await storage.get('relevantDomains')) {
+        updateCache(identifier)
+    }
 
     chrome.alarms.onAlarm.addListener(async (alarm) => {
         const { name } = alarm
