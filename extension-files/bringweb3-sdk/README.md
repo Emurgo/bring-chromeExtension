@@ -231,7 +231,7 @@ console.log(current) // true | false
 
 // Set state example
 const res = await setTurnOff(true)
-console.log(res) // true
+console.log(res.isTurnedOff) // true
 ```
 
 
