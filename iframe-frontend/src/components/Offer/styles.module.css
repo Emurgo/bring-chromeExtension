@@ -25,6 +25,7 @@
     font-size: var(--details-subtitle-f-s);
     font-weight: var(--details-subtitle-f-w);
     color: var(--details-subtitle-f-c);
+    white-space: nowrap;
 }
 
 .cashback_amount {
