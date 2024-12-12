@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.2.6
+
+### Patch Changes
+
+- 67071be: Improve notification open page mechanism
+
 ## 1.2.5
 
 ### Patch Changes
