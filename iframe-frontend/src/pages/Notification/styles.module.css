@@ -26,4 +26,5 @@
     border-style: solid;
     border-color: var(--notification-btn-border-c);
     background: var(--notification-btn-bg);
+    cursor: pointer
 }

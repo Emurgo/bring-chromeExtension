@@ -39,6 +39,11 @@ const Notification = () => {
         sendMessage({ action: ACTIONS.ERASE_NOTIFICATION })
     }
 
+    const openCashbackPage = () => {
+        sendMessage({ action: ACTIONS.OPEN_CASHBACK_PAGE })
+        notificationSeen()
+    }
+
     return (
         <div className={styles.container}>
             <PlatformLogo
@@ -47,14 +52,12 @@ const Notification = () => {
                 width={40}
             />
             <div className={styles.notification_details}>New cashback reward</div>
-            <a
+            <button
                 className={styles.link}
-                href={data.cashbackUrl}
-                onClick={notificationSeen}
-                target='_blank'
+                onClick={openCashbackPage}
             >
                 {toCaseString('Details', data.textMode)}
-            </a>
+            </button>
             <CloseBtn
                 callback={notificationSeen}
             />

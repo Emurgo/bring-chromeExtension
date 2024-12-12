@@ -8,7 +8,8 @@ declare global {
         PROMPT_LOGIN = 'PROMPT_LOGIN',
         OPT_OUT = 'OPT_OUT',
         ADD_KEYFRAMES = 'ADD_KEYFRAMES',
-        ERASE_NOTIFICATION = 'ERASE_NOTIFICATION'
+        ERASE_NOTIFICATION = 'ERASE_NOTIFICATION',
+        OPEN_CASHBACK_PAGE = 'OPEN_CASHBACK_PAGE'
     }
 
     interface Styles {
