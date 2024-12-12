@@ -1,3 +1,4 @@
+import { openExtensionCashbackPage } from './utils/background/openExtensionCashbackPage';
 import fetchDomains from "./utils/api/fetchDomains.js"
 import validateDomain from "./utils/api/validateDomain.js"
 import { ApiEndpoint } from "./utils/apiEndpoint.js"
@@ -166,6 +167,10 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
                 console.warn(`Bring unknown action: ${action}`);
                 return true;
             }
+            case 'OPEN_CASHBACK_PAGE':
+                openExtensionCashbackPage(cashbackPagePath || '')
+                sendResponse({ message: 'cashback page opened successfully' })
+                return true
         }
     })
 

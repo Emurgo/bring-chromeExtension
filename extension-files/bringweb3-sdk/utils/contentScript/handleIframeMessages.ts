@@ -14,7 +14,8 @@ const ACTIONS = {
     PROMPT_LOGIN: 'PROMPT_LOGIN',
     OPT_OUT: 'OPT_OUT',
     ADD_KEYFRAMES: 'ADD_KEYFRAMES',
-    ERASE_NOTIFICATION: 'ERASE_NOTIFICATION'
+    ERASE_NOTIFICATION: 'ERASE_NOTIFICATION',
+    OPEN_CASHBACK_PAGE: 'OPEN_CASHBACK_PAGE'
 }
 
 const UNION_ACTIONS = [ACTIONS.ACTIVATE]
@@ -22,7 +23,7 @@ const UNION_ACTIONS = [ACTIONS.ACTIVATE]
 const handleIframeMessages = ({ event, iframeEl, promptLogin }: Props) => {
     const { data } = event
     const { from, action, style, keyFrames, time, extensionId, url } = data
-
+    
     if (from !== 'bringweb3') return
 
     // If the event comes from another extension that installed our package, ignore it (unless it ACTIVATE action)
@@ -49,6 +50,9 @@ const handleIframeMessages = ({ event, iframeEl, promptLogin }: Props) => {
             chrome.runtime.sendMessage({ action, from: "bringweb3" })
         case ACTIONS.ADD_KEYFRAMES:
             addKeyframes(keyFrames)
+            break;
+        case ACTIONS.OPEN_CASHBACK_PAGE:
+            chrome.runtime.sendMessage({ action, from: "bringweb3" })
             break;
         default:
             // console.log('Non exist ACTION:', action);
