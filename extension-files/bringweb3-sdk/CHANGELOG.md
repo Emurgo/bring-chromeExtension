@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.2.7
+
+### Patch Changes
+
+- a6b3d7d: Fix bug when navigating inside a website
+
 ## 1.2.6
 
 ### Patch Changes
