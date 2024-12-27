@@ -1,7 +1,7 @@
 import injectIFrame from "./utils/contentScript/injectIFrame.js";
 import handleIframeMessages from "./utils/contentScript/handleIframeMessages.js";
 import startListenersForWalletAddress from "./utils/contentScript/startLIstenersForWalletAddress.js";
-import getDomain from "./utils/getDomain.js";
+import parseUrl from "./utils/parseUrl.js";
 let iframeEl: IFrame = null
 let isIframeOpen = false
 
@@ -94,12 +94,11 @@ const bringInitContentScript = async ({
                 return true
 
             case 'INJECT':
-                if ((request.domain !== getDomain(location.href)) || isIframeOpen) {
+                if ((request.domain !== parseUrl(location.href)) || isIframeOpen) {
                     sendResponse({ status: 'Domain already changed' });
                     return true
                 }
                 const { token, iframeUrl, userId } = request;
-                console.log({ token, iframeUrl, userId });
 
                 const query: { [key: string]: string } = { token }
                 if (userId) query['userId'] = userId

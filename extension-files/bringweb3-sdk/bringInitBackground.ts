@@ -2,7 +2,7 @@ import { openExtensionCashbackPage } from './utils/background/openExtensionCashb
 import fetchDomains from "./utils/api/fetchDomains.js"
 import validateDomain from "./utils/api/validateDomain.js"
 import { ApiEndpoint } from "./utils/apiEndpoint.js"
-import getDomain from "./utils/getDomain.js"
+import parseUrl from "./utils/parseUrl.js"
 import { UPDATE_CACHE_ALARM_NAME } from './utils/constants.js'
 import storage from "./utils/storage.js"
 import handleActivate from "./utils/background/activate.js"
@@ -41,9 +41,12 @@ const getRelevantDomain = async (url: string | undefined, apiKey: string) => {
     }
 
     if (!url || !relevantDomains || !relevantDomains.length) return ''
-    const domain = getDomain(url)
+    const domain = parseUrl(url)
+    console.log('check relevant', { domain, url });
+
     for (const relevantDomain of relevantDomains) {
         if (domain.startsWith(relevantDomain)) {
+            console.log('Found relevant', { domain, relevantDomain });
 
             const quietDomains = await storage.get('quietDomains')
             if (quietDomains && quietDomains[relevantDomain] && Date.now() < quietDomains[relevantDomain]) {
@@ -105,7 +108,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
 
     ApiEndpoint.getInstance().setApiEndpoint(apiEndpoint)
 
-    if (! await storage.get('relevantDomains')) {
+    if (!await storage.get('relevantDomains')) {
         updateCache(identifier)
     }
 
@@ -175,10 +178,11 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
     })
 
     chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+        console.log('before previousUrl', tab.url);
 
         if (!tab?.url?.startsWith('http') || !tab.url) return;
 
-        const url = getDomain(tab.url)
+        const url = parseUrl(tab.url)
 
         const optOut = await storage.get('optOut');
 
@@ -193,6 +197,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
         const previousUrl = urlsDict[tabId];
 
         if (changeInfo.status !== 'complete' || url === previousUrl) return;
+        console.log('after previousUrl');
 
         urlsDict[tabId] = url
 

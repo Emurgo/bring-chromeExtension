@@ -3,7 +3,7 @@ import { ApiEndpoint } from "../apiEndpoint"
 const fetchDomains = async (apiKey: string) => {
     const endpoint = ApiEndpoint.getInstance().getApiEndpoint()
 
-    const res = await fetch(`${endpoint}/domains`, {
+    const res = await fetch(`${endpoint}/domains?country=ALL`, {
         headers: {
             'x-api-key': apiKey
         }
