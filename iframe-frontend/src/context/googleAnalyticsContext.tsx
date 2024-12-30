@@ -2,6 +2,7 @@ import { FC, createContext, useEffect, ReactNode } from 'react';
 import ReactGA from 'react-ga4';
 import { TEST_ID } from '../config';
 import { VariantKey } from '../utils/ABTest/ABTestVariant';
+import analytics from '../api/analytics';
 
 type EventName = 'retailer_shop' | 'popup_close' | 'opt_out' | 'retailer_activation'
 
@@ -69,7 +70,21 @@ export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, pl
         });
     };
 
-    const sendGaEvent = (name: EventName, event: GAEvent): void => {
+    const sendGaEvent = async (name: EventName, event: GAEvent): Promise<void> => {
+        const backendEvent: Parameters<typeof analytics>[0] = {
+            type: name,
+            ...event,
+            platform,
+            testId: TEST_ID,
+            testVariant,
+        }
+
+        if (walletAddress) backendEvent.walletAddress = walletAddress
+        try {
+            await analytics(backendEvent)
+        } catch (error) {
+            console.error('BRING: Error sending analytics event', error)
+        }
         if (window.origin.includes('localhost')) {
             return
         }
