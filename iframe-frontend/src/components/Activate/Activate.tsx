@@ -7,6 +7,7 @@ import { useGoogleAnalytics } from '../../hooks/useGoogleAnalytics'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 import { useRouteLoaderData } from 'react-router-dom'
 import toCaseString from '../../utils/toCaseString'
+import { useEffect, useRef } from 'react'
 // import SwitchBtn from '../SwitchBtn/SwitchBtn'
 
 interface ActivateProps {
@@ -21,10 +22,19 @@ interface ActivateProps {
 const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName, retailerName, walletAddress }: ActivateProps) => {
     const { textMode, url } = useRouteLoaderData('root') as LoaderData
     const { sendGaEvent } = useGoogleAnalytics()
+    const effectRan = useRef(false);
+
+    useEffect(() => {
+        if (effectRan.current === true) return
+        sendGaEvent('wallet_connected', {
+            category: 'system',
+            details: retailerName
+        }, true)
+        effectRan.current = true
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     const redirectEvent = () => {
-        console.log('POPUP', { url });
-
         sendMessage({ action: ACTIONS.ACTIVATE, url })
         sendGaEvent('retailer_shop', {
             category: 'user_action',

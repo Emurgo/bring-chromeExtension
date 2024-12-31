@@ -26,6 +26,7 @@ const rootLoader = async ({ request }: Props) => {
 
     return {
         ...res.info,
+        userId,
         themeMode,
         textMode,
         switchWallet,

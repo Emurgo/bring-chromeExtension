@@ -10,6 +10,7 @@ const Layout = () => {
     return (
         <>
             <GoogleAnalyticsProvider
+                userId={data.userId}
                 measurementId={GA_MEASUREMENT_ID}
                 platform={data.platformName}
                 testVariant={data.variant}

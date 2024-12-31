@@ -40,6 +40,7 @@ declare global {
         textMode: 'upper' | 'lower'
         variant: VariantKey
         switchWallet: boolean
+        userId: string | undefined
     }
 
     interface Message {
@@ -53,7 +54,7 @@ declare global {
     }
 
     interface GoogleAnalyticsContextType {
-        sendGaEvent: (name: EventName, event: GAEvent) => void;
+        sendGaEvent: (name: EventName, event: GAEvent, disableGA?: boolean) => Promise<void>;
         sendPageViewEvent: (path: string) => void;
     }
 }
