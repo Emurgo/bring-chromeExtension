@@ -115,7 +115,7 @@ export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, pl
 
     const sendGaEvent = async (name: EventName, event: GAEvent, disableGA: boolean = false): Promise<void> => {
 
-        sendBackendEvent(name, event)
+        await sendBackendEvent(name, event)
 
         if (window.origin.includes('localhost')) return
 
@@ -136,6 +136,7 @@ export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, pl
 
         if (walletAddress) params.walletAddress = walletAddress
         ReactGA.event(name, params)
+        return
     };
 
     return (

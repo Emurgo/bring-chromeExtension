@@ -54,7 +54,7 @@ declare global {
     }
 
     interface GoogleAnalyticsContextType {
-        sendGaEvent: (name: EventName, event: GAEvent, disableGA?: boolean) => void;
+        sendGaEvent: (name: EventName, event: GAEvent, disableGA?: boolean) => Promise<void>;
         sendPageViewEvent: (path: string) => void;
     }
 }

@@ -10,13 +10,13 @@ interface Props {
 const CloseBtn = ({ callback }: Props) => {
     const { sendGaEvent } = useGoogleAnalytics()
 
-    const close = () => {
-        sendMessage({ action: ACTIONS.CLOSE, time: Date.now() + QUIET_TIME })
-        sendGaEvent('popup_close', {
+    const close = async () => {
+        await sendGaEvent('popup_close', {
             category: 'user_action',
             action: 'click',
             details: 'Extension'
         })
+        sendMessage({ action: ACTIONS.CLOSE, time: Date.now() + QUIET_TIME })
     }
 
     return (
