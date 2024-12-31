@@ -148,8 +148,8 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
                 <div className={styles.btns_container}>
                     <button
                         className={styles.action_btn}
-                        onClick={() => {
-                            sendGaEvent('popup_close', {
+                        onClick={async () => {
+                            await sendGaEvent('popup_close', {
                                 category: 'user_action',
                                 action: 'click',
                                 details: 'extension'
