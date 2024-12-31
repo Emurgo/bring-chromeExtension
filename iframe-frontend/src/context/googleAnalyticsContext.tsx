@@ -111,9 +111,9 @@ export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, pl
 
     const sendGaEvent = async (name: EventName, event: GAEvent, disableGA: boolean = false): Promise<void> => {
 
-        await sendBackendEvent(name, event)
-
         if (window.origin.includes('localhost')) return
+
+        await sendBackendEvent(name, event)
 
         if (!ReactGA.isInitialized) {
             console.warn('BRING: Google Analytics is not initialized');
