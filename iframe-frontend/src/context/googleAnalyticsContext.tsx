@@ -20,10 +20,6 @@ interface BackendEvent {
     process?: "activate" | "initiate" | "submit";
 }
 
-interface GoogleAnalyticsContextType {
-    sendGaEvent: (name: EventName, event: GAEvent) => void;
-    sendPageViewEvent: (path: string) => void;
-}
 
 export const GoogleAnalyticsContext = createContext<GoogleAnalyticsContextType | undefined>(undefined);
 
