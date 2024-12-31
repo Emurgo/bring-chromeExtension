@@ -7,10 +7,10 @@ interface Body {
     walletAddress?: string
     testId: string
     testVariant: string
-    category: string
+    category?: string
     action?: string
     process?: string
-    details?: string
+    details?: unknown
 }
 
 const analytics = async (body: Body) => {
