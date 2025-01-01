@@ -30,16 +30,17 @@ interface Props {
     platform: string
     userId: string | undefined
     testVariant: VariantKey
+    retailerName: string | undefined
 }
 
-export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, platform, testVariant, userId }) => {
+export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, platform, testVariant, userId, retailerName }) => {
     const effectRan = useRef(false)
     const { walletAddress } = useWalletAddress()
 
     const sendBackendEvent = useCallback(async (name: EventName, event: BackendEvent) => {
         const backendEvent: Parameters<typeof analytics>[0] = {
-            type: name,
             ...event,
+            type: name,
             platform,
             testId: TEST_ID,
             testVariant,
@@ -81,14 +82,18 @@ export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, pl
     useEffect(() => {
 
         if (effectRan.current) return
+        const details: { [key: string]: string } = {
+            pageLocation: window.location.href,
+            pagePath: window.location.pathname,
+            pageTitle: document.title,
+        }
+        if (retailerName) details.retailer = retailerName
+
         sendBackendEvent('page_view', {
             category: 'system',
-            details: {
-                pageLocation: window.location.href,
-                pagePath: window.location.pathname,
-                pageTitle: document.title
-            }
+            details
         })
+
         effectRan.current = true
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -106,15 +111,16 @@ export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, pl
             hitType: 'pageview',
             page_location: window.location.href,
             page_path: window.location.pathname,
-            page_title: document.title
+            page_title: document.title,
+            retailer: retailerName
         });
     };
 
     const sendGaEvent = async (name: EventName, event: GAEvent, disableGA: boolean = false): Promise<void> => {
 
-        await sendBackendEvent(name, event)
-
         if (window.origin.includes('localhost')) return
+
+        await sendBackendEvent(name, event)
 
         if (!ReactGA.isInitialized) {
             console.warn('BRING: Google Analytics is not initialized');
