@@ -13,6 +13,7 @@ import splitWordMaxFive from '../../utils/splitWordMaxFive'
 import LoadingOverlay from '../LoadingOverlay/LoadingOverlay'
 import { useRouteLoaderData } from 'react-router-dom'
 import toCaseString from '../../utils/toCaseString'
+import { useWalletAddress } from '../../hooks/useWalletAddress'
 
 interface BringEventData {
     from: string
@@ -25,20 +26,20 @@ interface Props {
     nextFn: () => void
     closeFn: () => void
     setRedirectUrl: (url: string) => void
-    setWalletAddress: (walletAddress: WalletAddress) => void
 }
 
-const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Props) => {
+const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: Props) => {
     const { sendGaEvent } = useGoogleAnalytics()
+    const { walletAddress, setWalletAddress } = useWalletAddress()
     const { iconsPath, textMode } = useRouteLoaderData('root') as LoaderData
     const [tokenSymbol, setTokenSymbol] = useState(info.cryptoSymbols[0])
     const [optOutOpen, setOptOutOpen] = useState(false)
     const [status, setStatus] = useState<'idle' | 'waiting' | 'done'>('idle')
 
-    const activateAction = useCallback(async (walletAddress?: string) => {
+    const activateAction = useCallback(async () => {
         try {
             const { platformName, retailerId, url } = info
-            walletAddress = info.walletAddress || walletAddress
+
             if (!walletAddress) {
                 setStatus('waiting')
                 sendMessage({ action: ACTIONS.PROMPT_LOGIN })
@@ -52,30 +53,37 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
                 tokenSymbol
             })
             if (res.status !== 200) throw `Got ${res.status} status`
-            sendGaEvent('retailer_activation', {
-                category: 'user_action',
-                action: 'click',
-                process: 'activate',
-                details: info.name
-            })
+
             setRedirectUrl(res.url)
             nextFn()
         } catch (error) {
             console.error(error);
         }
-    }, [info, nextFn, sendGaEvent, setRedirectUrl, tokenSymbol])
+    }, [info, walletAddress, tokenSymbol, setRedirectUrl, nextFn])
+
+    const handleFirstClick = () => {
+        sendGaEvent('retailer_activation', {
+            category: 'user_action',
+            action: 'click',
+            process: 'activate',
+            details: info.name
+        })
+        activateAction()
+    }
 
     const walletAddressUpdate = useCallback((e: MessageEvent<BringEventData>) => {
         const { walletAddress, action } = e.data
         if (action !== 'WALLET_ADDRESS_UPDATE') return
         setWalletAddress(walletAddress)
+    }, [setWalletAddress])
 
-        if (status === 'waiting') {
+    useEffect(() => {
+        if (status === 'waiting' && walletAddress) {
             console.log('BRING: out of waiting block');
             setStatus('done')
-            activateAction(walletAddress)
+            activateAction()
         }
-    }, [status, setWalletAddress, activateAction])
+    }, [walletAddress, status, activateAction])
 
     useEffect(() => {
         if (status === 'done') return
@@ -110,10 +118,10 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
     return (
         <div className={styles.container}>
             <CloseBtn />
-            {info?.walletAddress ?
+            {walletAddress ?
                 <div className={styles.top_container}>
                     <div className={styles.wallet_container}>
-                        <span className={styles.wallet}>{splitWordMaxFive(info.walletAddress)}</span>
+                        <span className={styles.wallet}>{splitWordMaxFive(walletAddress)}</span>
                     </div>
                     <SwitchBtn
                         callback={() => setStatus('waiting')}
@@ -140,7 +148,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn, setWalletAddress }: Prop
             </div>
             <div className={styles.action_container}>
                 <button
-                    onClick={() => activateAction()}
+                    onClick={handleFirstClick}
                     className={styles.btn}
                 >
                     {toCaseString("Let's go", textMode)}

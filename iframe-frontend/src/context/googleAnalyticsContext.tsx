@@ -3,6 +3,7 @@ import ReactGA from 'react-ga4';
 import { TEST_ID } from '../config';
 import { VariantKey } from '../utils/ABTest/ABTestVariant';
 import analytics from '../api/analytics';
+import { useWalletAddress } from '../hooks/useWalletAddress';
 
 type EventName = 'retailer_shop' | 'popup_close' | 'opt_out' | 'retailer_activation' | 'page_view'
 
@@ -28,12 +29,12 @@ interface Props {
     children: ReactNode
     platform: string
     userId: string | undefined
-    walletAddress: string | undefined
     testVariant: VariantKey
 }
 
-export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, platform, walletAddress, testVariant, userId }) => {
+export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, platform, testVariant, userId }) => {
     const effectRan = useRef(false)
+    const { walletAddress } = useWalletAddress()
 
     const sendBackendEvent = useCallback(async (name: EventName, event: BackendEvent) => {
         const backendEvent: Parameters<typeof analytics>[0] = {
@@ -111,9 +112,9 @@ export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, pl
 
     const sendGaEvent = async (name: EventName, event: GAEvent, disableGA: boolean = false): Promise<void> => {
 
-        if (window.origin.includes('localhost')) return
-
         await sendBackendEvent(name, event)
+
+        if (window.origin.includes('localhost')) return
 
         if (!ReactGA.isInitialized) {
             console.warn('BRING: Google Analytics is not initialized');
