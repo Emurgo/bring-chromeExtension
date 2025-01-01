@@ -1,5 +1,6 @@
 import { Outlet, useLoaderData } from "react-router-dom"
 import { GoogleAnalyticsProvider } from "../context/googleAnalyticsContext"
+import WalletAddressProvider from "../context/walletAddressContext"
 import { GA_MEASUREMENT_ID } from "../config"
 import useCustomTheme from "../hooks/useCustomTheme"
 
@@ -9,15 +10,16 @@ const Layout = () => {
 
     return (
         <>
-            <GoogleAnalyticsProvider
-                userId={data.userId}
-                measurementId={GA_MEASUREMENT_ID}
-                platform={data.platformName}
-                testVariant={data.variant}
-                walletAddress={data.walletAddress}
-            >
-                <Outlet />
-            </GoogleAnalyticsProvider>
+            <WalletAddressProvider address={data.walletAddress}>
+                <GoogleAnalyticsProvider
+                    userId={data.userId}
+                    measurementId={GA_MEASUREMENT_ID}
+                    platform={data.platformName}
+                    testVariant={data.variant}
+                >
+                    <Outlet />
+                </GoogleAnalyticsProvider>
+            </WalletAddressProvider>
         </>
     )
 }
