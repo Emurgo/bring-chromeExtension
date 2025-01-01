@@ -23,5 +23,6 @@ interface BringEvent {
         time?: number
         key?: string
         url?: string
+        domain?: string
     }
 }

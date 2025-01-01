@@ -42,11 +42,9 @@ const getRelevantDomain = async (url: string | undefined, apiKey: string) => {
 
     if (!url || !relevantDomains || !relevantDomains.length) return ''
     const domain = parseUrl(url)
-    console.log('check relevant', { domain, url });
 
     for (const relevantDomain of relevantDomains) {
         if (domain.startsWith(relevantDomain)) {
-            console.log('Found relevant', { domain, relevantDomain });
 
             const quietDomains = await storage.get('quietDomains')
             if (quietDomains && quietDomains[relevantDomain] && Date.now() < quietDomains[relevantDomain]) {
@@ -147,13 +145,19 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
                 return true;
             }
             case 'CLOSE': {
-                const { time } = request
-                getRelevantDomain(sender.tab?.url || sender.origin, identifier)
-                    .then(domain => {
-                        if (!domain) return true;
-                        addQuietDomain(domain, time)
-                        sendResponse({ message: 'domain added to quiet list' })
-                    })
+                const { time, domain } = request
+                if (domain) {
+
+                    addQuietDomain(domain, time)
+                    sendResponse({ message: 'domain added to quiet list' })
+                } else {
+                    getRelevantDomain(sender.tab?.url || sender.origin, identifier)
+                        .then(domain => {
+                            if (!domain) return true;
+                            addQuietDomain(domain, time)
+                            sendResponse({ message: 'domain added to quiet list' })
+                        })
+                }
                 return true;
             }
             case 'WALLET_ADDRESS_UPDATE': {
@@ -178,7 +182,6 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
     })
 
     chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-        console.log('before previousUrl', tab.url);
 
         if (!tab?.url?.startsWith('http') || !tab.url) return;
 
@@ -197,7 +200,6 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
         const previousUrl = urlsDict[tabId];
 
         if (changeInfo.status !== 'complete' || url === previousUrl) return;
-        console.log('after previousUrl');
 
         urlsDict[tabId] = url
 

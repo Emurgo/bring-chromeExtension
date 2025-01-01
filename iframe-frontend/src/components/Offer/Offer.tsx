@@ -79,7 +79,6 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: Props) => {
 
     useEffect(() => {
         if (status === 'waiting' && walletAddress) {
-            console.log('BRING: out of waiting block');
             setStatus('done')
             activateAction()
         }

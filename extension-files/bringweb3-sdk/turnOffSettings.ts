@@ -19,7 +19,6 @@ export const getTurnOff = (): Promise<TurnOff> => {
                 reject(chrome.runtime.lastError);
                 return;
             }
-            console.log({ response });
             resolve({ isTurnedOff: response.isOptedOut });
         });
     });
