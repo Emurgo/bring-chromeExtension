@@ -12,6 +12,7 @@ const Layout = () => {
         <>
             <WalletAddressProvider address={data.walletAddress}>
                 <GoogleAnalyticsProvider
+                    retailerName={data.name}
                     userId={data.userId}
                     measurementId={GA_MEASUREMENT_ID}
                     platform={data.platformName}
