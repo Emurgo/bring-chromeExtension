@@ -14,7 +14,7 @@ const CloseBtn = ({ callback }: Props) => {
         await sendGaEvent('popup_close', {
             category: 'user_action',
             action: 'click',
-            details: 'Extension'
+            details: 'extension'
         })
         sendMessage({ action: ACTIONS.CLOSE, time: Date.now() + QUIET_TIME })
     }
