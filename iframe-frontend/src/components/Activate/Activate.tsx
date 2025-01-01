@@ -8,6 +8,7 @@ import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 import { useRouteLoaderData } from 'react-router-dom'
 import toCaseString from '../../utils/toCaseString'
 import { useEffect, useRef } from 'react'
+import { useWalletAddress } from '../../hooks/useWalletAddress'
 // import SwitchBtn from '../SwitchBtn/SwitchBtn'
 
 interface ActivateProps {
@@ -15,11 +16,11 @@ interface ActivateProps {
     retailerMarkdown: string
     generalMarkdown: string
     platformName: string
-    walletAddress: WalletAddress
     retailerName: string
 }
 
-const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName, retailerName, walletAddress }: ActivateProps) => {
+const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName, retailerName }: ActivateProps) => {
+    const { walletAddress } = useWalletAddress()
     const { textMode, url } = useRouteLoaderData('root') as LoaderData
     const { sendGaEvent } = useGoogleAnalytics()
     const effectRan = useRef(false);

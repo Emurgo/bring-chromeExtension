@@ -13,7 +13,7 @@ enum STEPS {
 }
 
 const Home = () => {
-  const [info, setInfo] = useState<Info>(useRouteLoaderData('root') as LoaderData)
+  const info = useRouteLoaderData('root') as LoaderData
   const [step, setStep] = useState(STEPS.OFFER)
   const [direction, setDirection] = useState(1)
   const [redirectUrl, setRedirectUrl] = useState('')
@@ -42,13 +42,6 @@ const Home = () => {
 
   const close = () => {
     sendMessage({ action: ACTIONS.CLOSE, time: Date.now() + QUIET_TIME })
-  }
-
-  const setWalletAddress = (walletAddress: WalletAddress): void => {
-    if (!info) return
-    const tmpInfo = structuredClone(info)
-    tmpInfo.walletAddress = walletAddress
-    setInfo(tmpInfo)
   }
 
   const slideVariants: Variants = {
@@ -88,7 +81,6 @@ const Home = () => {
               <Offer
                 info={info}
                 setRedirectUrl={setRedirectUrl}
-                setWalletAddress={setWalletAddress}
                 closeFn={close}
                 nextFn={() => {
                   setStep(STEPS.ACTIVATE)
@@ -102,7 +94,6 @@ const Home = () => {
                   generalMarkdown={generalMarkdown}
                   redirectUrl={redirectUrl}
                   platformName={info.platformName}
-                  walletAddress={info.walletAddress}
                   retailerName={info.name}
                 />
                 :

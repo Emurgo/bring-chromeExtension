@@ -57,6 +57,11 @@ declare global {
         sendGaEvent: (name: EventName, event: GAEvent, disableGA?: boolean) => Promise<void>;
         sendPageViewEvent: (path: string) => void;
     }
+
+    interface WalletAddressContextType {
+        walletAddress: string | undefined;
+        setWalletAddress: (address: string | undefined) => void;
+    }
 }
 
 export { }
