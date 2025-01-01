@@ -16,7 +16,6 @@ export const setOptOut = async (time: number): Promise<OptOut> => {
 
 export const getOptOut = async (): Promise<OptOut> => {
     const optOut = await storage.get('optOut')
-    console.log({ isOptedOut: !!(optOut && (optOut > Date.now())) });
 
     return { isOptedOut: !!(optOut && optOut > Date.now()) };
 }

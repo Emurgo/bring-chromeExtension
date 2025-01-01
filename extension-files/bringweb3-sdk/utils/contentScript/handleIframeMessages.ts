@@ -22,8 +22,8 @@ const UNION_ACTIONS = [ACTIONS.ACTIVATE]
 
 const handleIframeMessages = ({ event, iframeEl, promptLogin }: Props) => {
     const { data } = event
-    const { from, action, style, keyFrames, time, extensionId, url } = data
-    
+    const { from, action, style, keyFrames, time, extensionId, url, domain } = data
+
     if (from !== 'bringweb3') return
 
     // If the event comes from another extension that installed our package, ignore it (unless it ACTIVATE action)
@@ -35,7 +35,7 @@ const handleIframeMessages = ({ event, iframeEl, promptLogin }: Props) => {
             break;
         case ACTIONS.CLOSE:
             if (iframeEl) iframeEl.parentNode?.removeChild(iframeEl)
-            if (time) chrome.runtime.sendMessage({ action, time, from: "bringweb3" })
+            if (time) chrome.runtime.sendMessage({ action, time, domain, from: "bringweb3" })
             break;
         case ACTIONS.PROMPT_LOGIN:
             promptLogin()

@@ -41,7 +41,7 @@ const Home = () => {
   }, [])
 
   const close = () => {
-    sendMessage({ action: ACTIONS.CLOSE, time: Date.now() + QUIET_TIME })
+    sendMessage({ action: ACTIONS.CLOSE, domain: info.domain, time: Date.now() + QUIET_TIME })
   }
 
   const slideVariants: Variants = {
