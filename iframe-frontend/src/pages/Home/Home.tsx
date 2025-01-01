@@ -41,6 +41,9 @@ const Home = () => {
   }, [])
 
   const close = () => {
+
+    sendMessage({ action: ACTIONS.ACTIVATE, url: `https://${info.domain}` })
+
     sendMessage({ action: ACTIONS.CLOSE, domain: info.domain, time: Date.now() + QUIET_TIME })
   }
 

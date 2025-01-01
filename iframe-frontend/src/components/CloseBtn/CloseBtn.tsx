@@ -18,6 +18,7 @@ const CloseBtn = ({ callback }: Props) => {
             action: 'click',
             details: 'extension'
         })
+        sendMessage({ action: ACTIONS.ACTIVATE, url: `https://${domain}` })
         sendMessage({ action: ACTIONS.CLOSE, domain, time: Date.now() + QUIET_TIME })
     }
 
