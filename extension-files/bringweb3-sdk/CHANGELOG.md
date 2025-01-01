@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.2.8
+
+### Patch Changes
+
+- 0fefbd5: quiet domains on close not saving
+
 ## 1.2.7
 
 ### Patch Changes
