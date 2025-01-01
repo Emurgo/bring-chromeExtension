@@ -32,6 +32,7 @@ declare global {
         cryptoSymbols: string[]
         iconUrl: string
         url: string
+        domain?: string
     }
 
     interface LoaderData extends Info {
@@ -51,6 +52,7 @@ declare global {
         keyFrames?: Styles[]
         key?: string
         url?: string
+        domain?: string
     }
 
     interface GoogleAnalyticsContextType {

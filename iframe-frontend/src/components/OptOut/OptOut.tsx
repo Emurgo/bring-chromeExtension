@@ -51,7 +51,6 @@ const OptOut = ({ open, onClose }: Props) => {
     }, [onClose, isOpted, handleClose]);
 
     const handleOptOut = (time: number, label: string) => {
-        console.log({ dict, label, value: dict[label as keyof typeof dict] });
 
         sendMessage({ action: ACTIONS.OPT_OUT, time, key: dict[label as keyof typeof dict] })
         setIsOpted(true)
