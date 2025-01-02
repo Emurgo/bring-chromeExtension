@@ -16,6 +16,7 @@ const rootLoader = async ({ request }: Props) => {
     const textMode = searchParams.get('textMode') || 'lower'
     const themeMode = searchParams.get('themeMode') || 'light'
     const userId = searchParams.get('userId')
+    const version = searchParams.get('v') || '0.0.0'
     const switchWallet = (searchParams.get('switchWallet') || 'false')?.toLowerCase() === 'true'
 
     // Load chosen font
@@ -26,6 +27,7 @@ const rootLoader = async ({ request }: Props) => {
 
     return {
         ...res.info,
+        version,
         userId,
         themeMode,
         textMode,

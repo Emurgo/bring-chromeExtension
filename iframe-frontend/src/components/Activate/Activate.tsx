@@ -21,7 +21,7 @@ interface ActivateProps {
 
 const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName, retailerName }: ActivateProps) => {
     const { walletAddress } = useWalletAddress()
-    const { textMode, url } = useRouteLoaderData('root') as LoaderData
+    const { textMode, url, domain } = useRouteLoaderData('root') as LoaderData
     const { sendGaEvent } = useGoogleAnalytics()
     const effectRan = useRef(false);
 
@@ -36,7 +36,7 @@ const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName
     }, [])
 
     const redirectEvent = () => {
-        sendMessage({ action: ACTIONS.ACTIVATE, url })
+        sendMessage({ action: ACTIONS.ACTIVATE, url, domain })
         sendGaEvent('retailer_shop', {
             category: 'user_action',
             action: 'click',

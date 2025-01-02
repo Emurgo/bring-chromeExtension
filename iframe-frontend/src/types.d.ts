@@ -42,6 +42,7 @@ declare global {
         variant: VariantKey
         switchWallet: boolean
         userId: string | undefined
+        version: string
     }
 
     interface Message {
