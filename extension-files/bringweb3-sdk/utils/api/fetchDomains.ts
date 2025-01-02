@@ -1,16 +1,10 @@
-import { ApiEndpoint } from "../apiEndpoint"
+import apiRequest from "./apiRequest"
 
 const fetchDomains = async (apiKey: string) => {
-    const endpoint = ApiEndpoint.getInstance().getApiEndpoint()
 
-    const res = await fetch(`${endpoint}/domains?country=ALL`, {
-        headers: {
-            'x-api-key': apiKey
-        }
-    })
-    const json = await res.json()
-    // console.log({ json });
-    return json
+    const res = await apiRequest({ path: '/domains', apiKey, method: 'GET' })
+
+    return res
 }
 
 export default fetchDomains

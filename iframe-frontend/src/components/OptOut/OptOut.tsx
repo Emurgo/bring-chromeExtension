@@ -13,7 +13,7 @@ const options = [
     { label: '24 hours', time: 24 * 60 * 60 * 1000 },
     { label: '7 days', time: 7 * 24 * 60 * 60 * 1000 },
     { label: '30 days', time: 30 * 24 * 60 * 60 * 1000 },
-    { label: 'forever', time: Number.MAX_SAFE_INTEGER },
+    { label: 'forever', time: 999999999999999 },
 ]
 
 const dict = {
