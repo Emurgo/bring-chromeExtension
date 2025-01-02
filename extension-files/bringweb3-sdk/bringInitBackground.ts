@@ -131,8 +131,8 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
 
         switch (action) {
             case 'ACTIVATE': {
-                const { url, extensionId } = request
-                handleActivate(url, extensionId, identifier, cashbackPagePath).then(() => sendResponse());
+                const { domain, extensionId } = request
+                handleActivate(domain, extensionId, identifier, cashbackPagePath).then(() => sendResponse());
                 return true;
             }
             case 'GET_OPT_OUT': {
@@ -146,18 +146,9 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
             }
             case 'CLOSE': {
                 const { time, domain } = request
-                if (domain) {
-
-                    addQuietDomain(domain, time)
-                    sendResponse({ message: 'domain added to quiet list' })
-                } else {
-                    getRelevantDomain(sender.tab?.url || sender.origin, identifier)
-                        .then(domain => {
-                            if (!domain) return true;
-                            addQuietDomain(domain, time)
-                            sendResponse({ message: 'domain added to quiet list' })
-                        })
-                }
+                if (!domain) return true;
+                addQuietDomain(domain, time)
+                sendResponse({ message: 'domain added to quiet list' })
                 return true;
             }
             case 'WALLET_ADDRESS_UPDATE': {

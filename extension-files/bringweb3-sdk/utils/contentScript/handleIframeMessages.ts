@@ -41,7 +41,7 @@ const handleIframeMessages = ({ event, iframeEl, promptLogin }: Props) => {
             promptLogin()
             break;
         case ACTIONS.ACTIVATE:
-            chrome.runtime.sendMessage({ action, from: "bringweb3", url, extensionId })
+            chrome.runtime.sendMessage({ action, from: "bringweb3", domain, extensionId })
             break;
         case ACTIONS.OPT_OUT:
             chrome.runtime.sendMessage({ action, time, from: "bringweb3" })

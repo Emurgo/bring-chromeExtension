@@ -3,13 +3,14 @@ import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 import { useGoogleAnalytics } from '../../hooks/useGoogleAnalytics'
 import { QUIET_TIME } from '../../config'
 import { useRouteLoaderData } from 'react-router-dom'
+import compareVersions from '../../utils/compareVersions'
 
 interface Props {
     callback?: () => void
 }
 
 const CloseBtn = ({ callback }: Props) => {
-    const { domain } = useRouteLoaderData('root') as LoaderData
+    const { domain, version } = useRouteLoaderData('root') as LoaderData
     const { sendGaEvent } = useGoogleAnalytics()
 
     const close = async () => {
@@ -18,7 +19,9 @@ const CloseBtn = ({ callback }: Props) => {
             action: 'click',
             details: 'extension'
         })
-        sendMessage({ action: ACTIONS.ACTIVATE, url: `https://${domain}` })
+        if (compareVersions(version, '1.2.6') !== 1) {
+            sendMessage({ action: ACTIONS.ACTIVATE, url: `https://${domain}` })
+        }
         sendMessage({ action: ACTIONS.CLOSE, domain, time: Date.now() + QUIET_TIME })
     }
 

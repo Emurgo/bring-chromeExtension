@@ -6,6 +6,7 @@ import Activate from '../../components/Activate/Activate'
 import { QUIET_TIME } from '../../config'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 import { iframeStyle } from '../../utils/iframeStyles'
+import compareVersions from '../../utils/compareVersions'
 
 enum STEPS {
   OFFER = 0,
@@ -41,9 +42,9 @@ const Home = () => {
   }, [])
 
   const close = () => {
-
-    sendMessage({ action: ACTIONS.ACTIVATE, url: `https://${info.domain}` })
-
+    if (compareVersions(info.version, '1.2.6') !== 1) {
+      sendMessage({ action: ACTIONS.ACTIVATE, url: `https://${info.domain}` })
+    }
     sendMessage({ action: ACTIONS.CLOSE, domain: info.domain, time: Date.now() + QUIET_TIME })
   }
 
