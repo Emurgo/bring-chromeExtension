@@ -11,6 +11,7 @@ const webpack = require('webpack');
 const config = merge(common, {
   entry: {
     popup: PATHS.src + '/popup.js',
+    login: PATHS.src + '/login.js',
     contentScript: PATHS.src + '/contentScript.js',
     background: PATHS.src + '/background.js',
   },
@@ -18,11 +19,16 @@ const config = merge(common, {
     ignored: /node_modules\/(?!@bringweb3\/sdk)/,
   },
   plugins: [
-    new HtmlWebpackPlugin({
+    new HtmlWebpackPlugin([{
       template: PATHS.src + '/popup.html',
       filename: 'popup.html',
       chunks: ['popup']
-    }),
+    },
+    {
+      template: PATHS.src + '/login.html',
+      filename: 'login.html',
+      chunks: ['login']
+    }]),
     new webpack.DefinePlugin({
       'process.env': {
         'PLATFORM_IDENTIFIER': JSON.stringify(process.env.PLATFORM_IDENTIFIER),
