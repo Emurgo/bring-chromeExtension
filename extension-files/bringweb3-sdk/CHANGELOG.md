@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.2.10
+
+### Patch Changes
+
+- 1ae4d4b: make api request interceptor
+
 ## 1.2.9
 
 ### Patch Changes
