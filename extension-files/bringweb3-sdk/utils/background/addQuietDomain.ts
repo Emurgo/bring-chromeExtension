@@ -1,9 +1,7 @@
-import parseUrl from "../parseUrl"
 import storage from "../storage"
 const quietTime = 30 * 60 * 1000
 
 const addQuietDomain = async (domain: string, time?: number) => {
-    domain = parseUrl(domain)
     if (!time) time = quietTime
 
     let quietDomains = await storage.get('quietDomains')
