@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.2.9
+
+### Patch Changes
+
+- 0f84d26: activate action uses domain instead of url
+
 ## 1.2.8
 
 ### Patch Changes
