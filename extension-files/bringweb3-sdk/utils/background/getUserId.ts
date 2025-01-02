@@ -1,11 +1,10 @@
 import storage from "../storage"
-import getWalletAddress from "./getWalletAddress"
+import { v4 as uuidv4 } from "uuid"
 
 const getUserId = async (): Promise<string | undefined> => {
     let userId = await storage.get('id')
-    const address = await getWalletAddress()
-    if (!address && !userId) {
-        userId = Math.random().toString(36).substring(2)
+    if (!userId) {
+        userId = uuidv4()
         storage.set('id', userId)
     }
     return userId

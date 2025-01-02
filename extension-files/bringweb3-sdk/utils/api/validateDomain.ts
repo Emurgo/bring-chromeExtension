@@ -1,5 +1,4 @@
-import { ApiEndpoint } from "../apiEndpoint";
-// import getQueryParams from "../getQueryParams";
+import apiRequest from "./apiRequest"
 
 interface ValidateDomainProps {
     apiKey: string,
@@ -12,19 +11,10 @@ interface ValidateDomainProps {
 }
 
 const validateDomain = async ({ apiKey, body }: ValidateDomainProps) => {
-    const endpoint = ApiEndpoint.getInstance().getApiEndpoint()
 
-    const res = await fetch(`${endpoint}/check/popup`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        },
-        body: JSON.stringify(body)
-    })
-    const json = await res.json()
-    // console.log({ json });
-    return json
+    const res = await apiRequest({ path: '/check/popup', apiKey, method: 'POST', params: body })
+
+    return res
 }
 
 export default validateDomain;

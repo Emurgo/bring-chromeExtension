@@ -1,4 +1,4 @@
-import { ApiEndpoint } from "../apiEndpoint";
+import apiRequest from "./apiRequest";
 
 interface CheckEventsProps {
     apiKey: string;
@@ -15,22 +15,13 @@ interface Body {
 }
 
 const checkEvents = async ({ apiKey, walletAddress, cashbackUrl, lastActivation }: CheckEventsProps) => {
-    const endpoint = ApiEndpoint.getInstance().getApiEndpoint()
     const body: Body = { walletAddress }
     if (lastActivation) body.lastActivation = lastActivation;
     if (cashbackUrl) body.cashbackUrl = cashbackUrl;
 
-    const res = await fetch(`${endpoint}/check/notification`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        },
-        body: JSON.stringify(body)
-    })
-    const json = await res.json()
+    const res = await apiRequest({ path: '/check/notification', apiKey, method: 'POST', params: body })
 
-    return json
+    return res
 }
 
 export default checkEvents;
