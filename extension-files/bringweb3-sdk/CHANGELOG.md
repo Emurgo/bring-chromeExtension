@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.2.11
+
+### Patch Changes
+
+- e76b67c: handle removing wallet address in case of undefined address
+
 ## 1.2.10
 
 ### Patch Changes
