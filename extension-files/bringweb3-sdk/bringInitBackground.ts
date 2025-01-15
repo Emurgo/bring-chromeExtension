@@ -153,8 +153,13 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
             }
             case 'WALLET_ADDRESS_UPDATE': {
                 const { walletAddress } = request
-                storage.set('walletAddress', walletAddress as string)
-                    .then(() => sendResponse(walletAddress))
+                if (!walletAddress) {
+                    storage.remove('walletAddress')
+                        .then(() => sendResponse({ message: 'wallet address removed successfully' }))
+                } else {
+                    storage.set('walletAddress', walletAddress as string)
+                        .then(() => sendResponse(walletAddress))
+                }
                 return true;
             }
             case 'ERASE_NOTIFICATION':
