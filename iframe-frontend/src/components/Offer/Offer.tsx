@@ -35,7 +35,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: Props) => {
     const [tokenSymbol, setTokenSymbol] = useState(info.cryptoSymbols[0])
     const [optOutOpen, setOptOutOpen] = useState(false)
     const [isAddressUpdated, setIsAddressUpdated] = useState(false)
-    const [status, setStatus] = useState<'idle' | 'waiting' | 'done'>('idle')
+    const [status, setStatus] = useState<'idle' | 'waiting' | 'done' | 'switch'>('idle')
 
     const activateAction = useCallback(async () => {
         try {
@@ -80,9 +80,12 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: Props) => {
     }, [setWalletAddress])
 
     useEffect(() => {
-        if (status === 'waiting' && isAddressUpdated) {
+        if (!isAddressUpdated) return
+        if (status === 'waiting') {
             setStatus('done')
             activateAction()
+        } else if (status === 'switch') {
+            setStatus('idle')
         }
     }, [walletAddress, status, activateAction, isAddressUpdated])
 
@@ -125,7 +128,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: Props) => {
                         <span className={styles.wallet}>{splitWordMaxFive(walletAddress)}</span>
                     </div>
                     <SwitchBtn
-                        callback={() => setStatus('waiting')}
+                        callback={() => setStatus('switch')}
                     />
                 </div>
                 :
@@ -181,7 +184,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: Props) => {
                 </div>
             </div>
             <LoadingOverlay
-                open={['waiting'].includes(status)}
+                open={['waiting', 'switch'].includes(status)}
             />
             <OptOut
                 open={optOutOpen}
