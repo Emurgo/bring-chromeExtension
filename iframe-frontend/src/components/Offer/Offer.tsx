@@ -34,6 +34,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: Props) => {
     const { iconsPath, textMode, variant } = useRouteLoaderData('root') as LoaderData
     const [tokenSymbol, setTokenSymbol] = useState(info.cryptoSymbols[0])
     const [optOutOpen, setOptOutOpen] = useState(false)
+    const [isAddressUpdated, setIsAddressUpdated] = useState(false)
     const [status, setStatus] = useState<'idle' | 'waiting' | 'done'>('idle')
 
     const activateAction = useCallback(async () => {
@@ -75,14 +76,15 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: Props) => {
         const { walletAddress, action } = e.data
         if (action !== 'WALLET_ADDRESS_UPDATE') return
         setWalletAddress(walletAddress)
+        setIsAddressUpdated(true)
     }, [setWalletAddress])
 
     useEffect(() => {
-        if (status === 'waiting' && walletAddress) {
+        if (status === 'waiting' && isAddressUpdated) {
             setStatus('done')
             activateAction()
         }
-    }, [walletAddress, status, activateAction])
+    }, [walletAddress, status, activateAction, isAddressUpdated])
 
     useEffect(() => {
         if (status === 'done') return
@@ -179,7 +181,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: Props) => {
                 </div>
             </div>
             <LoadingOverlay
-                open={status === 'waiting'}
+                open={['waiting'].includes(status)}
             />
             <OptOut
                 open={optOutOpen}
