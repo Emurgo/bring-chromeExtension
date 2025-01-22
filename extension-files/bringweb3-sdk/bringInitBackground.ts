@@ -131,8 +131,8 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
 
         switch (action) {
             case 'ACTIVATE': {
-                const { domain, extensionId } = request
-                handleActivate(domain, extensionId, identifier, cashbackPagePath).then(() => sendResponse());
+                const { domain, extensionId, time } = request
+                handleActivate(domain, extensionId, identifier, cashbackPagePath, time).then(() => sendResponse());
                 return true;
             }
             case 'GET_OPT_OUT': {
