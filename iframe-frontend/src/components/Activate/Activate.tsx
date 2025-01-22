@@ -19,6 +19,8 @@ interface ActivateProps {
     retailerName: string
 }
 
+const ACTIVATE_QUIET_TIME = 24 * 60 * 60 * 1000
+
 const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName, retailerName }: ActivateProps) => {
     const { walletAddress } = useWalletAddress()
     const { textMode, url, domain } = useRouteLoaderData('root') as LoaderData
@@ -36,7 +38,7 @@ const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName
     }, [])
 
     const redirectEvent = () => {
-        sendMessage({ action: ACTIONS.ACTIVATE, url, domain })
+        sendMessage({ action: ACTIONS.ACTIVATE, url, domain, time: Date.now() + ACTIVATE_QUIET_TIME })
         sendGaEvent('retailer_shop', {
             category: 'user_action',
             action: 'click',
