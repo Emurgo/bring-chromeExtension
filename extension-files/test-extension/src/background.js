@@ -8,15 +8,15 @@ bringInitBackground({
 })
 
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    console.log(message);
+// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+//     console.log(message);
 
-    if (message.action === "openWindow") {
-        chrome.windows.create({
-            url: "login.html",
-            type: "popup",
-            width: 800,
-            height: 600
-        });
-    }
-});
+//     if (message.action === "openWindow") {
+//         chrome.windows.create({
+//             url: "login.html",
+//             type: "popup",
+//             width: 800,
+//             height: 600
+//         });
+//     }
+// });
