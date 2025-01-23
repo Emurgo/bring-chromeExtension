@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.2.12
+
+### Patch Changes
+
+- 4a10aeb: fix bug error on dev mode
+
 ## 1.2.11
 
 ### Patch Changes
