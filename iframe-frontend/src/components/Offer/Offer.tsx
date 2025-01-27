@@ -35,7 +35,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: Props) => {
     const [tokenSymbol, setTokenSymbol] = useState(info.cryptoSymbols[0])
     const [optOutOpen, setOptOutOpen] = useState(false)
     const [isAddressUpdated, setIsAddressUpdated] = useState(false)
-    const [status, setStatus] = useState<'idle' | 'waiting' | 'done' | 'switch'>('idle')
+    const [status, setStatus] = useState<'idle' | 'waiting' | 'switch' | 'activating' | 'done'>('idle')
 
     const activateAction = useCallback(async () => {
         try {
@@ -63,6 +63,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: Props) => {
     }, [info, walletAddress, tokenSymbol, setRedirectUrl, nextFn])
 
     const handleFirstClick = () => {
+        setStatus('activating')
         sendGaEvent('retailer_activation', {
             category: 'user_action',
             action: 'click',
@@ -154,6 +155,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: Props) => {
                 <button
                     onClick={handleFirstClick}
                     className={styles.btn}
+                    disabled={status !== 'idle'}
                 >
                     {toCaseString("Let's go", textMode)}
                 </button>
