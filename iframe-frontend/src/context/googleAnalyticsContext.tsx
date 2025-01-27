@@ -31,9 +31,10 @@ interface Props {
     userId: string | undefined
     testVariant: VariantKey
     retailerName: string | undefined
+    location: string
 }
 
-export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, platform, testVariant, userId, retailerName }) => {
+export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, platform, testVariant, userId, retailerName, location }) => {
     const effectRan = useRef(false)
     const { walletAddress } = useWalletAddress()
 
@@ -90,6 +91,7 @@ export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, pl
             pageLocation: window.location.href,
             pagePath: window.location.pathname,
             pageTitle: document.title,
+            parentLocation: location
         }
         if (retailerName) details.retailer = retailerName
 
