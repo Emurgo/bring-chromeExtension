@@ -80,8 +80,12 @@ export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, pl
     }, [measurementId, platform, testVariant, walletAddress]);
 
     useEffect(() => {
+        if (window.origin.includes('localhost')) {
+            return
+        }
 
         if (effectRan.current) return
+
         const details: { [key: string]: string } = {
             pageLocation: window.location.href,
             pagePath: window.location.pathname,
