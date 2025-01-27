@@ -17,6 +17,7 @@ const Layout = () => {
                     measurementId={GA_MEASUREMENT_ID}
                     platform={data.platformName}
                     testVariant={data.variant}
+                    location={data.url}
                 >
                     <Outlet />
                 </GoogleAnalyticsProvider>
