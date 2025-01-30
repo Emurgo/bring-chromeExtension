@@ -3,10 +3,12 @@ import { motion, AnimatePresence, Variants } from 'framer-motion'
 import { useRouteLoaderData } from 'react-router-dom'
 import Offer from '../../components/Offer/Offer'
 import Activate from '../../components/Activate/Activate'
-import { QUIET_TIME } from '../../config'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 import { iframeStyle } from '../../utils/iframeStyles'
 import compareVersions from '../../utils/compareVersions'
+
+const DAY_IN_MS = 24 * 60 * 60 * 1000
+const THIRTY_MIN_MS = 30 * 60 * 1000
 
 enum STEPS {
   OFFER = 0,
@@ -45,6 +47,7 @@ const Home = () => {
     if (compareVersions(info.version, '1.2.6') !== 1) {
       sendMessage({ action: ACTIONS.ACTIVATE, url: `https://${info.domain}` })
     }
+    const QUIET_TIME = info.variant === 'control' ? DAY_IN_MS : THIRTY_MIN_MS
     sendMessage({ action: ACTIONS.CLOSE, domain: info.domain, time: Date.now() + QUIET_TIME })
   }
 
