@@ -1,4 +1,5 @@
 import { ApiEndpoint } from "../apiEndpoint"
+import getUserId from "../background/getUserId"
 import getVersion from "../getVersion"
 import storage from "../storage"
 
@@ -22,7 +23,7 @@ const apiRequest = async (req: Request) => {
             ...params,
             version: getVersion(),
             opt_out: await storage.get('optOut') || 0,
-            user_id: await storage.get('id') || 'undefined',
+            user_id: await getUserId() || 'undefined',
             wallet_address: await storage.get('walletAddress') || 'undefined'
         })
         endpoint += `?${urlParams.toString()}`
@@ -31,7 +32,7 @@ const apiRequest = async (req: Request) => {
             ...params,
             version: getVersion(),
             optOut: await storage.get('optOut') || 0,
-            userId: await storage.get('id') || undefined,
+            userId: await getUserId() || undefined,
             walletAddress: params?.walletAddress || await storage.get('walletAddress') || undefined
         }
     }
