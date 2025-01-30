@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.2.13
+
+### Patch Changes
+
+- a1feeeb: id generation
+
 ## 1.2.12
 
 ### Patch Changes
