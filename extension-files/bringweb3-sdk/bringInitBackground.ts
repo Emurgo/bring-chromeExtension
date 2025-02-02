@@ -132,7 +132,8 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
         switch (action) {
             case 'ACTIVATE': {
                 const { domain, extensionId, time } = request
-                handleActivate(domain, extensionId, identifier, cashbackPagePath, time).then(() => sendResponse());
+                handleActivate(domain, extensionId, identifier, cashbackPagePath, time)
+                    .then(() => sendResponse());
                 return true;
             }
             case 'GET_OPT_OUT': {
@@ -163,8 +164,8 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
                 return true;
             }
             case 'ERASE_NOTIFICATION':
-                storage.remove('notification').then(() => sendResponse())
-                sendResponse({ message: 'notification erased successfully' })
+                storage.remove('notification')
+                    .then(() => sendResponse({ message: 'notification erased successfully' }))
                 return true
             default: {
                 console.warn(`Bring unknown action: ${action}`);
@@ -186,7 +187,6 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
         const optOut = await storage.get('optOut');
 
         if (optOut && optOut > Date.now()) {
-            await showNotification(identifier, tabId, cashbackPagePath, url);
             return;
         } else if (optOut) {
             storage.remove('optOut')
