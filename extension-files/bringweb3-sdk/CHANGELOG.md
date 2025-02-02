@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.2.14
+
+### Patch Changes
+
+- 3775261: disable any popup when opted out, fix double sendResponse
+
 ## 1.2.13
 
 ### Patch Changes
