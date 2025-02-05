@@ -12,6 +12,8 @@ import getWalletAddress from "./utils/background/getWalletAddress.js"
 import sendMessage from "./utils/background/sendMessage.js"
 import getUserId from "./utils/background/getUserId.js"
 import showNotification from "./utils/background/showNotification.js"
+import { fetchWhitelist } from './utils/api/fetchWhitelist';
+import isWhitelisted from './utils/background/isWhitelisted';
 
 const calcDelay = (timestamp: number) => {
     const now = Date.now()
@@ -23,6 +25,12 @@ const updateCache = async (apiKey: string) => {
 
     storage.set('relevantDomains', res.relevantDomains)
 
+    const whitelist = await fetchWhitelist()
+
+    if (whitelist) {
+        storage.set('redirectsWhitelist', whitelist)
+    }
+
     const { nextUpdateTimestamp } = res
 
     const delay = calcDelay(nextUpdateTimestamp)
@@ -30,6 +38,7 @@ const updateCache = async (apiKey: string) => {
     chrome.alarms.create(UPDATE_CACHE_ALARM_NAME, {
         delayInMinutes: delay || 60 * 24 * 2
     })
+
     return res.relevantDomains
 }
 
@@ -65,6 +74,7 @@ const urlsDict: UrlDict = {}
 interface Configuration {
     identifier: string
     apiEndpoint: string
+    whitelistEndpoint?: string
     cashbackPagePath?: string
 }
 /**
@@ -75,6 +85,7 @@ interface Configuration {
  * @param {Object} configuration - The configuration object.
  * @param {string} configuration.identifier - The identifier for the extension.
  * @param {string} configuration.apiEndpoint - The API endpoint ('prod' or 'sandbox').
+ * @param {string} configuration.whitelistEndpoint - Endpoint for whitelist of redirect urls.
  * @param {string} [configuration.cashbackPagePath] - Optional path to the cashback page.
  * @throws {Error} Throws an error if identifier or apiEndpoint is missing, or if apiEndpoint is invalid.
  * @returns {Promise<void>}
@@ -97,14 +108,16 @@ interface Configuration {
  * bringInitBackground({
  *   identifier: '<bring_identifier>',
  *   apiEndpoint: 'sandbox',
+ *   whitelistEndpoint: 'https://example.com/whitelist.json',
  *   cashbackPagePath: '/cashback.html'
  * });
  */
-const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }: Configuration) => {
+const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, whitelistEndpoint }: Configuration) => {
     if (!identifier || !apiEndpoint) throw new Error('Missing configuration')
     if (!['prod', 'sandbox'].includes(apiEndpoint)) throw new Error('unknown apiEndpoint')
 
     ApiEndpoint.getInstance().setApiEndpoint(apiEndpoint)
+    ApiEndpoint.getInstance().setWhitelistEndpoint(whitelistEndpoint || '')
 
     if (!await storage.get('relevantDomains')) {
         updateCache(identifier)
@@ -131,8 +144,8 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
 
         switch (action) {
             case 'ACTIVATE': {
-                const { domain, extensionId, time } = request
-                handleActivate(domain, extensionId, identifier, cashbackPagePath, time)
+                const { domain, extensionId, time, redirectUrl } = request
+                handleActivate(domain, extensionId, identifier, cashbackPagePath, time, sender.tab?.id, redirectUrl)
                     .then(() => sendResponse());
                 return true;
             }
@@ -208,7 +221,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
 
         const address = await getWalletAddress(tabId);
 
-        const { token, isValid, iframeUrl } = await validateDomain({
+        const { token, isValid, iframeUrl, networkUrl } = await validateDomain({
             apiKey: identifier,
             body: {
                 domain: match,
@@ -221,6 +234,8 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath }
             if (isValid === false) addQuietDomain(match);
             return;
         }
+        if (!isWhitelisted(networkUrl, await storage.get('redirectsWhitelist'))) return;
+
         const userId = await getUserId()
         sendMessage(tabId, {
             action: 'INJECT',

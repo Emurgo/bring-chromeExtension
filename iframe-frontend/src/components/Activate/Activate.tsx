@@ -7,8 +7,10 @@ import { useGoogleAnalytics } from '../../hooks/useGoogleAnalytics'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 import { useRouteLoaderData } from 'react-router-dom'
 import toCaseString from '../../utils/toCaseString'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useWalletAddress } from '../../hooks/useWalletAddress'
+import compareVersions from '../../utils/compareVersions'
+import { Oval } from 'react-loader-spinner'
 // import SwitchBtn from '../SwitchBtn/SwitchBtn'
 
 interface ActivateProps {
@@ -23,8 +25,9 @@ const ACTIVATE_QUIET_TIME = 24 * 60 * 60 * 1000
 
 const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName, retailerName }: ActivateProps) => {
     const { walletAddress } = useWalletAddress()
-    const { textMode, url, domain } = useRouteLoaderData('root') as LoaderData
+    const { textMode, url, domain, version } = useRouteLoaderData('root') as LoaderData
     const { sendGaEvent } = useGoogleAnalytics()
+    const [activated, setActivated] = useState(false)
     const effectRan = useRef(false);
 
     useEffect(() => {
@@ -38,7 +41,8 @@ const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName
     }, [])
 
     const redirectEvent = () => {
-        sendMessage({ action: ACTIONS.ACTIVATE, url, domain, time: Date.now() + ACTIVATE_QUIET_TIME })
+        setActivated(true)
+        sendMessage({ action: ACTIONS.ACTIVATE, url, domain, time: Date.now() + ACTIVATE_QUIET_TIME, redirectUrl })
         sendGaEvent('retailer_shop', {
             category: 'user_action',
             action: 'click',
@@ -64,12 +68,39 @@ const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName
             <Markdown className={styles.markdown}>
                 {`${retailerMarkdown}${generalMarkdown}`}
             </Markdown>
-            <a
-                className={styles.activate_btn}
-                onClick={redirectEvent}
-                href={redirectUrl}
-                target='_top'
-            >{toCaseString('Activate', textMode)}</a>
+            {
+                compareVersions(version, '1.2.14') !== 1 ?
+                    <a
+                        className={styles.activate_btn}
+                        onClick={redirectEvent}
+                        href={redirectUrl}
+                        target='_top'
+                    >{toCaseString('Activate', textMode)}</a>
+                    :
+                    <button
+                        className={styles.activate_btn}
+                        onClick={redirectEvent}
+                        disabled={activated}
+                    >
+                        {
+                            !activated ?
+                                <>
+                                    {toCaseString('Activate', textMode)}
+                                </>
+                                :
+                                <Oval
+                                    visible={true}
+                                    height="20"
+                                    width="20"
+                                    strokeWidth="4"
+                                    strokeWidthSecondary="4"
+                                    color="var(--primary-btn-f-c)"
+                                    secondaryColor=""
+                                    ariaLabel="oval-loading"
+                                />
+                        }
+                    </button>
+            }
         </div>
     )
 }

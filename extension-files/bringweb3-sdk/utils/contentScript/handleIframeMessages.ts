@@ -22,7 +22,7 @@ const UNION_ACTIONS = [ACTIONS.ACTIVATE]
 
 const handleIframeMessages = ({ event, iframeEl, promptLogin }: Props) => {
     const { data } = event
-    const { from, action, style, keyFrames, time, extensionId, url, domain } = data
+    const { from, action, style, keyFrames, time, extensionId, url, domain, redirectUrl } = data
 
     if (from !== 'bringweb3') return
 
@@ -41,7 +41,8 @@ const handleIframeMessages = ({ event, iframeEl, promptLogin }: Props) => {
             promptLogin()
             break;
         case ACTIONS.ACTIVATE:
-            chrome.runtime.sendMessage({ action, from: "bringweb3", domain, extensionId, time })
+            console.log(data);
+            chrome.runtime.sendMessage({ action, from: "bringweb3", domain, extensionId, time, redirectUrl })
             break;
         case ACTIONS.OPT_OUT:
             chrome.runtime.sendMessage({ action, time, from: "bringweb3" })
