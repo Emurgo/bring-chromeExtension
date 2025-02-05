@@ -41,7 +41,6 @@ const handleIframeMessages = ({ event, iframeEl, promptLogin }: Props) => {
             promptLogin()
             break;
         case ACTIONS.ACTIVATE:
-            console.log(data);
             chrome.runtime.sendMessage({ action, from: "bringweb3", domain, extensionId, time, redirectUrl })
             break;
         case ACTIONS.OPT_OUT:
@@ -53,7 +52,7 @@ const handleIframeMessages = ({ event, iframeEl, promptLogin }: Props) => {
             addKeyframes(keyFrames)
             break;
         case ACTIONS.OPEN_CASHBACK_PAGE:
-            chrome.runtime.sendMessage({ action, from: "bringweb3" })
+            chrome.runtime.sendMessage({ action, url, from: "bringweb3" })
             break;
         default:
             // console.log('Non exist ACTION:', action);

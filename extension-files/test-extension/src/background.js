@@ -5,7 +5,7 @@ bringInitBackground({
     identifier: process.env.PLATFORM_IDENTIFIER,
     apiEndpoint: 'sandbox', // 'sandbox' || 'prod'
     whitelistEndpoint: 'https://media.bringweb3.io/tests/redirects.json',
-    cashbackPagePath: '/main_window.html#/cashback'
+    // cashbackPagePath: '/main_window.html#/cashback'
 })
 
 

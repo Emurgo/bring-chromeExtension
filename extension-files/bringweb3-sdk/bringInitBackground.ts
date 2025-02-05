@@ -185,7 +185,8 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
                 return true;
             }
             case 'OPEN_CASHBACK_PAGE':
-                openExtensionCashbackPage(cashbackPagePath || '')
+                const { url } = request
+                openExtensionCashbackPage(url || cashbackPagePath)
                 sendResponse({ message: 'cashback page opened successfully' })
                 return true
         }
