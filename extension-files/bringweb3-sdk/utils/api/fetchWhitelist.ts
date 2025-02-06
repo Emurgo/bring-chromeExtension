@@ -8,7 +8,14 @@ export const fetchWhitelist = async () => {
             return []
         }
 
-        const response = await fetch(endpoint)
+        const response = await fetch(endpoint, {
+            method: 'GET',
+            cache: 'no-store', // Prevents caching
+            headers: {
+                'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+                'Pragma': 'no-cache'
+            }
+        })
 
         if (!response.ok) {
             throw new Error('Failed to fetch whitelist')
