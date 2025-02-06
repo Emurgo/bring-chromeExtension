@@ -140,7 +140,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: Props) => {
             />
             <div className={styles.details}>
                 <div className={styles.subtitle_container}>
-                    <img src={`${iconsPath}/coins.svg`} alt="cashback icon" />
+                    <img src={`/${iconsPath}/coins.svg`} alt="cashback icon" />
                     <h2 className={styles.subtitle}>Earn Crypto Cashback</h2>
                 </div>
                 <span className={styles.sm_txt}>Buy with any card and earn up to <span className={styles.cashback_amount}>{formatCashback(+info.maxCashback, info.cashbackSymbol, info.cashbackCurrency)}</span> in
