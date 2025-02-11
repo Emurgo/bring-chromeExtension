@@ -21,9 +21,18 @@ const calcDelay = (timestamp: number) => {
 }
 
 const updateCache = async (apiKey: string) => {
-    const res = await fetchDomains(apiKey)
+    const relevantDomainsCheck = await storage.get('relevantDomainsCheck')
+    const relevantDomainsList = await storage.get('relevantDomains')
 
-    storage.set('relevantDomains', res.relevantDomains)
+    if (relevantDomainsList?.length && relevantDomainsCheck && relevantDomainsCheck > Date.now()) {
+        return relevantDomainsList
+    }
+
+    const res = await fetchDomains(apiKey)
+    const { nextUpdateTimestamp, relevantDomains } = res
+
+    storage.set('relevantDomains', relevantDomains)
+    storage.set('relevantDomainsCheck', nextUpdateTimestamp)
 
     const whitelist = await fetchWhitelist()
 
@@ -31,7 +40,6 @@ const updateCache = async (apiKey: string) => {
         storage.set('redirectsWhitelist', whitelist)
     }
 
-    const { nextUpdateTimestamp } = res
 
     const delay = calcDelay(nextUpdateTimestamp)
 
@@ -39,13 +47,13 @@ const updateCache = async (apiKey: string) => {
         delayInMinutes: delay || 60 * 24 * 2
     })
 
-    return res.relevantDomains
+    return relevantDomains
 }
 
 const getRelevantDomain = async (url: string | undefined, apiKey: string) => {
-    let relevantDomains = await storage.get('relevantDomains')
+    let relevantDomains = await updateCache(apiKey)
 
-    if (relevantDomains === undefined) {
+    if (!relevantDomains) {
         relevantDomains = await updateCache(apiKey)
     }
 
@@ -119,9 +127,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
     ApiEndpoint.getInstance().setApiEndpoint(apiEndpoint)
     ApiEndpoint.getInstance().setWhitelistEndpoint(whitelistEndpoint || '')
 
-    if (!await storage.get('relevantDomains')) {
-        updateCache(identifier)
-    }
+    updateCache(identifier)
 
     chrome.alarms.onAlarm.addListener(async (alarm) => {
         const { name } = alarm
