@@ -47,6 +47,7 @@ export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, pl
             testVariant,
         }
 
+        if (retailerName) backendEvent.retailer = retailerName
         if (walletAddress) backendEvent.walletAddress = walletAddress
         if (userId) backendEvent.userId = userId
 
@@ -56,7 +57,7 @@ export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, pl
             console.error('BRING: Error sending analytics event', error)
             return { success: false, error }
         }
-    }, [platform, testVariant, userId, walletAddress])
+    }, [platform, retailerName, testVariant, userId, walletAddress])
 
     useEffect(() => {
         if (ReactGA.isInitialized && measurementId) return;
