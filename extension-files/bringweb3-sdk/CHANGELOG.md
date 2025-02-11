@@ -1,5 +1,16 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.3.0
+
+### Minor Changes
+
+- b406236: Add option for whitelisted redirect urls
+
+### Patch Changes
+
+- ea6057f: fix notification link
+- ed6dcce: Disable http caching for whitelist call
+
 ## 1.2.14
 
 ### Patch Changes
