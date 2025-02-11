@@ -40,7 +40,7 @@ const Notification = () => {
     }
 
     const openCashbackPage = () => {
-        sendMessage({ action: ACTIONS.OPEN_CASHBACK_PAGE })
+        sendMessage({ action: ACTIONS.OPEN_CASHBACK_PAGE, url: data.cashbackUrl })
         notificationSeen()
     }
 

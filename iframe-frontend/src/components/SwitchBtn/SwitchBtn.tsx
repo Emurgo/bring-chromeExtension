@@ -24,7 +24,7 @@ const SwitchBtn = ({ callback }: Props) => {
             onClick={promptLogin}
         >
             <img
-                src={`${iconsPath}/switch.svg`}
+                src={`/${iconsPath}/switch.svg`}
                 alt="switch icon"
             />
         </button>
