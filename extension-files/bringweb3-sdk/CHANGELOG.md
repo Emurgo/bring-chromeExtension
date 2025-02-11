@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.3.1
+
+### Patch Changes
+
+- 2b63c79: fix relevant domains list not updating
+
 ## 1.3.0
 
 ### Minor Changes
