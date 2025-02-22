@@ -1,5 +1,4 @@
 import { openExtensionCashbackPage } from './utils/background/openExtensionCashbackPage';
-import fetchDomains from "./utils/api/fetchDomains.js"
 import validateDomain from "./utils/api/validateDomain.js"
 import { ApiEndpoint } from "./utils/apiEndpoint.js"
 import parseUrl from "./utils/parseUrl.js"
@@ -12,50 +11,11 @@ import getWalletAddress from "./utils/background/getWalletAddress.js"
 import sendMessage from "./utils/background/sendMessage.js"
 import getUserId from "./utils/background/getUserId.js"
 import showNotification from "./utils/background/showNotification.js"
-import { fetchWhitelist } from './utils/api/fetchWhitelist';
 import isWhitelisted from './utils/background/isWhitelisted';
+import { updateCache } from './utils/background/updateCache';
 
-const calcDelay = (timestamp: number) => {
-    const now = Date.now()
-    return (timestamp - now) / 1000 / 60 // milliseconds to minutes
-}
-
-const updateCache = async (apiKey: string) => {
-    const relevantDomainsCheck = await storage.get('relevantDomainsCheck')
-    const relevantDomainsList = await storage.get('relevantDomains')
-
-    if (relevantDomainsList?.length && relevantDomainsCheck && relevantDomainsCheck > Date.now()) {
-        return relevantDomainsList
-    }
-
-    const res = await fetchDomains(apiKey)
-    const { nextUpdateTimestamp, relevantDomains } = res
-
-    storage.set('relevantDomains', relevantDomains)
-    storage.set('relevantDomainsCheck', nextUpdateTimestamp)
-
-    const whitelist = await fetchWhitelist()
-
-    if (whitelist) {
-        storage.set('redirectsWhitelist', whitelist)
-    }
-
-
-    const delay = calcDelay(nextUpdateTimestamp)
-
-    chrome.alarms.create(UPDATE_CACHE_ALARM_NAME, {
-        delayInMinutes: delay || 60 * 24 * 2
-    })
-
-    return relevantDomains
-}
-
-const getRelevantDomain = async (url: string | undefined, apiKey: string) => {
-    let relevantDomains = await updateCache(apiKey)
-
-    if (!relevantDomains) {
-        relevantDomains = await updateCache(apiKey)
-    }
+const getRelevantDomain = async (url: string | undefined) => {
+    const relevantDomains = await updateCache()
 
     if (!url || !relevantDomains || !relevantDomains.length) return ''
     const domain = parseUrl(url)
@@ -126,15 +86,16 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
 
     ApiEndpoint.getInstance().setApiEndpoint(apiEndpoint)
     ApiEndpoint.getInstance().setWhitelistEndpoint(whitelistEndpoint || '')
+    ApiEndpoint.getInstance().setApiKey(identifier)
 
-    updateCache(identifier)
+    updateCache()
 
     chrome.alarms.onAlarm.addListener(async (alarm) => {
         const { name } = alarm
 
         switch (name) {
             case UPDATE_CACHE_ALARM_NAME:
-                updateCache(identifier)
+                updateCache()
                 break;
             default:
                 console.error('alarm with no use case:', name);
@@ -219,7 +180,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
 
         urlsDict[tabId] = url
 
-        const match = await getRelevantDomain(tab.url, identifier);
+        const match = await getRelevantDomain(tab.url);
 
         if (!match || !match.length) {
             await showNotification(identifier, tabId, cashbackPagePath, url)
@@ -241,7 +202,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
             if (isValid === false) addQuietDomain(match);
             return;
         }
-        if (!isWhitelisted(networkUrl, await storage.get('redirectsWhitelist'))) return;
+        if (!await isWhitelisted(networkUrl, await storage.get('redirectsWhitelist'))) return;
 
         const userId = await getUserId()
         sendMessage(tabId, {
