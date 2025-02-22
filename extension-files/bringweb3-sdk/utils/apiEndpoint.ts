@@ -3,6 +3,7 @@ export class ApiEndpoint {
   private static instance: ApiEndpoint | null = null;
   private apiEndpoint: string = '';
   private whitelistEndpoint: string = '';
+  private apiKey: string = '';
 
   private constructor() {
   }
@@ -24,10 +25,11 @@ export class ApiEndpoint {
       : 'https://sandbox-api.bringweb3.io/v1/extension';
   }
 
+  public setApiKey(apiKey: string): void {
+    this.apiKey = apiKey;
+  }
+
   public getWhitelistEndpoint(): string {
-    if (!this.whitelistEndpoint) {
-      throw new Error('Whitelist endpoint not set. Call setWhitelistEndpoint first.');
-    }
     return this.whitelistEndpoint;
   }
 
@@ -36,5 +38,12 @@ export class ApiEndpoint {
       throw new Error('API endpoint not set. Call setApiEndpoint first.');
     }
     return this.apiEndpoint;
+  }
+
+  public getApiKey(): string {
+    if (!this.apiKey) {
+      throw new Error('API key not set. Call setApiKey first.');
+    }
+    return this.apiKey;
   }
 }

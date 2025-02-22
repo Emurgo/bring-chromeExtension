@@ -14,7 +14,7 @@ const handleActivate = async (domain: string, extensionId: string, identifier: s
     if (tabId && redirectUrl) {
         const whitelist = await storage.get('redirectsWhitelist')
 
-        if (!whitelist?.length || isWhitelisted(redirectUrl, whitelist)) {
+        if (!whitelist?.length || await isWhitelisted(redirectUrl, whitelist)) {
             chrome.tabs.update(tabId, { url: redirectUrl })
         }
     }
