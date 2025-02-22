@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.3.2
+
+### Patch Changes
+
+- a151374: Fix no whitelist usecase
+
 ## 1.3.1
 
 ### Patch Changes
