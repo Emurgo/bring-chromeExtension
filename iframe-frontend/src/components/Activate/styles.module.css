@@ -59,6 +59,9 @@
 }
 
 .activate_btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: var(--primary-btn-f-s);
     font-weight: var(--primary-btn-f-w);
     color: var(--primary-btn-f-c);
@@ -72,6 +75,7 @@
     line-height: 36px;
     text-align: center;
     text-decoration: none;
+    cursor: pointer;
 }
 
 .markdown {

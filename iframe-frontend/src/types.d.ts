@@ -54,6 +54,7 @@ declare global {
         key?: string
         url?: string
         domain?: string
+        redirectUrl?: string
     }
 
     interface GoogleAnalyticsContextType {

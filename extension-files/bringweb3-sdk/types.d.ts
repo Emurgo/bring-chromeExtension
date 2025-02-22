@@ -24,5 +24,6 @@ interface BringEvent {
         key?: string
         url?: string
         domain?: string
+        redirectUrl?: string
     }
 }

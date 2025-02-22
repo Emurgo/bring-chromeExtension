@@ -11,6 +11,7 @@ interface Body {
     action?: string
     process?: string
     details?: unknown
+    retailer?: string
 }
 
 const analytics = async (body: Body) => {
