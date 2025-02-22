@@ -1,11 +1,18 @@
 import { ApiEndpoint } from "../apiEndpoint";
+import storage from "../storage";
+import { updateCache } from "./updateCache";
 
-const isWhitelisted = (urlString: string, whitelist: string[]): boolean => {
+const isWhitelisted = async (urlString: string, whitelist: string[]): Promise<boolean> => {
     try {
         const whitelistEndpoint = ApiEndpoint.getInstance().getWhitelistEndpoint()
 
-        if (!whitelist.length) {
-            return !!whitelistEndpoint;
+        if (whitelistEndpoint && !whitelist?.length) {
+            await updateCache()
+            whitelist = await storage.get('redirectsWhitelist')
+        }
+
+        if (!whitelist?.length) {
+            return whitelistEndpoint ? false : true;
         };
 
         const url = new URL(urlString);
