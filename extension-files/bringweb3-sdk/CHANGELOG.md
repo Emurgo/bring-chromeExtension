@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.3.3
+
+### Patch Changes
+
+- 6ac9ee2: fix whitelist check
+
 ## 1.3.2
 
 ### Patch Changes
