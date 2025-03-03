@@ -14,14 +14,42 @@ import showNotification from "./utils/background/showNotification.js"
 import isWhitelisted from './utils/background/isWhitelisted';
 import { updateCache } from './utils/background/updateCache';
 
+const urlRemoveOptions = ['www.', 'www1.', 'www2.']
+
 const getRelevantDomain = async (url: string | undefined) => {
     const relevantDomains = await updateCache()
 
     if (!url || !relevantDomains || !relevantDomains.length) return ''
-    const domain = parseUrl(url)
 
-    for (const relevantDomain of relevantDomains) {
-        if (domain.startsWith(relevantDomain)) {
+    let urlObj = null
+
+    try {
+        urlObj = new URL(url)
+    } catch (error) {
+        urlObj = new URL(`https://${url}`)
+    }
+
+    let tabDomain = urlObj.hostname
+    let tabPath = urlObj.pathname
+
+    for (const urlRemoveOption of urlRemoveOptions) {
+        tabDomain = tabDomain.replace(urlRemoveOption, '')
+    }
+
+    for (let relevantDomain of relevantDomains) {
+        let allowSubdomain = false
+
+        if (relevantDomain.startsWith('*.')) {
+            allowSubdomain = true
+        }
+
+        const relevantDomainPath = "/" + relevantDomain.split('/').filter((e: string) => e).slice(1).join('/');
+
+        if (tabPath.startsWith(relevantDomainPath)) {
+            tabDomain += relevantDomainPath
+        }
+
+        if (tabDomain === relevantDomain || (allowSubdomain && tabDomain.endsWith(relevantDomain.replace('*.', '')))) {
 
             const quietDomains = await storage.get('quietDomains')
             if (quietDomains && quietDomains[relevantDomain] && Date.now() < quietDomains[relevantDomain]) {
