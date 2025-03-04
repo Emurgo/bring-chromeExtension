@@ -295,5 +295,5 @@ bringInitContentScript({
     promptLogin,
     theme: 'dark',
     text: 'lower',
-    switchWallet: true
+    switchWallet: false
 });
