@@ -45,7 +45,7 @@ const getRelevantDomain = async (url: string | undefined) => {
 
         const relevantDomainPath = "/" + relevantDomain.split('/').filter((e: string) => e).slice(1).join('/');
 
-        if (tabPath.startsWith(relevantDomainPath)) {
+        if (relevantDomainPath !== '/' && tabPath.startsWith(relevantDomainPath)) {
             tabDomain += relevantDomainPath
         }
 
