@@ -13,6 +13,7 @@ import getUserId from "./utils/background/getUserId.js"
 import showNotification from "./utils/background/showNotification.js"
 import isWhitelisted from './utils/background/isWhitelisted';
 import { updateCache } from './utils/background/updateCache';
+import removeTrailingSlash from './utils/background/removeTrailingSlash';
 
 const urlRemoveOptions = ['www.', 'www1.', 'www2.']
 
@@ -30,20 +31,22 @@ const getRelevantDomain = async (url: string | undefined) => {
     }
 
     let tabDomain = urlObj.hostname
-    let tabPath = urlObj.pathname
+    let tabPath = removeTrailingSlash(urlObj.pathname)
 
     for (const urlRemoveOption of urlRemoveOptions) {
         tabDomain = tabDomain.replace(urlRemoveOption, '')
     }
 
     for (let relevantDomain of relevantDomains) {
+        const originalRelevantDomain = relevantDomain
+        relevantDomain = removeTrailingSlash(relevantDomain)
         let allowSubdomain = false
 
         if (relevantDomain.startsWith('*.')) {
             allowSubdomain = true
         }
 
-        const relevantDomainPath = "/" + relevantDomain.split('/').filter((e: string) => e).slice(1).join('/');
+        const relevantDomainPath = "/" + relevantDomain.split('/').slice(1).join('/') || '';
 
         if (relevantDomainPath !== '/' && tabPath.startsWith(relevantDomainPath)) {
             tabDomain += relevantDomainPath
@@ -55,7 +58,7 @@ const getRelevantDomain = async (url: string | undefined) => {
             if (quietDomains && quietDomains[relevantDomain] && Date.now() < quietDomains[relevantDomain]) {
                 return ''
             }
-            return relevantDomain
+            return originalRelevantDomain
         }
     }
     return ''
