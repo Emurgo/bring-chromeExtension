@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.3.4
+
+### Patch Changes
+
+- 7147361: add support for subdomains
+
 ## 1.3.3
 
 ### Patch Changes
