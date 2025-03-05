@@ -18,6 +18,7 @@ const Layout = () => {
                     platform={data.platformName}
                     testVariant={data.variant}
                     location={data.url}
+                    flowId={data.flowId}
                 >
                     <Outlet />
                 </GoogleAnalyticsProvider>

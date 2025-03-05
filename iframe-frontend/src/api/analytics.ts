@@ -12,6 +12,7 @@ interface Body {
     process?: string
     details?: unknown
     retailer?: string
+    flowId: string
 }
 
 const analytics = async (body: Body) => {
