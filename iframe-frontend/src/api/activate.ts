@@ -6,6 +6,7 @@ interface ActivateProps {
     retailerId: string
     url: string
     tokenSymbol: string
+    flowId: string
 }
 
 const activate = async (body: ActivateProps) => {

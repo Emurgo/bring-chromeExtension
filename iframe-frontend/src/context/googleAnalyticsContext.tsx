@@ -32,9 +32,10 @@ interface Props {
     testVariant: VariantKey
     retailerName: string | undefined
     location: string
+    flowId: string
 }
 
-export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, platform, testVariant, userId, retailerName, location }) => {
+export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, platform, testVariant, userId, retailerName, location, flowId }) => {
     const effectRan = useRef(false)
     const { walletAddress } = useWalletAddress()
 
@@ -45,6 +46,7 @@ export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, pl
             platform,
             testId: TEST_ID,
             testVariant,
+            flowId,
         }
 
         if (retailerName) backendEvent.retailer = retailerName
@@ -57,7 +59,7 @@ export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, pl
             console.error('BRING: Error sending analytics event', error)
             return { success: false, error }
         }
-    }, [platform, retailerName, testVariant, userId, walletAddress])
+    }, [flowId, platform, retailerName, testVariant, userId, walletAddress])
 
     useEffect(() => {
         if (ReactGA.isInitialized && measurementId) return;

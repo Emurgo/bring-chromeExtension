@@ -31,7 +31,7 @@ interface Props {
 const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: Props) => {
     const { sendGaEvent } = useGoogleAnalytics()
     const { walletAddress, setWalletAddress } = useWalletAddress()
-    const { iconsPath, textMode } = useRouteLoaderData('root') as LoaderData
+    const { iconsPath, textMode, flowId } = useRouteLoaderData('root') as LoaderData
     const [tokenSymbol, setTokenSymbol] = useState(info.cryptoSymbols[0])
     const [optOutOpen, setOptOutOpen] = useState(false)
     const [isAddressUpdated, setIsAddressUpdated] = useState(false)
@@ -51,7 +51,8 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: Props) => {
                 platformName,
                 retailerId,
                 url,
-                tokenSymbol
+                tokenSymbol,
+                flowId
             })
             if (res.status !== 200) throw `Got ${res.status} status`
 
@@ -60,7 +61,7 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: Props) => {
         } catch (error) {
             console.error(error);
         }
-    }, [info, walletAddress, tokenSymbol, setRedirectUrl, nextFn])
+    }, [info, walletAddress, tokenSymbol, flowId, setRedirectUrl, nextFn])
 
     const handleFirstClick = () => {
         setStatus('activating')
