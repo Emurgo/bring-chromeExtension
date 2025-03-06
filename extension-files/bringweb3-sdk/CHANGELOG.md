@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.3.5
+
+### Patch Changes
+
+- 058809e: add timestamp to requests
+
 ## 1.3.4
 
 ### Patch Changes
