@@ -22,6 +22,7 @@ const apiRequest = async (req: Request) => {
         const urlParams = new URLSearchParams({
             ...params,
             version: getVersion(),
+            timestamp: Date.now().toString(),
             opt_out: await storage.get('optOut') || 0,
             user_id: await getUserId() || 'undefined',
             wallet_address: await storage.get('walletAddress') || 'undefined'
@@ -31,6 +32,7 @@ const apiRequest = async (req: Request) => {
         params = {
             ...params,
             version: getVersion(),
+            timestamp: Date.now(),
             optOut: await storage.get('optOut') || 0,
             userId: await getUserId() || undefined,
             walletAddress: params?.walletAddress || await storage.get('walletAddress') || undefined
