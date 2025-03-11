@@ -7,7 +7,7 @@ interface ActivateProps {
     url: string
     tokenSymbol: string
     flowId: string
-    timestamp: number
+    timestamp?: number
 }
 
 const activate = async (body: ActivateProps) => {
