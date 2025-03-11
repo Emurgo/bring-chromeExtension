@@ -13,7 +13,7 @@ interface Body {
     details?: unknown
     retailer?: string
     flowId: string
-    timestamp: number
+    timestamp?: number
 }
 
 const analytics = async (body: Body) => {
