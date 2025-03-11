@@ -2,15 +2,20 @@ import { API_URL, API_KEY } from "../config"
 
 type Token = string | null
 
+interface Req {
+    token: Token
+    userId: string
+}
 
 interface VerifyResponse {
     status: number
     info: Info
 }
 
-const verify = async (token: Token): Promise<VerifyResponse> => {
+const verify = async ({ token, userId }: Req): Promise<VerifyResponse> => {
     const body = {
         token,
+        userId,
         timestamp: Date.now()
     }
 
