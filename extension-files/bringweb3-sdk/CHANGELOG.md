@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.3.6
+
+### Patch Changes
+
+- d2ec57b: fix missing popups
+
 ## 1.3.5
 
 ### Patch Changes
