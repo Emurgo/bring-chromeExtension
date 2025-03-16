@@ -21,8 +21,9 @@ const ACTIONS = {
 const UNION_ACTIONS = [ACTIONS.ACTIVATE]
 
 const handleIframeMessages = ({ event, iframeEl, promptLogin }: Props) => {
-    const { data } = event
-    const { from, action, style, keyFrames, time, extensionId, url, domain, redirectUrl } = data
+    if (!event?.data) return
+
+    const { from, action, style, keyFrames, time, extensionId, url, domain, redirectUrl } = event.data
 
     if (from !== 'bringweb3') return
 
