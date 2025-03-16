@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.3.7
+
+### Patch Changes
+
+- 70414cc: handle event with no data
+
 ## 1.3.6
 
 ### Patch Changes
