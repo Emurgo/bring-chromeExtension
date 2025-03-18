@@ -15,7 +15,7 @@ const checkNotifications = async (apiKey: string, tabId?: number, cashbackUrl?: 
 
     const lastActivation = await storage.get('lastActivation')
 
-    const res = await checkEvents({ apiKey, walletAddress, cashbackUrl, lastActivation });
+    const res = await checkEvents({ walletAddress, cashbackUrl, lastActivation });
 
     storage.set('notificationCheck', res.nextCall);
 
