@@ -95,31 +95,40 @@ const bringInitContentScript = async ({
                 return true
 
             case 'INJECT':
-                if (getDomain(location.href) !== getDomain(request.domain)) {
-                    sendResponse({ status: 'Domain already changed' });
+                try {
+
+                    if (getDomain(location.href) !== getDomain(request.domain)) {
+                        sendResponse({ status: 'failed', message: 'Domain already changed' });
+                        return true
+                    } else if (isIframeOpen) {
+                        sendResponse({ status: 'failed', message: 'iframe already open' });
+                        return true
+                    }
+                    const { token, iframeUrl, userId } = request;
+
+                    const query: { [key: string]: string } = { token }
+                    if (userId) query['userId'] = userId
+
+                    iframeEl = injectIFrame({
+                        query,
+                        iframeUrl,
+                        theme: theme === 'dark' ? darkTheme : lightTheme,
+                        themeMode: theme || 'light',
+                        text,
+                        switchWallet,
+                        page: request.page
+                    });
+                    isIframeOpen = true
+                    sendResponse({ status: 'success' });
                     return true
-                } else if (isIframeOpen) {
-                    sendResponse({ status: 'iframe already open' });
+                } catch (error) {
+                    if (error instanceof Error) {
+                        sendResponse({ status: 'failed', message: error.message });
+                    } else {
+                        sendResponse({ status: 'failed', message: String(error) });
+                    }
                     return true
                 }
-                const { token, iframeUrl, userId } = request;
-
-                const query: { [key: string]: string } = { token }
-                if (userId) query['userId'] = userId
-
-                iframeEl = injectIFrame({
-                    query,
-                    iframeUrl,
-                    theme: theme === 'dark' ? darkTheme : lightTheme,
-                    themeMode: theme || 'light',
-                    text,
-                    switchWallet,
-                    page: request.page
-                });
-                isIframeOpen = true
-                sendResponse({ status: 'success' });
-                return true
-
             default:
                 console.error(`Unknown action: ${action}`);
                 break;
