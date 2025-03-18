@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.3.8
+
+### Patch Changes
+
+- aa39263: add error report
+
 ## 1.3.7
 
 ### Patch Changes
