@@ -20,7 +20,7 @@ export const updateCache = async () => {
         return relevantDomainsList
     }
 
-    const res = await fetchDomains(apiKey)
+    const res = await fetchDomains()
     const { nextUpdateTimestamp, relevantDomains } = res
 
     storage.set('relevantDomains', relevantDomains)

@@ -1,13 +1,12 @@
 import { ApiEndpoint } from "../apiEndpoint"
 import apiRequest from "./apiRequest"
 
-const fetchDomains = async (apiKey: string) => {
+const fetchDomains = async () => {
     const whitelistEndpoint = ApiEndpoint.getInstance().getWhitelistEndpoint()
 
     const request: Parameters<typeof apiRequest>[0] = {
         path: '/domains',
-        apiKey,
-        method: 'GET',
+        method: 'GET'
     }
 
     if (whitelistEndpoint) {

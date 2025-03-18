@@ -1,7 +1,6 @@
 import apiRequest from "./apiRequest"
 
 interface ValidateDomainProps {
-    apiKey: string,
     body: {
         url: string,
         domain: string,
@@ -10,9 +9,9 @@ interface ValidateDomainProps {
     }
 }
 
-const validateDomain = async ({ apiKey, body }: ValidateDomainProps) => {
+const validateDomain = async ({ body }: ValidateDomainProps) => {
 
-    const res = await apiRequest({ path: '/check/popup', apiKey, method: 'POST', params: body })
+    const res = await apiRequest({ path: '/check/popup', method: 'POST', params: body })
 
     return res
 }

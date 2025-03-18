@@ -14,6 +14,7 @@ import showNotification from "./utils/background/showNotification.js"
 import isWhitelisted from './utils/background/isWhitelisted';
 import { updateCache } from './utils/background/updateCache';
 import removeTrailingSlash from './utils/background/removeTrailingSlash';
+import analytics from './utils/api/analytics';
 
 const urlRemoveOptions = ['www.', 'www1.', 'www2.']
 
@@ -220,8 +221,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
 
         const address = await getWalletAddress(tabId);
 
-        const { token, isValid, iframeUrl, networkUrl } = await validateDomain({
-            apiKey: identifier,
+        const { token, isValid, iframeUrl, networkUrl, flowId } = await validateDomain({
             body: {
                 domain: match,
                 url: tab.url,
@@ -236,13 +236,24 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
         if (!await isWhitelisted(networkUrl, await storage.get('redirectsWhitelist'))) return;
 
         const userId = await getUserId()
-        sendMessage(tabId, {
+
+        const res = await sendMessage(tabId, {
             action: 'INJECT',
             token,
             domain: url,
             iframeUrl,
             userId
         });
+
+        if (res?.status !== 'success') {
+            analytics({
+                type: 'no_popup',
+                userId,
+                walletAddress: address,
+                details: { url: tab.url, match, iframeUrl, reason: res?.message, status: res?.status },
+                flowId
+            })
+        }
     })
 
     chrome.tabs.onRemoved.addListener(tabId => delete urlsDict[tabId])
