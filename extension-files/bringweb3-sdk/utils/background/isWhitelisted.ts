@@ -4,7 +4,7 @@ import { updateCache } from "./updateCache";
 
 const isWhitelisted = async (urlString: string, whitelist: string[]): Promise<boolean> => {
     const whitelistEndpoint = ApiEndpoint.getInstance().getWhitelistEndpoint()
-    if (!(whitelistEndpoint?.trim().length > 0)) {
+    if ((whitelistEndpoint?.trim().length ?? 0) < 1) {
         // This is local EMURGO change we do not allow there to be a version with no whitelist
         throw new Error('Cashback redirection whitelist endpoint is required!');
     }
