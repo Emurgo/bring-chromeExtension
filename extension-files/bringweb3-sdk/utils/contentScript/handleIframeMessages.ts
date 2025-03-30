@@ -24,7 +24,6 @@ const handleIframeMessages = ({ event, iframeEl, promptLogin }: Props) => {
     if (!event?.data) return
 
     const { from, action, style, keyFrames, time, extensionId, url, domain, redirectUrl } = event.data
-
     if (from !== 'bringweb3') return
 
     // If the event comes from another extension that installed our package, ignore it (unless it ACTIVATE action)
