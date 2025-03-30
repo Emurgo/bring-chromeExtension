@@ -9,7 +9,7 @@ const handleActivate = async (domain: string, extensionId: string, identifier: s
         await storage.set('lastActivation', Date.now());
     }
 
-    if (domain) addQuietDomain(domain, time || Date.now() + 24 * 60 * 60 * 1000)
+    if (domain) addQuietDomain(domain, time || (Date.now() + 24 * 60 * 60 * 1000))
 
     if (tabId && redirectUrl) {
         const whitelist = await storage.get('redirectsWhitelist')
