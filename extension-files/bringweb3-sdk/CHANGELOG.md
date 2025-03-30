@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.3.10
+
+### Patch Changes
+
+- 3ebc217: fix: queit domain time logics
+
 ## 1.3.9
 
 ### Patch Changes
