@@ -7,9 +7,9 @@ const addQuietDomain = async (domain: string, time?: number) => {
     let quietDomains = await storage.get('quietDomains')
 
     if (typeof quietDomains === 'object') {
-        quietDomains[domain] = Date.now() + time
+        quietDomains[domain] = time
     } else {
-        quietDomains = { [domain]: Date.now() + quietTime }
+        quietDomains = { [domain]: time }
     }
     storage.set('quietDomains', quietDomains)
 }
