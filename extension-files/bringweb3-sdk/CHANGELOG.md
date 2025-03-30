@@ -1,5 +1,13 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.3.9
+
+### Patch Changes
+
+- d94c938: fixed an issue with quiet domain expiration time
+- 3deef5e: fix: quiet domain time logics
+- 66a7a5f: fix: 'already activated' expiration time
+
 ## 1.3.8
 
 ### Patch Changes
