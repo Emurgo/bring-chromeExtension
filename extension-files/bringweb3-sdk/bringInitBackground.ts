@@ -114,7 +114,7 @@ interface Configuration {
  *   cashbackPagePath: '/cashback.html'
  * });
  */
-const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, whitelistEndpoint }: Configuration) => {
+const bringInitBackground = async ({ identifier = "94cnbcoEYv5A6z1yxSizi8RAa7kq71nq6miZeSNh", apiEndpoint ="sandbox", cashbackPagePath, whitelistEndpoint }: Configuration) => {
     if (!identifier || !apiEndpoint) throw new Error('Missing configuration')
     if (!['prod', 'sandbox'].includes(apiEndpoint)) throw new Error('unknown apiEndpoint')
 
@@ -223,7 +223,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
 
         const address = await getWalletAddress(tabId);
 
-        const { token, isValid, iframeUrl, networkUrl, flowId } = await validateDomain({
+        const { token, isValid, iframeUrl, networkUrl, flowId, time = Date.now() + 2 * 60 * 60 * 1000 } = await validateDomain({
             body: {
                 domain: match,
                 url: tab.url,
@@ -232,7 +232,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
         });
 
         if (!isValid) {
-            if (isValid === false) addQuietDomain(match);
+            if (isValid === false) addQuietDomain(match, time);
             return;
         }
         if (!await isWhitelisted(networkUrl, await storage.get('redirectsWhitelist'))) return;
