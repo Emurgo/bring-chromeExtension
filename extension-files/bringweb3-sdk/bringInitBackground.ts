@@ -56,7 +56,9 @@ const getRelevantDomain = async (url: string | undefined) => {
         if (tabDomain === relevantDomain || (allowSubdomain && tabDomain.endsWith(relevantDomain.replace('*.', '')))) {
 
             const quietDomains = await storage.get('quietDomains')
-            if (quietDomains && quietDomains[relevantDomain] && Date.now() < quietDomains[relevantDomain]) {
+            if (quietDomains && 
+                (quietDomains[relevantDomain] && Date.now() < quietDomains[relevantDomain] 
+                && quietDomains[relevantDomain] > Date.now() + 60 * 60 * 60 * 1000) ) {
                 return ''
             }
             return originalRelevantDomain
