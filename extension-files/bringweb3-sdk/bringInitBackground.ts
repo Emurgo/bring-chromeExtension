@@ -114,7 +114,7 @@ interface Configuration {
  *   cashbackPagePath: '/cashback.html'
  * });
  */
-const bringInitBackground = async ({ identifier = "94cnbcoEYv5A6z1yxSizi8RAa7kq71nq6miZeSNh", apiEndpoint ="sandbox", cashbackPagePath, whitelistEndpoint }: Configuration) => {
+const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, whitelistEndpoint }: Configuration) => {
     if (!identifier || !apiEndpoint) throw new Error('Missing configuration')
     if (!['prod', 'sandbox'].includes(apiEndpoint)) throw new Error('unknown apiEndpoint')
 
