@@ -56,9 +56,9 @@ const getRelevantDomain = async (url: string | undefined) => {
         if (tabDomain === relevantDomain || (allowSubdomain && tabDomain.endsWith(relevantDomain.replace('*.', '')))) {
 
             const quietDomains = await storage.get('quietDomains')
-            if (quietDomains && 
-                (quietDomains[relevantDomain] && Date.now() < quietDomains[relevantDomain] 
-                && quietDomains[relevantDomain] < Date.now() + 60 * 24 * 60 * 60 * 1000) ) {
+            if (quietDomains &&
+                (quietDomains[relevantDomain] && Date.now() < quietDomains[relevantDomain]
+                    && quietDomains[relevantDomain] < Date.now() + 60 * 24 * 60 * 60 * 1000)) {
                 return ''
             }
             return originalRelevantDomain
@@ -223,7 +223,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
 
         const address = await getWalletAddress(tabId);
 
-        const { token, isValid, iframeUrl, networkUrl, flowId, time = Date.now() + 2 * 60 * 60 * 1000 } = await validateDomain({
+        const { token, isValid, iframeUrl, networkUrl, flowId, time = Date.now() + 24 * 60 * 60 * 1000 } = await validateDomain({
             body: {
                 domain: match,
                 url: tab.url,

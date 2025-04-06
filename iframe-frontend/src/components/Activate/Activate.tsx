@@ -21,7 +21,7 @@ interface ActivateProps {
     retailerName: string
 }
 
-const ACTIVATE_QUIET_TIME = 24 * 60 * 60 * 1000
+const ACTIVATE_QUIET_TIME = 2 * 60 * 60 * 1000
 
 const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName, retailerName }: ActivateProps) => {
     const { walletAddress } = useWalletAddress()
