@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.3.11
+
+### Patch Changes
+
+- 8dd7229: Fix default quietDomain time
+
 ## 1.3.10
 
 ### Patch Changes
