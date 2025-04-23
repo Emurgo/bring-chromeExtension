@@ -15,6 +15,8 @@ import isWhitelisted from './utils/background/isWhitelisted';
 import { updateCache } from './utils/background/updateCache';
 import removeTrailingSlash from './utils/background/removeTrailingSlash';
 import analytics from './utils/api/analytics';
+import addOptOutDomain from './utils/background/addOptOutDomain';
+import getDomain from './utils/getDomain';
 
 const urlRemoveOptions = ['www.', 'www1.', 'www2.']
 
@@ -78,6 +80,9 @@ interface Configuration {
     apiEndpoint: string
     whitelistEndpoint?: string
     cashbackPagePath?: string
+    isEnabledByDefault: boolean
+    showNotifications?: boolean
+    notificationCallback?: () => void
 }
 /**
  * Initializes the background script for the Bring extension.
@@ -89,6 +94,8 @@ interface Configuration {
  * @param {string} configuration.apiEndpoint - The API endpoint ('prod' or 'sandbox').
  * @param {string} configuration.whitelistEndpoint - Endpoint for whitelist of redirect urls.
  * @param {string} [configuration.cashbackPagePath] - Optional path to the cashback page.
+ * @param {boolean} [configuration.isEnabledByDefault] - Determine if the user see the popup by default. defaults to true.
+ * @param {boolean} [configuration.showNotifications] - Determine if the extension should show notifications about new rewards. defaults to true.
  * @throws {Error} Throws an error if identifier or apiEndpoint is missing, or if apiEndpoint is invalid.
  * @returns {Promise<void>}
  *
@@ -111,16 +118,22 @@ interface Configuration {
  *   identifier: '<bring_identifier>',
  *   apiEndpoint: 'sandbox',
  *   whitelistEndpoint: 'https://example.com/whitelist.json',
+ *   isEnabledByDefault: true,
  *   cashbackPagePath: '/cashback.html'
  * });
  */
-const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, whitelistEndpoint }: Configuration) => {
+const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, whitelistEndpoint, isEnabledByDefault = true, showNotifications = true, notificationCallback }: Configuration) => {
     if (!identifier || !apiEndpoint) throw new Error('Missing configuration')
     if (!['prod', 'sandbox'].includes(apiEndpoint)) throw new Error('unknown apiEndpoint')
-
     ApiEndpoint.getInstance().setApiEndpoint(apiEndpoint)
     ApiEndpoint.getInstance().setWhitelistEndpoint(whitelistEndpoint || '')
     ApiEndpoint.getInstance().setApiKey(identifier)
+
+    const popupEnabled = await storage.get('popupEnabled')
+
+    if (popupEnabled === undefined) {
+        await storage.set('popupEnabled', isEnabledByDefault)
+    }
 
     updateCache()
 
@@ -157,6 +170,25 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
             case 'OPT_OUT': {
                 const { time } = request
                 setOptOut(time).then(res => sendResponse(res))
+                return true;
+            }
+            case 'OPT_OUT_SPECIFIC': {
+                const { domain, time } = request
+                console.log('OPT_OUT_SPECIFIC', domain, time);
+
+                addOptOutDomain(domain, time).then(res => sendResponse(res))
+                return true;
+            }
+            case 'GET_POPUP_ENABLED': {
+                storage.get('popupEnabled').then(res => {
+                    console.log('GET_POPUP_ENABLED', res)
+                    sendResponse({ isPopupEnabled: res })
+                })
+                return true;
+            }
+            case 'SET_POPUP_ENABLED': {
+                const { isPopupEnabled } = request
+                storage.set('popupEnabled', isPopupEnabled).then(res => sendResponse({ isPopupEnabled }))
                 return true;
             }
             case 'CLOSE': {
@@ -200,12 +232,19 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
         const url = parseUrl(tab.url)
 
         const optOut = await storage.get('optOut');
+        const isPopupEnabled = await storage.get('popupEnabled');
 
-        if (optOut && optOut > Date.now()) {
+        if (!isPopupEnabled || (optOut && optOut > Date.now())) {
             return;
         } else if (optOut) {
             storage.remove('optOut')
             storage.remove('optOutKey')
+        }
+
+        const optOutDomains = await storage.get('optOutDomains')
+
+        if (optOutDomains && optOutDomains[getDomain(url)] && optOutDomains[getDomain(url)] > Date.now()) {
+            return;
         }
 
         const previousUrl = urlsDict[tabId];
@@ -217,7 +256,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
         const match = await getRelevantDomain(tab.url);
 
         if (!match || !match.length) {
-            await showNotification(identifier, tabId, cashbackPagePath, url)
+            await showNotification(identifier, tabId, cashbackPagePath, url, showNotifications, notificationCallback)
             return;
         };
 

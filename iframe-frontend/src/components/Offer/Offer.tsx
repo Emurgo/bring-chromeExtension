@@ -14,6 +14,7 @@ import LoadingOverlay from '../LoadingOverlay/LoadingOverlay'
 import { useRouteLoaderData } from 'react-router-dom'
 import toCaseString from '../../utils/toCaseString'
 import { useWalletAddress } from '../../hooks/useWalletAddress'
+import formatCashback from '../../utils/formatCashback'
 
 interface BringEventData {
     from: string
@@ -100,26 +101,6 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: Props) => {
             window.removeEventListener("message", walletAddressUpdate)
         }
     }, [status, activateAction, info, walletAddressUpdate])
-
-    const formatCashback = (amount: number, symbol: string, currency: string) => {
-        try {
-            if (symbol === '%') {
-                return (amount / 100).toLocaleString(undefined, {
-                    style: 'percent',
-                    maximumFractionDigits: 2
-                })
-            }
-
-            return amount.toLocaleString(undefined, {
-                style: 'currency',
-                currency: currency,
-                maximumFractionDigits: 2
-            })
-
-        } catch (error) {
-            return `${symbol}${amount}`
-        }
-    }
 
     return (
         <div className={styles.container}>

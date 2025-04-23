@@ -1,7 +1,10 @@
-import { getTurnOff, setTurnOff } from "@bringweb3/chrome-extension-kit";
+import { getTurnOff, setTurnOff, getPopupEnabled, setPopupEnabled } from "@bringweb3/chrome-extension-kit";
 
-const radio1 = document.querySelector("#false");
-const radio2 = document.querySelector("#true");
+const optOutOff = document.querySelector("#false");
+const optOutOn = document.querySelector("#true");
+
+const popupEnabledOff = document.querySelector("#popupEnabledFalse");
+const popupEnabledOn = document.querySelector("#popupEnabledTrue");
 
 const update = async (value) => {
     const res = await setTurnOff(value)
@@ -9,21 +12,39 @@ const update = async (value) => {
     init()
 }
 
-radio1.addEventListener("click", () => {
+optOutOff.addEventListener("click", () => {
     update(false)
 })
-radio2.addEventListener("click", () => {
+optOutOn.addEventListener("click", () => {
     update(true)
 })
+
+popupEnabledOff.addEventListener("click", async () => {
+    const res = await setPopupEnabled(false)
+    console.log(res);
+    init()
+})
+popupEnabledOn.addEventListener("click", async () => {
+    const res = await setPopupEnabled(true)
+    console.log(res);
+    init()
+})
+
 
 const init = async () => {
     // Send message to background script
     const res = await getTurnOff()
-    console.log('init', res);
     if (!res.isTurnedOff) {
-        radio1.checked = true;
+        optOutOff.checked = true;
     } else {
-        radio2.checked = true;
+        optOutOn.checked = true;
+    }
+    const isPopupEnabled = await getPopupEnabled()
+    console.log('isPopupEnabled', isPopupEnabled, typeof isPopupEnabled);
+    if (!isPopupEnabled.isPopupEnabled) {
+        popupEnabledOff.checked = true;
+    } else {
+        popupEnabledOn.checked = true;
     }
 }
 init()

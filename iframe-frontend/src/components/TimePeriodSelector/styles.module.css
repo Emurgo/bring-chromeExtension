@@ -1,0 +1,31 @@
+.container {
+    display: flex;
+    background-color: #000000;
+    border-radius: 32px;
+    width: 296px;
+    padding: 4px;
+    align-items: center;
+    justify-content: center;
+}
+
+.button {
+    display: flex;
+    align-items: center;
+    border-width: 0;
+    border-color: transparent;
+    outline: none;
+    background: transparent;
+    color: #9ca3af;
+    padding: 16px 12px;
+    border-radius: 32px;
+    font-size: 15px;
+    height: 32px;
+    cursor: pointer;
+    font-weight: 600;
+    text-wrap: nowrap;
+}
+
+.selected {
+    background: #242424 !important;
+    color: white;
+}

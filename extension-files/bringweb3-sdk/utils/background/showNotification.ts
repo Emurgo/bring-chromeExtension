@@ -21,7 +21,7 @@ const show = async (tabId: number, notification: Notification, domain: string) =
     })
 }
 
-const showNotification = async (identifier: string, tabId: number, cashbackPagePath: string | undefined, domain: string): Promise<void> => {
+const showNotification = async (identifier: string, tabId: number, cashbackPagePath: string | undefined, domain: string, showNotifications: boolean, notificationCallback?: () => void): Promise<void> => {
     const notificationFromStorage = await storage.get('notification')
 
     if (notificationFromStorage?.expiration < Date.now()) {
@@ -33,7 +33,10 @@ const showNotification = async (identifier: string, tabId: number, cashbackPageP
     const notification = await checkNotifications(identifier, tabId, getCashbackUrl(cashbackPagePath))
 
     if (notification.showNotification) {
-        return await show(tabId, notification, domain)
+        if (showNotifications) {
+            await show(tabId, notification, domain)
+        }
+        if (notificationCallback) notificationCallback()
     }
 }
 
