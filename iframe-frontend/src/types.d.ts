@@ -14,7 +14,7 @@ declare global {
     }
 
     interface Styles {
-        [key: string]: string
+        [key: string]: { [key: string]: string }
     }
 
     type WalletAddress = string | undefined
@@ -51,9 +51,9 @@ declare global {
     interface Message {
         action?: ACTIONS
         time?: number
-        style?: Styles
+        style?: unknown
         id?: string
-        keyFrames?: Styles[]
+        keyFrames?: unknown
         key?: string
         url?: string
         domain?: string
