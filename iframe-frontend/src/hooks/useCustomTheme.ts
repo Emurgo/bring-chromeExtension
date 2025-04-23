@@ -27,7 +27,7 @@ const useCustomTheme = (): ThemeParamsResult => {
             }
         })
         setDone(true)
-    }, [])
+    }, [theme])
 
     return { done }
 }
