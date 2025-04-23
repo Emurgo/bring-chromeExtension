@@ -1,7 +1,7 @@
 import { FC, createContext, useEffect, ReactNode, useCallback, useRef } from 'react';
 import ReactGA from 'react-ga4';
 import { TEST_ID } from '../config';
-import { VariantKey } from '../utils/ABTest/ABTestVariant';
+import { VariantKey } from '../utils/ABTest/platform-variants';
 import analytics from '../api/analytics';
 import { useWalletAddress } from '../hooks/useWalletAddress';
 
