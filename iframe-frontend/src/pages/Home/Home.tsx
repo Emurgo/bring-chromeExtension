@@ -3,6 +3,7 @@ import { motion, AnimatePresence, Variants } from 'framer-motion'
 import { useRouteLoaderData } from 'react-router-dom'
 import Offer from '../../components/Offer/Offer'
 import Activate from '../../components/Activate/Activate'
+import OneStep from '../../templates/b/OneStep/OneStep'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 import { iframeStyle } from '../../utils/iframeStyles'
 import compareVersions from '../../utils/compareVersions'
@@ -37,7 +38,9 @@ const Home = () => {
   }
 
   useEffect(() => {
-    sendMessage({ action: ACTIONS.OPEN, style: iframeStyle })
+    console.log(iframeStyle[info.platformName.toLowerCase()]);
+
+    sendMessage({ action: ACTIONS.OPEN, style: iframeStyle[info.platformName.toLowerCase()] || iframeStyle['default'] })
     loadMarkdown(info.retailerTermsUrl, setRetailerMarkdown)
     loadMarkdown(info.generalTermsUrl, setGeneralMarkdown)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -66,6 +69,14 @@ const Home = () => {
     }),
   };
 
+  if (info.variant === 'argentControl') {
+    return <>
+      <OneStep
+        retailerMarkdown={retailerMarkdown}
+        generalMarkdown={generalMarkdown}
+      />
+    </>
+  }
 
   return (
     <>

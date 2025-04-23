@@ -10,7 +10,15 @@ interface ActivateProps {
     timestamp?: number
 }
 
-const activate = async (body: ActivateProps) => {
+interface ActivateResponse {
+    status: number
+    flowId: string
+    url: string
+    cashbackInfoUrl: string
+    generalTermsUrl: string
+}
+
+const activate = async (body: ActivateProps): Promise<ActivateResponse> => {
     body.timestamp = Date.now()
 
     const res = await fetch(`${API_URL}/activate`, {

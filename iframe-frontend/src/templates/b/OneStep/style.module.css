@@ -1,0 +1,241 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 24px;
+}
+
+.addressContainer {
+    width: 100%;
+    min-height: 28px;
+}
+
+.address {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 102px;
+    height: 28px;
+    padding: 0 8px;
+    border-color: transparent;
+    border-radius: 32px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 14px;
+    color: #8C8C8C;
+    background: #242424;
+}
+
+.spacer {
+    height: 82px;
+}
+
+.title {
+    margin: 0;
+    margin-top: 16px;
+    color: white;
+    font-size: 22px;
+    line-height: 28px;
+    font-weight: 600;
+}
+
+.subtitle {
+    margin: 0;
+    margin-bottom: 16px;
+    color: #8C8C8C;
+    font-size: 20px;
+    line-height: 26px;
+    font-weight: 400;
+    text-align: center;
+}
+
+.termsBtn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 32px;
+    min-width: 121px;
+    color: #8C8C8C;
+    font-size: 13px;
+    line-height: 14px;
+    font-weight: 600;
+    border-radius: 32px;
+    border-color: transparent;
+    background: #242424;
+    padding: 0 8px;
+    cursor: pointer;
+}
+
+.clarify {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 14px;
+    text-align: center;
+    margin-top: 76px;
+    margin-bottom: 12px;
+    border-color: transparent;
+    color: white;
+    border-radius: 12px;
+    background: #242424;
+    padding: 12px 10px;
+}
+
+.termsHeader {
+    color: white;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 22px;
+    margin: 0;
+    margin-top: 6px;
+}
+
+.backBtn {
+    position: absolute;
+    left: 16px;
+    top: 16px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    background: transparent;
+}
+
+.btns {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.primaryBtn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #F36A3D;
+    border-color: transparent;
+    border-width: 0;
+    border-radius: 32px;
+    padding: 12px 16px;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 18px;
+    color: white;
+    width: 160px;
+    cursor: pointer;
+    height: 48px;
+}
+
+.primaryDisabled {
+    opacity: .5;
+}
+
+.secondaryBtn {
+    background: #FFFFFF1F;
+    border-color: transparent;
+    border-width: 0;
+    border-radius: 32px;
+    padding: 12px 16px;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 18px;
+    color: white;
+    width: 160px;
+    cursor: pointer;
+    height: 48px;
+}
+
+.agree {
+    margin-top: 12px;
+    color: #8C8C8C;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+}
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.65);
+    z-index: 10;
+    padding: 18px 16px;
+}
+
+.turnoffContainer {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    bottom: 18px;
+    width: 296px;
+    min-height: 254px;
+    padding: 18px 16px 24px 16px;
+    background: #242424;
+    border-radius: 16px;
+}
+
+.turnoffText {
+    color: white;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 28px;
+    margin: 16px 0;
+}
+
+.turnoffDetails {
+    color: #8C8C8C;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 26px;
+    text-align: center;
+}
+
+.turnoffBtns {
+    margin-top: 24px;
+    gap: 12px;
+}
+
+.turnoffCloseBtn {
+    background: transparent;
+    border-color: transparent;
+    border-width: 0;
+    margin-left: auto;
+    cursor: pointer;
+}
+
+.turnoffBtn {
+    width: 142px;
+}
+
+.turnOffCloseBtn {
+    width: 295px;
+    margin-top: 50.5px;
+}
+
+.extraMarginTop {
+    margin-top: 32px;
+}
+
+.markdown {
+    height: calc(100vh - 64px);
+    font-size: 17px;
+    font-weight: 400;
+    color: #8C8C8C;
+    background: transparent;
+    overflow-y: scroll;
+    line-height: 22px;
+}
+
+.markdown h3 {
+    display: none;
+}
+
+.markdown strong {
+    color: white;
+}
+
+.markdown::-webkit-scrollbar {
+    width: 4px;
+}
+
+.markdown::-webkit-scrollbar-thumb {
+    background: var(--markdown-scrollbar-color, #8C8C8C);
+    border-radius: 32px;
+}

@@ -1,5 +1,11 @@
 'use strict';
 import { bringInitContentScript } from "@bringweb3/chrome-extension-kit";
+const argentTheme = {
+    fontUrl: 'https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap',
+    fontFamily: "'Barlow', sans-serif",
+    popupBg: '#171717'
+}
+
 const template = {
     // font
     // fontUrl: 'https://fonts.googleapis.com/css2?family=Matemasie&display=swap',
@@ -289,11 +295,12 @@ const promptLogin = () => {
 }
 
 bringInitContentScript({
-    getWalletAddress: async () => await new Promise(resolve => setTimeout(() => resolve('addr1qydfh2z0m4j2297rzwsu7dfu4ld3a6nhgytrn2wzxgvdlwd6y4l5psyq79gflnhwlttgw8gk7aj5j6lj95vg7my67vpsdcvu4l'), 200)),
+    getWalletAddress: async () => await new Promise(resolve => setTimeout(() => resolve('0x05FFa03d2CAF23533c1F15E355196A20a11Fd96441d34F351d2471C386E89859'), 200)),
     walletAddressUpdateCallback: (callback) => { callback() },
     // promptLogin: async () => await new Promise(resolve => setTimeout(() => resolve('addr1qydfh2z0m4j2297rzwsu7dfu4ld3a6nhgytrn2wzxgvdlwd6y4l5psyq79gflnhwlttgw8gk7aj5j6lj95vg7my67vpsdcvu4l'), 4000)),
     promptLogin,
     theme: 'dark',
     text: 'lower',
-    switchWallet: false
+    switchWallet: false,
+    darkTheme: argentTheme
 });
