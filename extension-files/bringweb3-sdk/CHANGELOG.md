@@ -1,5 +1,55 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.3.11
+
+### Patch Changes
+
+- 8dd7229: Fix default quietDomain time
+
+## 1.3.10
+
+### Patch Changes
+
+- 3ebc217: fix: queit domain time logics
+
+## 1.3.9
+
+### Patch Changes
+
+- d94c938: fixed an issue with quiet domain expiration time
+- 3deef5e: fix: quiet domain time logics
+- 66a7a5f: fix: 'already activated' expiration time
+
+## 1.3.8
+
+### Patch Changes
+
+- aa39263: add error report
+
+## 1.3.7
+
+### Patch Changes
+
+- 70414cc: handle event with no data
+
+## 1.3.6
+
+### Patch Changes
+
+- d2ec57b: fix missing popups
+
+## 1.3.5
+
+### Patch Changes
+
+- 058809e: add timestamp to requests
+
+## 1.3.4
+
+### Patch Changes
+
+- 7147361: add support for subdomains
+
 ## 1.3.3
 
 ### Patch Changes

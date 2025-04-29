@@ -15,14 +15,14 @@ const rootLoader = async ({ request }: Props) => {
     const searchParams = new URL(request.url).searchParams
     const textMode = searchParams.get('textMode') || 'lower'
     const themeMode = searchParams.get('themeMode') || 'light'
-    const userId = searchParams.get('userId')
+    const userId = searchParams.get('userId') || ''
     const version = searchParams.get('v') || '0.0.0'
     const switchWallet = (searchParams.get('switchWallet') || 'false')?.toLowerCase() === 'true'
 
     // Load chosen font
     loadFont(searchParams.get('t_fontUrl'), searchParams.get('t_fontFamily'))
     // Verify token
-    const res = await verify(searchParams.get('token'))
+    const res = await verify({ token: searchParams.get('token'), userId })
     if (res.status !== 200) throw `got ${res.status} code`
 
     return {

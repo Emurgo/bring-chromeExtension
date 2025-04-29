@@ -1,7 +1,6 @@
 import apiRequest from "./apiRequest";
 
 interface CheckEventsProps {
-    apiKey: string;
     walletAddress: string
     cashbackUrl: string | undefined;
     lastActivation?: number
@@ -14,12 +13,12 @@ interface Body {
     lastActivation?: number
 }
 
-const checkEvents = async ({ apiKey, walletAddress, cashbackUrl, lastActivation }: CheckEventsProps) => {
+const checkEvents = async ({ walletAddress, cashbackUrl, lastActivation }: CheckEventsProps) => {
     const body: Body = { walletAddress }
     if (lastActivation) body.lastActivation = lastActivation;
     if (cashbackUrl) body.cashbackUrl = cashbackUrl;
 
-    const res = await apiRequest({ path: '/check/notification', apiKey, method: 'POST', params: body })
+    const res = await apiRequest({ path: '/check/notification', method: 'POST', params: body })
 
     return res
 }

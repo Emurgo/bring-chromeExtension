@@ -13,21 +13,55 @@ import getUserId from "./utils/background/getUserId.js"
 import showNotification from "./utils/background/showNotification.js"
 import isWhitelisted from './utils/background/isWhitelisted';
 import { updateCache } from './utils/background/updateCache';
+import removeTrailingSlash from './utils/background/removeTrailingSlash';
+import analytics from './utils/api/analytics';
+
+const urlRemoveOptions = ['www.', 'www1.', 'www2.']
 
 const getRelevantDomain = async (url: string | undefined) => {
     const relevantDomains = await updateCache()
 
     if (!url || !relevantDomains || !relevantDomains.length) return ''
-    const domain = parseUrl(url)
 
-    for (const relevantDomain of relevantDomains) {
-        if (domain.startsWith(relevantDomain)) {
+    let urlObj = null
+
+    try {
+        urlObj = new URL(url)
+    } catch (error) {
+        urlObj = new URL(`https://${url}`)
+    }
+
+    let tabDomain = urlObj.hostname
+    let tabPath = removeTrailingSlash(urlObj.pathname)
+
+    for (const urlRemoveOption of urlRemoveOptions) {
+        tabDomain = tabDomain.replace(urlRemoveOption, '')
+    }
+
+    for (let relevantDomain of relevantDomains) {
+        const originalRelevantDomain = relevantDomain
+        relevantDomain = removeTrailingSlash(relevantDomain)
+        let allowSubdomain = false
+
+        if (relevantDomain.startsWith('*.')) {
+            allowSubdomain = true
+        }
+
+        const relevantDomainPath = "/" + relevantDomain.split('/').slice(1).join('/') || '';
+
+        if (relevantDomainPath !== '/' && tabPath.startsWith(relevantDomainPath)) {
+            tabDomain += relevantDomainPath
+        }
+
+        if (tabDomain === relevantDomain || (allowSubdomain && tabDomain.endsWith(relevantDomain.replace('*.', '')))) {
 
             const quietDomains = await storage.get('quietDomains')
-            if (quietDomains && quietDomains[relevantDomain] && Date.now() < quietDomains[relevantDomain]) {
+            if (quietDomains &&
+                (quietDomains[relevantDomain] && Date.now() < quietDomains[relevantDomain]
+                    && quietDomains[relevantDomain] < Date.now() + 60 * 24 * 60 * 60 * 1000)) {
                 return ''
             }
-            return relevantDomain
+            return originalRelevantDomain
         }
     }
     return ''
@@ -194,8 +228,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
 
         const address = await getWalletAddress(tabId);
 
-        const { token, isValid, iframeUrl, networkUrl } = await validateDomain({
-            apiKey: identifier,
+        const { token, isValid, iframeUrl, networkUrl, flowId, time = Date.now() + 24 * 60 * 60 * 1000 } = await validateDomain({
             body: {
                 domain: match,
                 url: tab.url,
@@ -204,19 +237,30 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
         });
 
         if (!isValid) {
-            if (isValid === false) addQuietDomain(match);
+            if (isValid === false) addQuietDomain(match, time);
             return;
         }
         if (!await isWhitelisted(networkUrl, await storage.get('redirectsWhitelist'))) return;
 
         const userId = await getUserId()
-        sendMessage(tabId, {
+
+        const res = await sendMessage(tabId, {
             action: 'INJECT',
             token,
             domain: url,
             iframeUrl,
             userId
         });
+
+        if (res?.status !== 'success') {
+            analytics({
+                type: 'no_popup',
+                userId,
+                walletAddress: address,
+                details: { url: tab.url, match, iframeUrl, reason: res?.message, status: res?.status },
+                flowId
+            })
+        }
     })
 
     chrome.tabs.onRemoved.addListener(tabId => delete urlsDict[tabId])

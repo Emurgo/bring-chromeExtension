@@ -12,9 +12,13 @@ interface Body {
     process?: string
     details?: unknown
     retailer?: string
+    flowId: string
+    timestamp?: number
 }
 
 const analytics = async (body: Body) => {
+    body.timestamp = Date.now()
+
     const res = await fetch(`${API_URL}/analytics`, {
         method: 'POST',
         headers: {
