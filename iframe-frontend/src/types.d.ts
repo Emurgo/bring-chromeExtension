@@ -33,6 +33,7 @@ declare global {
         iconUrl: string
         url: string
         domain?: string
+        flowId: string
     }
 
     interface LoaderData extends Info {

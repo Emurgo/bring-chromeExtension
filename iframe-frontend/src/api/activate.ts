@@ -6,9 +6,13 @@ interface ActivateProps {
     retailerId: string
     url: string
     tokenSymbol: string
+    flowId: string
+    timestamp?: number
 }
 
 const activate = async (body: ActivateProps) => {
+    body.timestamp = Date.now()
+
     const res = await fetch(`${API_URL}/activate`, {
         method: 'POST',
         headers: {

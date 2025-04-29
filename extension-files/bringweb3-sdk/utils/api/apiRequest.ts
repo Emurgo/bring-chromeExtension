@@ -6,22 +6,23 @@ import storage from "../storage"
 interface Request {
     path: string
     method: 'POST' | 'GET'
-    apiKey: string
     params?: { [key: string]: any }
 }
 
 
 const apiRequest = async (req: Request) => {
-    let { path, method, apiKey, params } = req
-    if (!req || !path || !method || (!params && method === 'POST') || !apiKey) throw new Error('Missing endpoint or method')
+    let { path, method, params } = req
+    if (!req || !path || !method || (!params && method === 'POST')) throw new Error('Missing endpoint or method')
 
     let endpoint = ApiEndpoint.getInstance().getApiEndpoint()
     endpoint += path
+    const apiKey = ApiEndpoint.getInstance().getApiKey()
 
     if (method === 'GET') {
         const urlParams = new URLSearchParams({
             ...params,
             version: getVersion(),
+            timestamp: Date.now().toString(),
             opt_out: await storage.get('optOut') || 0,
             user_id: await getUserId() || 'undefined',
             wallet_address: await storage.get('walletAddress') || 'undefined'
@@ -31,6 +32,7 @@ const apiRequest = async (req: Request) => {
         params = {
             ...params,
             version: getVersion(),
+            timestamp: Date.now(),
             optOut: await storage.get('optOut') || 0,
             userId: await getUserId() || undefined,
             walletAddress: params?.walletAddress || await storage.get('walletAddress') || undefined
