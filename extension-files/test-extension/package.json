@@ -18,5 +18,8 @@
     "webpack": "^5.93.0",
     "webpack-cli": "^4.10.0",
     "webpack-merge": "^5.10.0"
+  },
+  "dependencies": {
+    "@bringweb3/chrome-extension-kit": "https://media.bringweb3.io/tests/bringweb3-chrome-extension-kit-v1.4.0.tgz"
   }
 }
