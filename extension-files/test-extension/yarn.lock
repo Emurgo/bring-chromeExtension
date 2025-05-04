@@ -2,6 +2,12 @@
 # yarn lockfile v1
 
 
+"@bringweb3/chrome-extension-kit@https://media.bringweb3.io/tests/bringweb3-chrome-extension-kit-v1.4.0.tgz":
+  version "1.4.0"
+  resolved "https://media.bringweb3.io/tests/bringweb3-chrome-extension-kit-v1.4.0.tgz#4121b5d762dd7456e7a8419a8ca42c21bacaa52b"
+  dependencies:
+    uuid "^11.0.3"
+
 "@discoveryjs/json-ext@^0.5.0":
   version "0.5.7"
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
@@ -2373,6 +2379,11 @@ utila@~0.4:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/utila/-/utila-0.4.0.tgz#8a16a05d445657a3aea5eecc5b12a4fa5379772c"
   integrity sha512-Z0DbgELS9/L/75wZbro8xAnT50pBVFQZ+hUEueGDU5FN51YSCYM+jdxsfCiHjwNP/4LCDD0i/graKpeBnOXKRA==
+
+uuid@^11.0.3:
+  version "11.1.0"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-11.1.0.tgz#9549028be1753bb934fc96e2bca09bb4105ae912"
+  integrity sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==
 
 watchpack@^2.4.1:
   version "2.4.1"
