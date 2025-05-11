@@ -11,30 +11,34 @@ permissions:
   contents: write
   pull-requests: write
 
-defaults:
-  run:
-    working-directory: extension-files/bringweb3-sdk
-
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Debug directory structure
+        run: |
+          pwd
+          ls -la
+          
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
           cache: 'yarn'
           cache-dependency-path: 'extension-files/bringweb3-sdk/yarn.lock'
-
+          
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-
+        working-directory: extension-files/bringweb3-sdk
+        
       - name: Create Release Pull Request or Publish
         id: changesets
         uses: changesets/action@v1
         with:
           publish: yarn release
-          cwd: "./extension-files/bringweb3-sdk"
+          # Use a relative path without ./ prefix
+          cwd: "extension-files/bringweb3-sdk"
           commit: "chore(release): version SDK package"
           title: "chore(release): version SDK package"
         env:
