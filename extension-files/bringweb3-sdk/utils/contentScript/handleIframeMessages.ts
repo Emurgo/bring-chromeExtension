@@ -48,7 +48,6 @@ const handleIframeMessages = ({ event, iframeEl, promptLogin }: Props) => {
             chrome.runtime.sendMessage({ action, time, from: "bringweb3" })
             break;
         case ACTIONS.OPT_OUT_SPECIFIC:
-            console.log('OPT_OUT_SPECIFIC:', action, time, domain)
             chrome.runtime.sendMessage({ action, domain, time, from: "bringweb3" })
             break;
         case ACTIONS.ERASE_NOTIFICATION:
