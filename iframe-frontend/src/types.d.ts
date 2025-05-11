@@ -1,4 +1,4 @@
-import { VariantKey } from "./utils/ABTest/ABTestVariant"
+import { VariantKey } from "./utils/ABTest/platform-variants"
 declare global {
 
     declare enum ACTIONS {
@@ -7,13 +7,14 @@ declare global {
         ACTIVATE = 'ACTIVATE',
         PROMPT_LOGIN = 'PROMPT_LOGIN',
         OPT_OUT = 'OPT_OUT',
+        OPT_OUT_SPECIFIC = 'OPT_OUT_SPECIFIC',
         ADD_KEYFRAMES = 'ADD_KEYFRAMES',
         ERASE_NOTIFICATION = 'ERASE_NOTIFICATION',
         OPEN_CASHBACK_PAGE = 'OPEN_CASHBACK_PAGE'
     }
 
     interface Styles {
-        [key: string]: string
+        [key: string]: { [key: string]: string }
     }
 
     type WalletAddress = string | undefined
@@ -44,14 +45,15 @@ declare global {
         switchWallet: boolean
         userId: string | undefined
         version: string
+        networkUrl: string
     }
 
     interface Message {
         action?: ACTIONS
         time?: number
-        style?: Styles
+        style?: unknown
         id?: string
-        keyFrames?: Styles[]
+        keyFrames?: unknown
         key?: string
         url?: string
         domain?: string

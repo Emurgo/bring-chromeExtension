@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useWalletAddress } from '../../hooks/useWalletAddress'
 import compareVersions from '../../utils/compareVersions'
 import { Oval } from 'react-loader-spinner'
+import { ACTIVATE_QUIET_TIME } from '../../config'
 // import SwitchBtn from '../SwitchBtn/SwitchBtn'
 
 interface ActivateProps {
@@ -21,7 +22,6 @@ interface ActivateProps {
     retailerName: string
 }
 
-const ACTIVATE_QUIET_TIME = 2 * 60 * 60 * 1000
 
 const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName, retailerName }: ActivateProps) => {
     const { walletAddress } = useWalletAddress()

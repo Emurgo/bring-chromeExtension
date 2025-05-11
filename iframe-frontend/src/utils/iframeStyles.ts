@@ -1,28 +1,62 @@
 
 interface Styles {
+    [key: string]: { [key: string]: string }
+}
+
+interface KeyFrames {
     [key: string]: string
 }
 
 
+// export const iframeStyle: Styles = {
+//     animation: 'slideIn .3s ease-in-out',
+//     width: '540px',
+//     height: `356px`,
+//     borderRadius: '20px',
+//     display: 'block',
+//     top: '10px'
+// }
+
+
 export const iframeStyle: Styles = {
-    animation: 'slideIn .3s ease-in-out',
-    width: '540px',
-    height: `356px`,
-    borderRadius: '20px',
-    display: 'block',
-    top: '10px'
+    default: {
+        animation: 'slideIn .3s ease-in-out',
+        width: '540px',
+        height: `356px`,
+        borderRadius: '20px',
+        display: 'block',
+        top: '10px'
+    },
+    argent: {
+        animation: 'slideIn .3s ease-in-out',
+        width: '360px',
+        height: `600px`,
+        borderRadius: '0px',
+        display: 'block',
+        top: '10px'
+    }
 }
 
 export const notificationIframeStyle: Styles = {
-    animation: 'slideIn .3s ease-in-out',
-    width: '400px',
-    height: `50px`,
-    borderRadius: '10px',
-    display: 'block',
-    top: '40px'
+    default: {
+        animation: 'slideIn .3s ease-in-out',
+        width: '400px',
+        height: `50px`,
+        borderRadius: '10px',
+        display: 'block',
+        top: '40px'
+    },
+    argent: {
+        animation: 'slideIn .3s ease-in-out',
+        width: '400px',
+        height: `50px`,
+        borderRadius: '10px',
+        display: 'block',
+        top: '40px'
+    }
 }
 
-export const keyFrames: Styles[] =
+export const keyFrames: KeyFrames[] =
     [
         {
             name: 'slideIn',
