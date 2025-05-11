@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.4.0
+
+### Minor Changes
+
+- 9081329: add disable popup by default feature
+
 ## 1.3.11
 
 ### Patch Changes
