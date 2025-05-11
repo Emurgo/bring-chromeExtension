@@ -174,21 +174,24 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
             }
             case 'OPT_OUT_SPECIFIC': {
                 const { domain, time } = request
-                console.log('OPT_OUT_SPECIFIC', domain, time);
 
                 addOptOutDomain(domain, time).then(res => sendResponse(res))
                 return true;
             }
             case 'GET_POPUP_ENABLED': {
-                storage.get('popupEnabled').then(res => {
-                    console.log('GET_POPUP_ENABLED', res)
-                    sendResponse({ isPopupEnabled: res })
-                })
+                storage.get('popupEnabled').then(res => sendResponse({ isPopupEnabled: res }))
                 return true;
             }
             case 'SET_POPUP_ENABLED': {
                 const { isPopupEnabled } = request
-                storage.set('popupEnabled', isPopupEnabled).then(res => sendResponse({ isPopupEnabled }))
+                storage.set('popupEnabled', isPopupEnabled)
+                    .then(() => {
+                        sendResponse({ isPopupEnabled })
+                    })
+                    .catch(error => {
+                        console.error('Error setting popup enabled:', error);
+                        sendResponse({ error: 'Failed to set popup enabled state' });
+                    });
                 return true;
             }
             case 'CLOSE': {

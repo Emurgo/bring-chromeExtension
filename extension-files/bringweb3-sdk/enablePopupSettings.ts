@@ -9,7 +9,6 @@ interface PopupEnabled {
  * @throws Will reject if there's an error communicating with the background script
  */
 export const getPopupEnabled = (): Promise<PopupEnabled> => {
-    console.log('start')
     return new Promise((resolve, reject) => {
         chrome.runtime.sendMessage({
             from: 'bringweb3',
