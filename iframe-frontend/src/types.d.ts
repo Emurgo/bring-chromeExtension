@@ -35,6 +35,7 @@ declare global {
         url: string
         domain?: string
         flowId: string
+        isTester?: boolean
     }
 
     interface LoaderData extends Info {

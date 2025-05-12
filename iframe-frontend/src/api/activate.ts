@@ -8,6 +8,7 @@ interface ActivateProps {
     tokenSymbol: string
     flowId: string
     timestamp?: number
+    isDemo?: boolean
 }
 
 interface ActivateResponse {

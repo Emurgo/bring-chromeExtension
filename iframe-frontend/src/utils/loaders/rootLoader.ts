@@ -4,6 +4,7 @@ import loadFont from "../loadFont"
 import verify from "../../api/verify"
 // import { selectVariant } from "../ABTest/ABTestVariant"
 import { selectVariant } from "../ABTest/platform-variants"
+import { ENV } from "../../config"
 
 interface Props {
     request: Request
@@ -31,6 +32,10 @@ const rootLoader = async ({ request }: Props) => {
     // Load chosen font
     loadFont(searchParams.get('t_fontUrl'), searchParams.get('t_fontFamily'))
     // Verify token
+
+    if (ENV === 'prod' && res.info.isTester) {
+        res.info.isTester = false
+    }
 
     return {
         ...res.info,
