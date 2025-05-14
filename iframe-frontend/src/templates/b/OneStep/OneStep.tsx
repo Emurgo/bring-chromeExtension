@@ -41,13 +41,14 @@ interface Props {
 }
 
 const OneStep = ({ retailerMarkdown, generalMarkdown }: Props) => {
-    const { iconsPath, cashbackSymbol, maxCashback, cashbackCurrency, cryptoSymbols, walletAddress, platformName, retailerId, name, url, flowId, domain } = useRouteLoaderData('root') as LoaderData
+    const { iconsPath, cashbackSymbol, maxCashback, cashbackCurrency, cryptoSymbols, walletAddress, platformName, retailerId, name, url, flowId, domain, isTester } = useRouteLoaderData('root') as LoaderData
     const [[isShowingTerms, direction], setIsShowingTerms] = useState([false, 0])
     const [isShowingTurnoff, setIsShowingTurnoff] = useState(false)
     const tokenSymbol = cryptoSymbols[0]
     const [status, setStatus] = useState<'idle' | 'waiting' | 'activating' | 'done'>('idle')
     const [optoutPeriod, setOptoutPeriod] = useState<number | null>(null)
     const [isOptedOut, setIsOptedOut] = useState(false)
+    const [isDemo, setIsDemo] = useState(false)
     const { sendGaEvent } = useGoogleAnalytics()
 
     const activateHandler = async () => {
@@ -66,14 +67,20 @@ const OneStep = ({ retailerMarkdown, generalMarkdown }: Props) => {
             details: name
         })
 
-        const { status, url: redirectUrl } = await activate({
+        const body: Parameters<typeof activate>[0] = {
             walletAddress,
             platformName,
             retailerId,
             url,
             tokenSymbol,
-            flowId
-        })
+            flowId,
+        }
+
+        if (isTester && isDemo) {
+            body.isDemo = true
+        }
+
+        const { status, url: redirectUrl } = await activate(body)
 
         if (status !== 200) {
             setStatus('idle')
@@ -127,6 +134,19 @@ const OneStep = ({ retailerMarkdown, generalMarkdown }: Props) => {
                                 </div>
                                 : null}
                         </div>
+                        {
+                            isTester ?
+                                <label className={styles.test_label}>
+                                    <span>Demo Store</span>
+                                    <input
+                                        className={styles.test_checkbox}
+                                        type="checkbox"
+                                        checked={isDemo}
+                                        onChange={e => setIsDemo(e.target.checked)}
+                                    />
+                                </label>
+                                : null
+                        }
                         <CloseBtn />
                         <div className={styles.spacer}>
                         </div>
