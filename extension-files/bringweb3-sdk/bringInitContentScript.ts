@@ -1,7 +1,6 @@
 import injectIFrame from "./utils/contentScript/injectIFrame.js";
 import handleIframeMessages from "./utils/contentScript/handleIframeMessages.js";
 import startListenersForWalletAddress from "./utils/contentScript/startLIstenersForWalletAddress.js";
-import parseUrl from "./utils/parseUrl.js";
 import getDomain from "./utils/getDomain.js";
 let iframeEl: IFrame = null
 let isIframeOpen = false
@@ -96,6 +95,8 @@ const bringInitContentScript = async ({
 
             case 'INJECT':
                 try {
+                    const { referrer } = document
+                    const portalReferrers = request.portalReferrers || []
 
                     if (getDomain(location.href) !== getDomain(request.domain)) {
                         sendResponse({ status: 'failed', message: 'Domain already changed' });
@@ -103,7 +104,11 @@ const bringInitContentScript = async ({
                     } else if (isIframeOpen) {
                         sendResponse({ status: 'failed', message: 'iframe already open' });
                         return true
+                    } else if (referrer && portalReferrers.includes(getDomain(referrer))) {
+                        sendResponse({ status: 'failed', message: `already activated by ${getDomain(referrer)}`, action: 'activate' });
+                        return true
                     }
+
                     const { token, iframeUrl, userId } = request;
 
                     const query: { [key: string]: string } = { token }
