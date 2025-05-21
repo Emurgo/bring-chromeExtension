@@ -270,7 +270,7 @@ const OneStep = ({ retailerMarkdown, generalMarkdown }: Props) => {
                                 </>
                                 :
                                 <>
-                                    <div className={`${styles.turnoffText} ${styles.extraMarginTop}`}>
+                                    <div className={`${styles.turnoffText}`}>
                                         Offer turned off for this store
                                     </div>
                                     <div className={styles.turnoffDetails}>

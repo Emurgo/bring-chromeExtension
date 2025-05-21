@@ -83,7 +83,9 @@ const checkCompanyOverride = (platformName: PlatformName): VariantKey | null => 
   // if (platformName === 'company_e') {
   //   return 'enterprise';
   // }
-  console.log(platformName)
+  if (!platformName) {
+    return null; // No override
+  }
   return null; // No override by default
 };
 

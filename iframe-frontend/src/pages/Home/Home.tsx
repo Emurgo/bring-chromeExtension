@@ -38,8 +38,6 @@ const Home = () => {
   }
 
   useEffect(() => {
-    console.log(iframeStyle[info.platformName.toLowerCase()]);
-
     sendMessage({ action: ACTIONS.OPEN, style: iframeStyle[info.platformName.toLowerCase()] || iframeStyle['default'] })
     loadMarkdown(info.retailerTermsUrl, setRetailerMarkdown)
     loadMarkdown(info.generalTermsUrl, setGeneralMarkdown)

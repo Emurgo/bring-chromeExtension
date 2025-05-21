@@ -1,6 +1,4 @@
 export const sendMessage = (message: Message) => {
-    console.log('Send message to parent:', message);
-
     const searchParams = new URLSearchParams(window.location.search);
     const extensionId = searchParams.get('extensionId');
     window.parent.postMessage({ from: 'bringweb3', ...message, extensionId }, '*')
