@@ -23,11 +23,6 @@ jobs:
       - name: Debug directory structure
         run: |
           pwd
-          ls -la
-          echo "Checking extension-files directory"
-          ls -la extension-files/
-          echo "Searching for bringweb3-sdk"
-          find . -type d -name "bringweb3-sdk" | grep .
           
       - uses: actions/setup-node@v4
         with:
