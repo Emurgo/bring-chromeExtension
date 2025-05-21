@@ -11,44 +11,30 @@ permissions:
   contents: write
   pull-requests: write
 
+defaults:
+  run:
+    working-directory: extension-files/bringweb3-sdk
+
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Debug directory structure
-        run: |
-          pwd
-          ls -la
-          echo "Checking extension-files directory"
-          ls -la extension-files/
-          echo "Searching for bringweb3-sdk"
-          find . -type d -name "bringweb3-sdk" | grep .
-          
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
           cache: 'yarn'
           cache-dependency-path: 'extension-files/bringweb3-sdk/yarn.lock'
-          
+
       - name: Install dependencies
-        run: |
-          if [ -d "extension-files/bringweb3-sdk" ]; then
-            cd extension-files/bringweb3-sdk
-            yarn install --frozen-lockfile
-          else
-            echo "Directory extension-files/bringweb3-sdk not found!"
-            exit 1
-          fi
-        
+        run: yarn install --frozen-lockfile
+
       - name: Create Release Pull Request or Publish
         id: changesets
         uses: changesets/action@v1
         with:
           publish: yarn release
-          # Use absolute path to avoid any confusion
-          cwd: "/home/runner/work/chromeExtension/chromeExtension/extension-files/bringweb3-sdk"
+          cwd: "./extension-files/bringweb3-sdk"
           commit: "chore(release): version SDK package"
           title: "chore(release): version SDK package"
         env:
