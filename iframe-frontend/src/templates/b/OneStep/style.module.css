@@ -128,7 +128,7 @@
 }
 
 .secondaryBtn {
-    background: #FFFFFF1F;
+    background: #3F3F3F;
     border-color: transparent;
     border-width: 0;
     border-radius: 32px;
@@ -165,7 +165,7 @@
     flex-direction: column;
     bottom: 18px;
     width: 296px;
-    min-height: 254px;
+    min-height: 187px;
     padding: 18px 16px 24px 16px;
     background: #242424;
     border-radius: 16px;
@@ -173,17 +173,17 @@
 
 .turnoffText {
     color: white;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
-    line-height: 28px;
-    margin: 16px 0;
+    line-height: 25px;
+    margin: 8px 0 24px;
 }
 
 .turnoffDetails {
-    color: #8C8C8C;
-    font-size: 20px;
+    color: #FFFFFF;
+    font-size: 16px;
     font-weight: 400;
-    line-height: 26px;
+    line-height: 22px;
     text-align: center;
 }
 
@@ -206,7 +206,7 @@
 
 .turnOffCloseBtn {
     width: 295px;
-    margin-top: 50.5px;
+    margin-top: 24px;
 }
 
 .extraMarginTop {

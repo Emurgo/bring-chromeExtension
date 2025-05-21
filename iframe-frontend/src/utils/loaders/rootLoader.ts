@@ -19,8 +19,6 @@ const rootLoader = async ({ request }: Props) => {
 
     const variant = selectVariant(userId || res.info.walletAddress || '', res.info.platformName)
 
-    console.log('variant', variant);
-
     // Set open animation
     sendMessage({ action: ACTIONS.ADD_KEYFRAMES, keyFrames })
 

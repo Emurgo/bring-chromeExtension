@@ -265,7 +265,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
 
         const address = await getWalletAddress(tabId);
 
-        const { token, isValid, iframeUrl, networkUrl, flowId, time = Date.now() + 24 * 60 * 60 * 1000 } = await validateDomain({
+        const { token, isValid, iframeUrl, networkUrl, flowId, portalReferrers, time = Date.now() + 24 * 60 * 60 * 1000 } = await validateDomain({
             body: {
                 domain: match,
                 url: tab.url,
@@ -286,8 +286,20 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
             token,
             domain: url,
             iframeUrl,
-            userId
+            userId,
+            portalReferrers
         });
+
+        if (res?.action) {
+            switch (res.action) {
+                case 'activate':
+                    handleActivate(match, chrome.runtime.id, identifier, cashbackPagePath, time, tabId)
+                    break;
+                default:
+                    console.error(`Unknown action: ${res.action}`);
+                    break;
+            }
+        }
 
         if (res?.status !== 'success') {
             analytics({

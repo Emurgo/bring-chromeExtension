@@ -5,6 +5,7 @@ interface Message {
     iframeUrl?: string
     page?: string
     userId?: string | undefined
+    portalReferrers?: string[]
 }
 
 const sendMessage = (tabId: number, message: Message): Promise<any> => {
