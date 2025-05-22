@@ -23,6 +23,7 @@ jobs:
       - name: Debug directory structure
         run: |
           pwd
+          ls -la
           
       - uses: actions/setup-node@v4
         with:
