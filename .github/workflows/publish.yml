@@ -39,7 +39,7 @@ jobs:
         uses: changesets/action@v1
         with:
           publish: yarn release
-          cwd: "./extension-files/bringweb3-sdk"
+          # cwd: "./extension-files/bringweb3-sdk"
           commit: "chore(release): version SDK package"
           title: "chore(release): version SDK package"
         env:
