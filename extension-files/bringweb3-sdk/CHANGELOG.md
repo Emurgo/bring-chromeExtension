@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.4.1
+
+### Patch Changes
+
+- dbeea72: Prevent popup from popping after activation from Portal
+
 ## 1.4.0
 
 ### Minor Changes
