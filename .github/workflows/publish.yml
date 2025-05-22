@@ -11,21 +11,15 @@ permissions:
   contents: write
   pull-requests: write
 
+defaults:
+  run:
+    working-directory: extension-files/bringweb3-sdk
+
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          # This is important for changesets to work properly
-          fetch-depth: 0
-      
-      - name: Debug directory structure
-        working-directory: ./extension-files/bringweb3-sdk
-        run: |
-          pwd
-          ls -la
-          
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
@@ -33,43 +27,16 @@ jobs:
           cache-dependency-path: 'extension-files/bringweb3-sdk/yarn.lock'
 
       - name: Install dependencies
-        working-directory: ./extension-files/bringweb3-sdk
         run: yarn install --frozen-lockfile
 
-      - name: Setup git user
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - name: Run changesets
-        working-directory: ./extension-files/bringweb3-sdk
-        run: |
-          # Check if there are any changesets
-          if [ -n "$(find .changeset -name '*.md' -not -name 'config.md' -not -name 'README.md' 2>/dev/null)" ]; then
-            echo "📝 Found changesets, creating version PR..."
-            
-            # Run changeset version to update package.json and CHANGELOG
-            yarn changeset version
-            
-            # Check if there are changes to commit
-            if [ -n "$(git status --porcelain)" ]; then
-              git add .
-              git commit -m "chore(release): version SDK package"
-              git push
-              echo "✅ Version PR would be created (skipping PR creation for now)"
-            else
-              echo "ℹ️ No changes after running changeset version"
-            fi
-          else
-            echo "🚀 No changesets found, checking for packages to publish..."
-            
-            # Check if we need to publish (this checks if local version != published version)
-            yarn changeset status --verbose
-            
-            # Run the publish command
-            yarn release
-            echo "✅ Published packages"
-          fi
+      - name: Create Release Pull Request or Publish
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          publish: yarn release
+          cwd: "./extension-files/bringweb3-sdk"
+          commit: "chore(release): version SDK package"
+          title: "chore(release): version SDK package"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
