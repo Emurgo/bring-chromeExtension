@@ -1,13 +1,7 @@
 import storage from "../storage"
 import fetchDomains from "../api/fetchDomains"
 import { fetchWhitelist } from "../api/fetchWhitelist"
-import { UPDATE_CACHE_ALARM_NAME } from "../constants"
 import { ApiEndpoint } from "../apiEndpoint"
-
-const calcDelay = (timestamp: number) => {
-    const now = Date.now()
-    return (timestamp - now) / 1000 / 60 // milliseconds to minutes
-}
 
 export const updateCache = async () => {
     const relevantDomainsCheck = await storage.get('relevantDomainsCheck')
@@ -19,15 +13,15 @@ export const updateCache = async () => {
 
     // Check all conditions that would require a fetch
     if (!relevantDomainsList) {
-        trigger = 'No domains in cache'
+        trigger = 'no domains in cache'
     } else if (!relevantDomainsList.length) {
-        trigger = 'Empty domains list'
+        trigger = 'empty domains list'
     } else if (!relevantDomainsCheck) {
-        trigger = 'No timestamp check found'
+        trigger = 'no domains timestamp check found'
     } else if (relevantDomainsCheck <= Date.now()) {
-        trigger = 'Cache expired'
+        trigger = 'cache expired'
     } else if (whitelistEndpoint && !whitelist?.length) {
-        trigger = 'Missing whitelist data'
+        trigger = 'missing whitelist data'
     }
 
     if (!trigger) {
@@ -45,12 +39,6 @@ export const updateCache = async () => {
     if (whitelist) {
         storage.set('redirectsWhitelist', whitelist)
     }
-
-    const delay = calcDelay(nextUpdateTimestamp)
-
-    chrome.alarms.create(UPDATE_CACHE_ALARM_NAME, {
-        delayInMinutes: delay || 60 * 24 * 2
-    })
 
     return relevantDomains
 }
