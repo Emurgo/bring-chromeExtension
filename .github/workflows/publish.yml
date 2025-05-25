@@ -23,7 +23,7 @@ jobs:
       - name: Debug directory structure
         run: |
           pwd
-          
+          ls -la
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
@@ -35,10 +35,10 @@ jobs:
 
       - name: Create Release Pull Request or Publish
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@v1.4.9
         with:
           publish: yarn release
-          cwd: "./extension-files/bringweb3-sdk"
+          cwd: "${{ github.workspace }}/extension-files/bringweb3-sdk"
           commit: "chore(release): version SDK package"
           title: "chore(release): version SDK package"
         env:
