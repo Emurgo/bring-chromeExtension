@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.4.2
+
+### Patch Changes
+
+- a628b15: Remove unnecessary calls to update domains list
+
 ## 1.4.1
 
 ### Patch Changes
