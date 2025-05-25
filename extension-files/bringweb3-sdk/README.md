@@ -60,8 +60,7 @@ Include this configuration inside your `manifest.json` file:
 ```json
   "permissions": [
     "storage",
-    "tabs",
-    "alarms"
+    "tabs"
   ],
   "content_scripts": [
     {
