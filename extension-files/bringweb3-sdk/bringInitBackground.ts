@@ -137,19 +137,6 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
 
     updateCache()
 
-    chrome.alarms.onAlarm.addListener(async (alarm) => {
-        const { name } = alarm
-
-        switch (name) {
-            case UPDATE_CACHE_ALARM_NAME:
-                updateCache()
-                break;
-            default:
-                console.error('alarm with no use case:', name);
-                break;
-        }
-    })
-
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         if (request?.from !== 'bringweb3') return
