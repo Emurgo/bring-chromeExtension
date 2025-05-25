@@ -13,14 +13,28 @@ export const updateCache = async () => {
     const relevantDomainsCheck = await storage.get('relevantDomainsCheck')
     const relevantDomainsList = await storage.get('relevantDomains')
     let whitelist = await storage.get('redirectsWhitelist')
-    const apiKey = ApiEndpoint.getInstance().getApiKey()
     const whitelistEndpoint = ApiEndpoint.getInstance().getWhitelistEndpoint()
 
-    if (relevantDomainsList?.length && relevantDomainsCheck && relevantDomainsCheck > Date.now() && (!whitelistEndpoint || (whitelistEndpoint && whitelist?.length))) {
+    let trigger: string | null = null
+
+    // Check all conditions that would require a fetch
+    if (!relevantDomainsList) {
+        trigger = 'No domains in cache'
+    } else if (!relevantDomainsList.length) {
+        trigger = 'Empty domains list'
+    } else if (!relevantDomainsCheck) {
+        trigger = 'No timestamp check found'
+    } else if (relevantDomainsCheck <= Date.now()) {
+        trigger = 'Cache expired'
+    } else if (whitelistEndpoint && !whitelist?.length) {
+        trigger = 'Missing whitelist data'
+    }
+
+    if (!trigger) {
         return relevantDomainsList
     }
 
-    const res = await fetchDomains()
+    const res = await fetchDomains(trigger)
     const { nextUpdateTimestamp, relevantDomains } = res
 
     storage.set('relevantDomains', relevantDomains)
