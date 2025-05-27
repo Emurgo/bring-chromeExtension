@@ -2,7 +2,6 @@ import { openExtensionCashbackPage } from './utils/background/openExtensionCashb
 import validateDomain from "./utils/api/validateDomain.js"
 import { ApiEndpoint } from "./utils/apiEndpoint.js"
 import parseUrl from "./utils/parseUrl.js"
-import { UPDATE_CACHE_ALARM_NAME } from './utils/constants.js'
 import storage from "./utils/storage.js"
 import handleActivate from "./utils/background/activate.js"
 import addQuietDomain from "./utils/background/addQuietDomain.js"
@@ -216,10 +215,9 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
     })
 
     chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+        if (!changeInfo.url || !tab?.url?.startsWith('http')) return
 
-        if (!tab?.url?.startsWith('http') || !tab.url) return;
-
-        const url = parseUrl(tab.url)
+        const url = parseUrl(tab.url);
 
         const optOut = await storage.get('optOut');
         const isPopupEnabled = await storage.get('popupEnabled');
@@ -239,7 +237,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
 
         const previousUrl = urlsDict[tabId];
 
-        if (changeInfo.status !== 'complete' || url === previousUrl) return;
+        if (url === previousUrl) return;
 
         urlsDict[tabId] = url
 
