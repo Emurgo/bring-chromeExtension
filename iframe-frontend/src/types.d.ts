@@ -47,6 +47,7 @@ declare global {
         userId: string | undefined
         version: string
         networkUrl: string
+        beamer: boolean
     }
 
     interface Message {
