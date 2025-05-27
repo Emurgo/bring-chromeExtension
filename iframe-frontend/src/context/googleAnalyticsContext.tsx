@@ -5,7 +5,7 @@ import { VariantKey } from '../utils/ABTest/platform-variants';
 import analytics from '../api/analytics';
 import { useWalletAddress } from '../hooks/useWalletAddress';
 
-type EventName = 'retailer_shop' | 'popup_close' | 'opt_out' | 'retailer_activation' | 'page_view'
+type EventName = 'retailer_shop' | 'popup_close' | 'opt_out' | 'retailer_activation' | 'page_view' | 'beamer'
 
 interface GAEvent {
     category: "user_action" | "system";
@@ -166,7 +166,7 @@ export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, pl
     };
 
     const sendGaEvent = async (name: EventName, event: GAEvent, disableGA: boolean = false): Promise<void> => {
-        if (window.origin.includes('localhost')) return
+        // if (window.origin.includes('localhost')) return
 
         const backendResult = await sendBackendEvent(name, event)
 
