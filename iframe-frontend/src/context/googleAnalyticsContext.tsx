@@ -166,7 +166,7 @@ export const GoogleAnalyticsProvider: FC<Props> = ({ measurementId, children, pl
     };
 
     const sendGaEvent = async (name: EventName, event: GAEvent, disableGA: boolean = false): Promise<void> => {
-        // if (window.origin.includes('localhost')) return
+        if (window.origin.includes('localhost')) return
 
         const backendResult = await sendBackendEvent(name, event)
 

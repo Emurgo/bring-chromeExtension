@@ -189,7 +189,9 @@ const OneStep = ({ retailerMarkdown, generalMarkdown }: Props) => {
                                 }
                             </button>
                         </div>
-                        <div className={styles.agree}>By activating, I accept the legal terms.</div>
+                        <div className={styles.agree}>
+                            By activating, I accept the <span className={styles.terms} onClick={() => sendMessage({ action: ACTIONS.OPEN_CASHBACK_PAGE, url: 'https://www.argent.xyz/legal/privacy/argent-x' })}>legal terms.</span>
+                        </div>
                     </motion.div>
                 ) : (
                     <motion.div
