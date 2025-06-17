@@ -4,7 +4,6 @@ const STORAGE_KEY = 'optOutDomains'
 
 const addOptOutDomain = async (domain: string, time: number) => {
     if (!domain) return
-    console.log({ time });
 
     let optOutDomains = await storage.get(STORAGE_KEY)
 
