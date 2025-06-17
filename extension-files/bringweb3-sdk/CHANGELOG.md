@@ -1,5 +1,12 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.4.3
+
+### Patch Changes
+
+- 916b73f: Improve popping speed
+- cf971a2: Improve data expiration mechanism
+
 ## 1.4.2
 
 ### Patch Changes
