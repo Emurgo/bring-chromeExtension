@@ -12,6 +12,7 @@ import { useWalletAddress } from '../../hooks/useWalletAddress'
 import compareVersions from '../../utils/compareVersions'
 import { Oval } from 'react-loader-spinner'
 import { ACTIVATE_QUIET_TIME } from '../../config'
+import parseTime from '../../utils/parseTime'
 // import SwitchBtn from '../SwitchBtn/SwitchBtn'
 
 interface ActivateProps {
@@ -42,7 +43,7 @@ const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName
 
     const redirectEvent = () => {
         setActivated(true)
-        sendMessage({ action: ACTIONS.ACTIVATE, url, domain, time: Date.now() + ACTIVATE_QUIET_TIME, redirectUrl })
+        sendMessage({ action: ACTIONS.ACTIVATE, url, domain, time: parseTime(ACTIVATE_QUIET_TIME, version), redirectUrl })
         sendGaEvent('retailer_shop', {
             category: 'user_action',
             action: 'click',

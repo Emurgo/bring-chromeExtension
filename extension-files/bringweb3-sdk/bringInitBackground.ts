@@ -254,7 +254,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
 
         const address = await getWalletAddress(tabId);
 
-        const { token, isValid, iframeUrl, networkUrl, flowId, portalReferrers, time = now + DAY_MS } = await validateDomain({
+        const { token, isValid, iframeUrl, networkUrl, flowId, portalReferrers, time = DAY_MS } = await validateDomain({
             body: {
                 domain: match,
                 url: tab.url,
