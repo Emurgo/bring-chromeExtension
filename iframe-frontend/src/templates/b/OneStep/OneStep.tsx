@@ -107,7 +107,7 @@ const OneStep = ({ retailerMarkdown, generalMarkdown }: Props) => {
     }
 
     const closePopup = () => {
-        sendMessage({ action: ACTIONS.CLOSE, domain, time: Date.now() + ACTIVATE_QUIET_TIME })
+        sendMessage({ action: ACTIONS.CLOSE, domain })
     }
 
     return (
