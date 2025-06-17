@@ -7,8 +7,8 @@ import OneStep from '../../templates/b/OneStep/OneStep'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 import { iframeStyle } from '../../utils/iframeStyles'
 import compareVersions from '../../utils/compareVersions'
+import parseTime from '../../utils/parseTime'
 
-const DAY_IN_MS = 24 * 60 * 60 * 1000
 const THIRTY_MIN_MS = 30 * 60 * 1000
 
 enum STEPS {
@@ -48,8 +48,7 @@ const Home = () => {
     if (compareVersions(info.version, '1.2.6') !== 1) {
       sendMessage({ action: ACTIONS.ACTIVATE, url: `https://${info.domain}` })
     }
-    const QUIET_TIME = info.variant === 'control' ? DAY_IN_MS : THIRTY_MIN_MS
-    sendMessage({ action: ACTIONS.CLOSE, domain: info.domain, time: Date.now() + QUIET_TIME })
+    sendMessage({ action: ACTIONS.CLOSE, domain: info.domain, time: parseTime(THIRTY_MIN_MS, info.version) })
   }
 
   const slideVariants: Variants = {

@@ -16,6 +16,7 @@ import formatCashback from "../../../utils/formatCashback"
 import splitStringWithDots from "../../../utils/splitStringWithDots"
 import { sendMessage, ACTIONS } from "../../../utils/sendMessage"
 import { ACTIVATE_QUIET_TIME } from "../../../config"
+import parseTime from '../../../utils/parseTime'
 
 
 const slideVariants = {
@@ -41,7 +42,7 @@ interface Props {
 }
 
 const OneStep = ({ retailerMarkdown, generalMarkdown }: Props) => {
-    const { iconsPath, cashbackSymbol, maxCashback, cashbackCurrency, cryptoSymbols, walletAddress, platformName, retailerId, name, url, flowId, domain, isTester } = useRouteLoaderData('root') as LoaderData
+    const { iconsPath, cashbackSymbol, maxCashback, cashbackCurrency, cryptoSymbols, walletAddress, platformName, retailerId, name, url, flowId, domain, isTester, version } = useRouteLoaderData('root') as LoaderData
     const [[isShowingTerms, direction], setIsShowingTerms] = useState([false, 0])
     const [isShowingTurnoff, setIsShowingTurnoff] = useState(false)
     const tokenSymbol = cryptoSymbols[0]
@@ -87,7 +88,7 @@ const OneStep = ({ retailerMarkdown, generalMarkdown }: Props) => {
             return
         }
 
-        sendMessage({ action: ACTIONS.ACTIVATE, url, domain, time: Date.now() + ACTIVATE_QUIET_TIME, redirectUrl })
+        sendMessage({ action: ACTIONS.ACTIVATE, url, domain, time: parseTime(ACTIVATE_QUIET_TIME, version), redirectUrl })
         sendGaEvent('retailer_shop', {
             category: 'user_action',
             action: 'click',
@@ -107,7 +108,7 @@ const OneStep = ({ retailerMarkdown, generalMarkdown }: Props) => {
     }
 
     const closePopup = () => {
-        sendMessage({ action: ACTIONS.CLOSE, domain, time: Date.now() + ACTIVATE_QUIET_TIME })
+        sendMessage({ action: ACTIONS.CLOSE, domain })
     }
 
     return (

@@ -16,6 +16,9 @@ import removeTrailingSlash from './utils/background/removeTrailingSlash';
 import analytics from './utils/api/analytics';
 import addOptOutDomain from './utils/background/addOptOutDomain';
 import getDomain from './utils/getDomain';
+import { DAY_MS } from './utils/constants';
+import { checkAndRunMigration } from './utils/background/dataMigration';
+import { isMsRangeActive } from './utils/background/timestampRange';
 
 const urlRemoveOptions = ['www.', 'www1.', 'www2.']
 
@@ -38,7 +41,7 @@ const getRelevantDomain = async (url: string | undefined) => {
     for (const urlRemoveOption of urlRemoveOptions) {
         tabDomain = tabDomain.replace(urlRemoveOption, '')
     }
-
+    const now = Date.now()
     for (let relevantDomain of relevantDomains) {
         const originalRelevantDomain = relevantDomain
         relevantDomain = removeTrailingSlash(relevantDomain)
@@ -57,9 +60,7 @@ const getRelevantDomain = async (url: string | undefined) => {
         if (tabDomain === relevantDomain || (allowSubdomain && tabDomain.endsWith(relevantDomain.replace('*.', '')))) {
 
             const quietDomains = await storage.get('quietDomains')
-            if (quietDomains &&
-                (quietDomains[relevantDomain] && Date.now() < quietDomains[relevantDomain]
-                    && quietDomains[relevantDomain] < Date.now() + 60 * 24 * 60 * 60 * 1000)) {
+            if (quietDomains && (quietDomains[relevantDomain] && isMsRangeActive(quietDomains[relevantDomain]) && quietDomains[relevantDomain][1] < now + 60 * DAY_MS)) {
                 return ''
             }
             return originalRelevantDomain
@@ -134,6 +135,8 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
         await storage.set('popupEnabled', isEnabledByDefault)
     }
 
+    await checkAndRunMigration();
+
     updateCache()
 
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -145,7 +148,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
         switch (action) {
             case 'ACTIVATE': {
                 const { domain, extensionId, time, redirectUrl } = request
-                handleActivate(domain, extensionId, identifier, cashbackPagePath, time, sender.tab?.id, redirectUrl)
+                handleActivate(domain, extensionId, cashbackPagePath, time, sender.tab?.id, redirectUrl)
                     .then(() => sendResponse());
                 return true;
             }
@@ -222,16 +225,17 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
         const optOut = await storage.get('optOut');
         const isPopupEnabled = await storage.get('popupEnabled');
 
-        if (!isPopupEnabled || (optOut && optOut > Date.now())) {
+        const now = Date.now();
+
+        if (!isPopupEnabled || isMsRangeActive(optOut, now)) {
             return;
         } else if (optOut) {
             storage.remove('optOut')
-            storage.remove('optOutKey')
         }
 
         const optOutDomains = await storage.get('optOutDomains')
 
-        if (optOutDomains && optOutDomains[getDomain(url)] && optOutDomains[getDomain(url)] > Date.now()) {
+        if (optOutDomains && isMsRangeActive(optOutDomains[getDomain(url)], now)) {
             return;
         }
 
@@ -244,13 +248,13 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
         const match = await getRelevantDomain(tab.url);
 
         if (!match || !match.length) {
-            await showNotification(identifier, tabId, cashbackPagePath, url, showNotifications, notificationCallback)
+            await showNotification(tabId, cashbackPagePath, url, showNotifications, notificationCallback)
             return;
         };
 
         const address = await getWalletAddress(tabId);
 
-        const { token, isValid, iframeUrl, networkUrl, flowId, portalReferrers, time = Date.now() + 24 * 60 * 60 * 1000 } = await validateDomain({
+        const { token, isValid, iframeUrl, networkUrl, flowId, portalReferrers, time = DAY_MS } = await validateDomain({
             body: {
                 domain: match,
                 url: tab.url,
@@ -278,7 +282,7 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
         if (res?.action) {
             switch (res.action) {
                 case 'activate':
-                    handleActivate(match, chrome.runtime.id, identifier, cashbackPagePath, time, tabId)
+                    handleActivate(match, chrome.runtime.id, cashbackPagePath, time, tabId)
                     break;
                 default:
                     console.error(`Unknown action: ${res.action}`);
