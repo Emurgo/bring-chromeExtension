@@ -11,7 +11,7 @@ const handleActivate = async (domain: string, extensionId: string, cashbackPageP
         await storage.set('lastActivation', now);
     }
 
-    if (domain) addQuietDomain(domain, time || (now + DAY_MS))
+    if (domain) addQuietDomain(domain, time || DAY_MS)
 
     if (tabId && redirectUrl) {
         const whitelist = await storage.get('redirectsWhitelist')
