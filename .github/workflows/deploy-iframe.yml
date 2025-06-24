@@ -67,7 +67,20 @@ jobs:
       - name: Set environment configuration
         id: config
         run: |
-          ENV="${{ github.event.inputs.target_environment || 'production' }}"
+          # Determine environment: manual input takes priority, otherwise infer from branch
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ENV="${{ github.event.inputs.target_environment }}"
+          else
+            # Auto-deployment: infer environment from branch
+            if [ "${{ github.ref_name }}" = "sandbox" ]; then
+              ENV="sandbox"
+            else
+              ENV="production"
+            fi
+          fi
+          
+          echo "Event: ${{ github.event_name }}"
+          echo "Branch: ${{ github.ref_name }}"
           echo "Target environment: $ENV"
           
           if [ "$ENV" = "sandbox" ]; then
@@ -82,6 +95,11 @@ jobs:
           
           echo "S3 Bucket: $S3_BUCKET"
           echo "CloudFront ID: $CLOUDFRONT_ID"
+          
+          if [ -z "$S3_BUCKET" ]; then
+            echo "ERROR: S3_BUCKET is empty! Check your secrets configuration."
+            exit 1
+          fi
           
           echo "s3-bucket=$S3_BUCKET" >> $GITHUB_OUTPUT
           echo "cloudfront-id=$CLOUDFRONT_ID" >> $GITHUB_OUTPUT
