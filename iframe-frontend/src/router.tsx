@@ -3,6 +3,7 @@ import Layout from './Layout/Layout.tsx'
 import Home from './pages/Home/Home.tsx'
 import Notification from './pages/Notification/Notification.tsx'
 import rootLoader from './utils/loaders/rootLoader.ts'
+import { BASE_PATH } from './config.ts'
 
 const router = createBrowserRouter([
     {
@@ -22,6 +23,8 @@ const router = createBrowserRouter([
             }
         ],
     },
-]);
+], {
+    basename: BASE_PATH
+});
 
 export default router;

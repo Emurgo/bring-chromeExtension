@@ -56,7 +56,17 @@ jobs:
           if [ "${{ steps.mode.outputs.mode }}" = "new_version" ]; then
             # Get version from SDK package.json
             SDK_VERSION=$(cat extension-files/bringweb3-sdk/package.json | jq -r '.version')
-            echo "version=v${SDK_VERSION}" >> $GITHUB_OUTPUT
+            
+            # If version is 0.0.0 (changeset placeholder), get the latest git tag
+            if [ "$SDK_VERSION" = "0.0.0" ]; then
+              echo "Package version is 0.0.0 (changeset placeholder), using latest git tag"
+              LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "1.0.0")
+              # Remove 'v' prefix if present
+              LATEST_TAG=${LATEST_TAG#v}
+              echo "version=v${LATEST_TAG}" >> $GITHUB_OUTPUT
+            else
+              echo "version=v${SDK_VERSION}" >> $GITHUB_OUTPUT
+            fi
           else
             # For override mode, get the latest existing version from S3 or use a default
             echo "version=latest" >> $GITHUB_OUTPUT
@@ -86,9 +96,27 @@ jobs:
         run: yarn install --frozen-lockfile
       
       - name: Build application
-        run: yarn build
+        run: |
+          # Set base path for deployment
+          if [ "${{ needs.determine-deployment.outputs.deployment-mode }}" = "new_version" ]; then
+            BASE_PATH="/${{ needs.determine-deployment.outputs.target-version }}/"
+          else
+            # For override mode, we need to determine the version first
+            ENV="${{ github.event.inputs.target_environment || (github.ref_name == 'sandbox' && 'sandbox' || 'production') }}"
+            if [ "$ENV" = "sandbox" ]; then
+              S3_BUCKET="${{ secrets.S3_BUCKET_SANDBOX }}"
+            else
+              S3_BUCKET="${{ secrets.S3_BUCKET_PROD }}"
+            fi
+            
+            # Get latest version from S3 for override mode
+            LATEST_VERSION=$(aws s3 ls "s3://${S3_BUCKET}/" | grep -E 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -1 | awk '{print $2}' | sed 's/\///' || echo "v1.0.0")
+            BASE_PATH="/${LATEST_VERSION}/"
+          fi
+          
+          echo "Building with base path: $BASE_PATH"
+          VITE_BASE_PATH="$BASE_PATH" yarn build
         env:
-          # Add any build-time environment variables here
           NODE_ENV: production
       
       - name: Set environment configuration
