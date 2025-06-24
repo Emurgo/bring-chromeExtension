@@ -1,0 +1,256 @@
+name: Deploy Iframe Frontend
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment_mode:
+        description: 'Deployment mode'
+        required: true
+        default: 'override'
+        type: choice
+        options:
+        - override
+        - new_version
+      target_environment:
+        description: 'Target environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - sandbox
+  push:
+    paths:
+      - 'iframe-frontend/**'
+    branches:
+      - main
+      - sandbox
+
+env:
+  NODE_VERSION: 'lts/*'
+
+jobs:
+  determine-deployment:
+    runs-on: ubuntu-latest
+    outputs:
+      deployment-mode: ${{ steps.mode.outputs.mode }}
+      target-version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Determine deployment mode
+        id: mode
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "mode=${{ github.event.inputs.deployment_mode }}" >> $GITHUB_OUTPUT
+          else
+            # Auto-push defaults to override mode
+            echo "mode=override" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Get target version
+        id: version
+        run: |
+          if [ "${{ steps.mode.outputs.mode }}" = "new_version" ]; then
+            # Get version from SDK package.json
+            SDK_VERSION=$(cat extension-files/bringweb3-sdk/package.json | jq -r '.version')
+            
+            # If version is 0.0.0 (changeset placeholder), get the latest git tag
+            if [ "$SDK_VERSION" = "0.0.0" ]; then
+              echo "Package version is 0.0.0 (changeset placeholder), using latest git tag"
+              LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "1.0.0")
+              # Remove 'v' prefix if present
+              LATEST_TAG=${LATEST_TAG#v}
+              echo "version=v${LATEST_TAG}" >> $GITHUB_OUTPUT
+            else
+              echo "version=v${SDK_VERSION}" >> $GITHUB_OUTPUT
+            fi
+          else
+            # For override mode, get the latest existing version from S3 or use a default
+            echo "version=latest" >> $GITHUB_OUTPUT
+          fi
+      
+
+  build-and-deploy:
+    needs: determine-deployment
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    defaults:
+      run:
+        working-directory: iframe-frontend
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
+          cache-dependency-path: 'iframe-frontend/yarn.lock'
+      
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      
+      - name: Set environment configuration
+        id: config
+        run: |
+          # Determine environment: manual input takes priority, otherwise infer from branch
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ENV="${{ github.event.inputs.target_environment }}"
+          else
+            # Auto-deployment: infer environment from branch
+            if [ "${{ github.ref_name }}" = "sandbox" ]; then
+              ENV="sandbox"
+            else
+              ENV="production"
+            fi
+          fi
+          
+          echo "Event: ${{ github.event_name }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Target environment: $ENV"
+          
+          if [ "$ENV" = "sandbox" ]; then
+            S3_BUCKET="${{ secrets.S3_BUCKET_SANDBOX }}"
+            CLOUDFRONT_ID="${{ secrets.CLOUDFRONT_ID_SANDBOX }}"
+            echo "Using sandbox environment"
+          else
+            S3_BUCKET="${{ secrets.S3_BUCKET_PROD }}"
+            CLOUDFRONT_ID="${{ secrets.CLOUDFRONT_ID_PROD }}"
+            echo "Using production environment"
+          fi
+          
+          echo "S3 Bucket: $S3_BUCKET"
+          echo "CloudFront ID: $CLOUDFRONT_ID"
+          
+          if [ -z "$S3_BUCKET" ]; then
+            echo "ERROR: S3_BUCKET is empty! Check your secrets configuration."
+            exit 1
+          fi
+          
+          echo "s3-bucket=$S3_BUCKET" >> $GITHUB_OUTPUT
+          echo "cloudfront-id=$CLOUDFRONT_ID" >> $GITHUB_OUTPUT
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-session-name: GitHubActions-IframeDeployment
+      
+      - name: Build application
+        run: |
+          # Set base path for deployment
+          if [ "${{ needs.determine-deployment.outputs.deployment-mode }}" = "new_version" ]; then
+            BASE_PATH="/${{ needs.determine-deployment.outputs.target-version }}/"
+          else
+            # For override mode, get latest version from S3
+            S3_BUCKET="${{ steps.config.outputs.s3-bucket }}"
+            LATEST_VERSION=$(aws s3 ls "s3://${S3_BUCKET}/" | grep -E 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -1 | awk '{print $2}' | sed 's/\///' || echo "v1.0.0")
+            BASE_PATH="/${LATEST_VERSION}/"
+          fi
+          
+          echo "Building with base path: $BASE_PATH"
+          VITE_BASE_PATH="$BASE_PATH" yarn build
+        env:
+          NODE_ENV: production
+      
+      - name: Get latest version for override mode
+        if: needs.determine-deployment.outputs.deployment-mode == 'override'
+        id: latest-version
+        run: |
+          S3_BUCKET="${{ steps.config.outputs.s3-bucket }}"
+          echo "Using S3 bucket: $S3_BUCKET"
+          
+          # List all version directories and get the latest one
+          LATEST_VERSION=$(aws s3 ls "s3://${S3_BUCKET}/" | grep -E 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -1 | awk '{print $2}' | sed 's/\///')
+          if [ -z "$LATEST_VERSION" ]; then
+            # If no versions exist, use v1.0.0 as default
+            LATEST_VERSION="v1.0.0"
+            echo "No existing versions found, using default: $LATEST_VERSION"
+          else
+            echo "Found latest version: $LATEST_VERSION"
+          fi
+          echo "latest-version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+      
+      - name: Deploy to S3 (New Version)
+        if: needs.determine-deployment.outputs.deployment-mode == 'new_version'
+        run: |
+          TARGET_VERSION="${{ needs.determine-deployment.outputs.target-version }}"
+          S3_BUCKET="${{ steps.config.outputs.s3-bucket }}"
+          
+          # Check if version already exists
+          if aws s3 ls "s3://${S3_BUCKET}/${TARGET_VERSION}/" > /dev/null 2>&1; then
+            echo "Version ${TARGET_VERSION} already exists. Aborting deployment."
+            exit 1
+          fi
+          
+          # Deploy to new version folder
+          aws s3 sync dist/ "s3://${S3_BUCKET}/${TARGET_VERSION}/" \
+            --delete \
+            --cache-control "public, max-age=31536000" \
+            --metadata-directive REPLACE
+          
+          # Update index.html with correct content type and shorter cache control
+          aws s3 cp "s3://${S3_BUCKET}/${TARGET_VERSION}/index.html" \
+            "s3://${S3_BUCKET}/${TARGET_VERSION}/index.html" \
+            --content-type "text/html" \
+            --cache-control "public, max-age=300" \
+            --metadata-directive REPLACE
+          
+          echo "✅ Deployed new version: ${TARGET_VERSION}"
+      
+      - name: Deploy to S3 (Override)
+        if: needs.determine-deployment.outputs.deployment-mode == 'override'
+        run: |
+          TARGET_VERSION="${{ steps.latest-version.outputs.latest-version }}"
+          S3_BUCKET="${{ steps.config.outputs.s3-bucket }}"
+          
+          # Deploy to existing version folder (override)
+          aws s3 sync dist/ "s3://${S3_BUCKET}/${TARGET_VERSION}/" \
+            --delete \
+            --cache-control "public, max-age=31536000" \
+            --metadata-directive REPLACE
+          
+          # Update index.html with correct content type and shorter cache control
+          aws s3 cp "s3://${S3_BUCKET}/${TARGET_VERSION}/index.html" \
+            "s3://${S3_BUCKET}/${TARGET_VERSION}/index.html" \
+            --content-type "text/html" \
+            --cache-control "public, max-age=300" \
+            --metadata-directive REPLACE
+          
+          echo "✅ Overrode existing version: ${TARGET_VERSION}"
+      
+      - name: Invalidate CloudFront
+        run: |
+          CLOUDFRONT_ID="${{ steps.config.outputs.cloudfront-id }}"
+          
+          if [ "${{ needs.determine-deployment.outputs.deployment-mode }}" = "new_version" ]; then
+            TARGET_VERSION="${{ needs.determine-deployment.outputs.target-version }}"
+          else
+            TARGET_VERSION="${{ steps.latest-version.outputs.latest-version }}"
+          fi
+          
+          # Invalidate specific version path
+          aws cloudfront create-invalidation \
+            --distribution-id "${CLOUDFRONT_ID}" \
+            --paths "/${TARGET_VERSION}/*"
+          
+          echo "✅ CloudFront invalidation created for /${TARGET_VERSION}/*"
+      
+      - name: Deployment Summary
+        run: |
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Mode**: ${{ needs.determine-deployment.outputs.deployment-mode }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: ${{ github.event.inputs.target_environment || 'production' }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.determine-deployment.outputs.deployment-mode }}" = "new_version" ]; then
+            echo "- **Version**: ${{ needs.determine-deployment.outputs.target-version }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Updated Version**: ${{ steps.latest-version.outputs.latest-version }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "- **S3 Bucket**: ${{ needs.determine-deployment.outputs.s3-bucket }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **CloudFront**: Invalidation triggered" >> $GITHUB_STEP_SUMMARY
