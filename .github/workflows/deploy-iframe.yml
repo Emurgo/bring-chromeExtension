@@ -35,8 +35,6 @@ jobs:
     outputs:
       deployment-mode: ${{ steps.mode.outputs.mode }}
       target-version: ${{ steps.version.outputs.version }}
-      s3-bucket: ${{ steps.config.outputs.s3-bucket }}
-      cloudfront-id: ${{ steps.config.outputs.cloudfront-id }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -63,6 +61,35 @@ jobs:
             # For override mode, get the latest existing version from S3 or use a default
             echo "version=latest" >> $GITHUB_OUTPUT
           fi
+      
+
+  build-and-deploy:
+    needs: determine-deployment
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    defaults:
+      run:
+        working-directory: iframe-frontend
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
+          cache-dependency-path: 'iframe-frontend/yarn.lock'
+      
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      
+      - name: Build application
+        run: yarn build
+        env:
+          # Add any build-time environment variables here
+          NODE_ENV: production
       
       - name: Set environment configuration
         id: config
@@ -103,34 +130,6 @@ jobs:
           
           echo "s3-bucket=$S3_BUCKET" >> $GITHUB_OUTPUT
           echo "cloudfront-id=$CLOUDFRONT_ID" >> $GITHUB_OUTPUT
-
-  build-and-deploy:
-    needs: determine-deployment
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-    defaults:
-      run:
-        working-directory: iframe-frontend
-    
-    steps:
-      - uses: actions/checkout@v4
-      
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'yarn'
-          cache-dependency-path: 'iframe-frontend/yarn.lock'
-      
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-      
-      - name: Build application
-        run: yarn build
-        env:
-          # Add any build-time environment variables here
-          NODE_ENV: production
       
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -143,7 +142,7 @@ jobs:
         if: needs.determine-deployment.outputs.deployment-mode == 'override'
         id: latest-version
         run: |
-          S3_BUCKET="${{ needs.determine-deployment.outputs.s3-bucket }}"
+          S3_BUCKET="${{ steps.config.outputs.s3-bucket }}"
           echo "Using S3 bucket: $S3_BUCKET"
           
           # List all version directories and get the latest one
@@ -161,7 +160,7 @@ jobs:
         if: needs.determine-deployment.outputs.deployment-mode == 'new_version'
         run: |
           TARGET_VERSION="${{ needs.determine-deployment.outputs.target-version }}"
-          S3_BUCKET="${{ needs.determine-deployment.outputs.s3-bucket }}"
+          S3_BUCKET="${{ steps.config.outputs.s3-bucket }}"
           
           # Check if version already exists
           if aws s3 ls "s3://${S3_BUCKET}/${TARGET_VERSION}/" > /dev/null 2>&1; then
@@ -187,7 +186,7 @@ jobs:
         if: needs.determine-deployment.outputs.deployment-mode == 'override'
         run: |
           TARGET_VERSION="${{ steps.latest-version.outputs.latest-version }}"
-          S3_BUCKET="${{ needs.determine-deployment.outputs.s3-bucket }}"
+          S3_BUCKET="${{ steps.config.outputs.s3-bucket }}"
           
           # Deploy to existing version folder (override)
           aws s3 sync dist/ "s3://${S3_BUCKET}/${TARGET_VERSION}/" \
@@ -205,7 +204,7 @@ jobs:
       
       - name: Invalidate CloudFront
         run: |
-          CLOUDFRONT_ID="${{ needs.determine-deployment.outputs.cloudfront-id }}"
+          CLOUDFRONT_ID="${{ steps.config.outputs.cloudfront-id }}"
           
           if [ "${{ needs.determine-deployment.outputs.deployment-mode }}" = "new_version" ]; then
             TARGET_VERSION="${{ needs.determine-deployment.outputs.target-version }}"
