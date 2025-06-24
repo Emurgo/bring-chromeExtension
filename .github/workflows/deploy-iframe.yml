@@ -68,13 +68,23 @@ jobs:
         id: config
         run: |
           ENV="${{ github.event.inputs.target_environment || 'production' }}"
+          echo "Target environment: $ENV"
+          
           if [ "$ENV" = "sandbox" ]; then
-            echo "s3-bucket=${{ secrets.S3_BUCKET_SANDBOX }}" >> $GITHUB_OUTPUT
-            echo "cloudfront-id=${{ secrets.CLOUDFRONT_ID_SANDBOX }}" >> $GITHUB_OUTPUT
+            S3_BUCKET="${{ secrets.S3_BUCKET_SANDBOX }}"
+            CLOUDFRONT_ID="${{ secrets.CLOUDFRONT_ID_SANDBOX }}"
+            echo "Using sandbox environment"
           else
-            echo "s3-bucket=${{ secrets.S3_BUCKET_PROD }}" >> $GITHUB_OUTPUT
-            echo "cloudfront-id=${{ secrets.CLOUDFRONT_ID_PROD }}" >> $GITHUB_OUTPUT
+            S3_BUCKET="${{ secrets.S3_BUCKET_PROD }}"
+            CLOUDFRONT_ID="${{ secrets.CLOUDFRONT_ID_PROD }}"
+            echo "Using production environment"
           fi
+          
+          echo "S3 Bucket: $S3_BUCKET"
+          echo "CloudFront ID: $CLOUDFRONT_ID"
+          
+          echo "s3-bucket=$S3_BUCKET" >> $GITHUB_OUTPUT
+          echo "cloudfront-id=$CLOUDFRONT_ID" >> $GITHUB_OUTPUT
 
   build-and-deploy:
     needs: determine-deployment
@@ -115,11 +125,17 @@ jobs:
         if: needs.determine-deployment.outputs.deployment-mode == 'override'
         id: latest-version
         run: |
+          S3_BUCKET="${{ needs.determine-deployment.outputs.s3-bucket }}"
+          echo "Using S3 bucket: $S3_BUCKET"
+          
           # List all version directories and get the latest one
-          LATEST_VERSION=$(aws s3 ls s3://${{ needs.determine-deployment.outputs.s3-bucket }}/ | grep -E 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -1 | awk '{print $2}' | sed 's/\///')
+          LATEST_VERSION=$(aws s3 ls "s3://${S3_BUCKET}/" | grep -E 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -1 | awk '{print $2}' | sed 's/\///')
           if [ -z "$LATEST_VERSION" ]; then
             # If no versions exist, use v1.0.0 as default
             LATEST_VERSION="v1.0.0"
+            echo "No existing versions found, using default: $LATEST_VERSION"
+          else
+            echo "Found latest version: $LATEST_VERSION"
           fi
           echo "latest-version=$LATEST_VERSION" >> $GITHUB_OUTPUT
       
