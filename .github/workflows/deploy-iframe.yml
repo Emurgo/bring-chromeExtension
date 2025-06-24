@@ -95,30 +95,6 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       
-      - name: Build application
-        run: |
-          # Set base path for deployment
-          if [ "${{ needs.determine-deployment.outputs.deployment-mode }}" = "new_version" ]; then
-            BASE_PATH="/${{ needs.determine-deployment.outputs.target-version }}/"
-          else
-            # For override mode, we need to determine the version first
-            ENV="${{ github.event.inputs.target_environment || (github.ref_name == 'sandbox' && 'sandbox' || 'production') }}"
-            if [ "$ENV" = "sandbox" ]; then
-              S3_BUCKET="${{ secrets.S3_BUCKET_SANDBOX }}"
-            else
-              S3_BUCKET="${{ secrets.S3_BUCKET_PROD }}"
-            fi
-            
-            # Get latest version from S3 for override mode
-            LATEST_VERSION=$(aws s3 ls "s3://${S3_BUCKET}/" | grep -E 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -1 | awk '{print $2}' | sed 's/\///' || echo "v1.0.0")
-            BASE_PATH="/${LATEST_VERSION}/"
-          fi
-          
-          echo "Building with base path: $BASE_PATH"
-          VITE_BASE_PATH="$BASE_PATH" yarn build
-        env:
-          NODE_ENV: production
-      
       - name: Set environment configuration
         id: config
         run: |
@@ -165,6 +141,23 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
           role-session-name: GitHubActions-IframeDeployment
+      
+      - name: Build application
+        run: |
+          # Set base path for deployment
+          if [ "${{ needs.determine-deployment.outputs.deployment-mode }}" = "new_version" ]; then
+            BASE_PATH="/${{ needs.determine-deployment.outputs.target-version }}/"
+          else
+            # For override mode, get latest version from S3
+            S3_BUCKET="${{ steps.config.outputs.s3-bucket }}"
+            LATEST_VERSION=$(aws s3 ls "s3://${S3_BUCKET}/" | grep -E 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -1 | awk '{print $2}' | sed 's/\///' || echo "v1.0.0")
+            BASE_PATH="/${LATEST_VERSION}/"
+          fi
+          
+          echo "Building with base path: $BASE_PATH"
+          VITE_BASE_PATH="$BASE_PATH" yarn build
+        env:
+          NODE_ENV: production
       
       - name: Get latest version for override mode
         if: needs.determine-deployment.outputs.deployment-mode == 'override'
