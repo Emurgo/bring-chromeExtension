@@ -158,8 +158,34 @@ jobs:
             BASE_PATH="/${LATEST_VERSION}/"
           fi
           
+          # Determine environment for Vite variables
+          ENV="${{ github.event.inputs.target_environment || (github.ref_name == 'sandbox' && 'sandbox' || 'production') }}"
+          echo "Building for environment: $ENV"
           echo "Building with base path: $BASE_PATH"
-          VITE_BASE_PATH="$BASE_PATH" yarn build
+          
+          # Set environment-specific variables
+          if [ "$ENV" = "sandbox" ]; then
+            export VITE_API_URL="${{ secrets.VITE_API_URL_SANDBOX }}"
+            export VITE_API_KEY="${{ secrets.VITE_API_KEY_SANDBOX }}"
+            export VITE_GA_MEASUREMENT_ID="${{ secrets.VITE_GA_MEASUREMENT_ID_SANDBOX }}"
+            export VITE_APP_ENV="sandbox"
+            export VITE_DEBUG_MODE="true"
+          else
+            export VITE_API_URL="${{ secrets.VITE_API_URL_PROD }}"
+            export VITE_API_KEY="${{ secrets.VITE_API_KEY_PROD }}"
+            export VITE_GA_MEASUREMENT_ID="${{ secrets.VITE_GA_MEASUREMENT_ID_PROD }}"
+            export VITE_APP_ENV="prod"
+            export VITE_DEBUG_MODE="false"
+          fi
+          
+          # Common variables for all environments
+          export VITE_BASE_PATH="$BASE_PATH"
+          export VITE_APP_VERSION="${{ github.sha }}"
+          export VITE_BUILD_TIME="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          export VITE_BRANCH_NAME="${{ github.ref_name }}"
+          export VITE_TEST_ID="${{ secrets.VITE_TEST_ID }}"
+          
+          yarn build
         env:
           NODE_ENV: production
       
