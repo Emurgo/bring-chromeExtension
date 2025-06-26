@@ -27,3 +27,5 @@ interface BringEvent {
         redirectUrl?: string
     }
 }
+
+// "watch": "tsup index.ts --env.IFRAME_URL=http://localhost:5173 --format cjs,esm --dts --watch",
