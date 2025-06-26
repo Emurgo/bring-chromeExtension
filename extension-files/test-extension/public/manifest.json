@@ -32,7 +32,6 @@
     }
   ],
   "host_permissions": [
-    "https://*.bringweb3.io/*",
-    "https://ddde1ehqp5cem.cloudfront.net/*"
+    "https://*.bringweb3.io/*"
   ]
 }

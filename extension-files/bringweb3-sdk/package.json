@@ -15,7 +15,7 @@
     "url": "https://github.com/Bring-Web3-LTD/chromeExtension.git"
   },
   "scripts": {
-    "watch": "tsup index.ts --env.IFRAME_URL=https://ddde1ehqp5cem.cloudfront.net --format cjs,esm --dts --watch",
+    "watch": "tsup index.ts --env.IFRAME_URL=http://localhost:5173 --format cjs,esm --dts --watch",
     "build": "tsup index.ts --format cjs,esm --dts --minify",
     "lint": "tsc",
     "test": "vitest --coverage",
