@@ -35,10 +35,29 @@ jobs:
     outputs:
       deployment-mode: ${{ steps.mode.outputs.mode }}
       target-version: ${{ steps.version.outputs.version }}
+      skip-auto-deployment: ${{ steps.commit-check.outputs.skip }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      
+      - name: Check commit message for new version flag
+        id: commit-check
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
+            echo "Commit message: $COMMIT_MESSAGE"
+            if [[ "$COMMIT_MESSAGE" == *"iframe-new-version"* ]]; then
+              echo "Found 'iframe-new-version' in commit message - skipping auto-deployment"
+              echo "skip=true" >> $GITHUB_OUTPUT
+            else
+              echo "No 'iframe-new-version' flag found - proceeding with auto-deployment"
+              echo "skip=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            # Manual dispatch - never skip
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
       
       - name: Determine deployment mode
         id: mode
@@ -56,15 +75,19 @@ jobs:
           if [ "${{ steps.mode.outputs.mode }}" = "new_version" ]; then
             # Get version from SDK package.json
             SDK_VERSION=$(cat extension-files/bringweb3-sdk/package.json | jq -r '.version')
+            echo "SDK package.json version: '$SDK_VERSION'"
             
             # If version is 0.0.0 (changeset placeholder), get the latest git tag
             if [ "$SDK_VERSION" = "0.0.0" ]; then
               echo "Package version is 0.0.0 (changeset placeholder), using latest git tag"
-              LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "1.0.0")
+              # Get the latest tag by sorting all tags by version number
+              LATEST_TAG=$(git tag -l | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -1 || echo "v1.0.0")
               # Remove 'v' prefix if present
               LATEST_TAG=${LATEST_TAG#v}
+              echo "Found latest tag: v${LATEST_TAG}"
               echo "version=v${LATEST_TAG}" >> $GITHUB_OUTPUT
             else
+              echo "Using SDK package version: v${SDK_VERSION}"
               echo "version=v${SDK_VERSION}" >> $GITHUB_OUTPUT
             fi
           else
@@ -75,10 +98,12 @@ jobs:
 
   build-and-deploy:
     needs: determine-deployment
+    if: needs.determine-deployment.outputs.skip-auto-deployment != 'true'
     runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
+    environment: ${{ github.event.inputs.target_environment || (github.ref_name == 'sandbox' && 'sandbox' || 'production') }}
     defaults:
       run:
         working-directory: iframe-frontend
@@ -114,15 +139,9 @@ jobs:
           echo "Branch: ${{ github.ref_name }}"
           echo "Target environment: $ENV"
           
-          if [ "$ENV" = "sandbox" ]; then
-            S3_BUCKET="${{ secrets.S3_BUCKET_SANDBOX }}"
-            CLOUDFRONT_ID="${{ secrets.CLOUDFRONT_ID_SANDBOX }}"
-            echo "Using sandbox environment"
-          else
-            S3_BUCKET="${{ secrets.S3_BUCKET_PROD }}"
-            CLOUDFRONT_ID="${{ secrets.CLOUDFRONT_ID_PROD }}"
-            echo "Using production environment"
-          fi
+          S3_BUCKET="${{ secrets.S3_BUCKET }}"
+          CLOUDFRONT_ID="${{ secrets.CLOUDFRONT_ID }}"
+          echo "Using $ENV environment"
           
           echo "S3 Bucket: $S3_BUCKET"
           echo "CloudFront ID: $CLOUDFRONT_ID"
@@ -154,8 +173,30 @@ jobs:
             BASE_PATH="/${LATEST_VERSION}/"
           fi
           
+          # Determine environment for Vite variables
+          ENV="${{ github.event.inputs.target_environment || (github.ref_name == 'sandbox' && 'sandbox' || 'production') }}"
+          echo "Building for environment: $ENV"
           echo "Building with base path: $BASE_PATH"
-          VITE_BASE_PATH="$BASE_PATH" yarn build
+          
+          # Set environment-specific variables from GitHub Environment secrets
+          export VITE_API_URL="${{ secrets.VITE_API_URL }}"
+          export VITE_API_KEY="${{ secrets.VITE_API_KEY }}"
+          export VITE_GA_MEASUREMENT_ID="${{ secrets.VITE_GA_MEASUREMENT_ID }}"
+          export VITE_APP_ENV="$ENV"
+          if [ "$ENV" = "sandbox" ]; then
+            export VITE_DEBUG_MODE="true"
+          else
+            export VITE_DEBUG_MODE="false"
+          fi
+          
+          # Common variables for all environments
+          export VITE_BASE_PATH="$BASE_PATH"
+          export VITE_APP_VERSION="${{ github.sha }}"
+          export VITE_BUILD_TIME="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          export VITE_BRANCH_NAME="${{ github.ref_name }}"
+          export VITE_TEST_ID="${{ secrets.VITE_TEST_ID }}"
+          
+          yarn build
         env:
           NODE_ENV: production
       
@@ -242,6 +283,49 @@ jobs:
           
           echo "✅ CloudFront invalidation created for /${TARGET_VERSION}/*"
       
+      - name: Update CloudFront KeyValueStore
+        run: |
+          S3_BUCKET="${{ steps.config.outputs.s3-bucket }}"
+          
+          # Determine environment key name
+          ENV="${{ github.event.inputs.target_environment || (github.ref_name == 'sandbox' && 'sandbox' || 'production') }}"
+          if [ "$ENV" = "sandbox" ]; then
+            KVS_KEY="sandbox"
+          else
+            KVS_KEY="prod"
+          fi
+          
+          echo "Updating KeyValueStore for environment: $KVS_KEY"
+          
+          # Get all version directories from S3 and format as comma-separated list
+          VERSIONS=$(aws s3 ls "s3://${S3_BUCKET}/" | grep -E 'v[0-9]+\.[0-9]+\.[0-9]+' | awk '{print $2}' | sed 's/\///' | sed 's/^v//' | sort -V | tr '\n' ',' | sed 's/,$//')
+          
+          echo "Available versions: $VERSIONS"
+          
+          # Get current ETag from the KeyValueStore description
+          ETAG=$(aws cloudfront-keyvaluestore describe-key-value-store \
+            --kvs-arn "${{ secrets.CLOUDFRONT_KVS_ARN }}" \
+            --query 'ETag' --output text 2>/dev/null || echo "")
+          
+          if [ -n "$ETAG" ] && [ "$ETAG" != "None" ]; then
+            echo "Updating KeyValueStore with ETag: $ETAG"
+            # Update with current ETag
+            aws cloudfront-keyvaluestore put-key \
+              --kvs-arn "${{ secrets.CLOUDFRONT_KVS_ARN }}" \
+              --key "$KVS_KEY" \
+              --value "$VERSIONS" \
+              --if-match "$ETAG"
+          else
+            echo "No ETag found or KeyValueStore doesn't exist"
+            # Try without if-match (for new KeyValueStore or if describe fails)
+            aws cloudfront-keyvaluestore put-key \
+              --kvs-arn "${{ secrets.CLOUDFRONT_KVS_ARN }}" \
+              --key "$KVS_KEY" \
+              --value "$VERSIONS"
+          fi
+          
+          echo "✅ Updated KeyValueStore key '$KVS_KEY' with versions: $VERSIONS"
+      
       - name: Deployment Summary
         run: |
           echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
@@ -254,3 +338,20 @@ jobs:
           fi
           echo "- **S3 Bucket**: ${{ needs.determine-deployment.outputs.s3-bucket }}" >> $GITHUB_STEP_SUMMARY
           echo "- **CloudFront**: Invalidation triggered" >> $GITHUB_STEP_SUMMARY
+
+  deployment-skipped:
+    needs: determine-deployment
+    if: needs.determine-deployment.outputs.skip-auto-deployment == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deployment Skipped Summary
+        run: |
+          echo "## ⏭️ Deployment Skipped" >> $GITHUB_STEP_SUMMARY
+          echo "Auto-deployment was skipped because commit message contains 'iframe-new-version'" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: ${{ github.event.head_commit.message }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "To deploy manually:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Go to Actions → Deploy Iframe Frontend" >> $GITHUB_STEP_SUMMARY
+          echo "2. Click 'Run workflow'" >> $GITHUB_STEP_SUMMARY
+          echo "3. Select 'new_version' mode for new version or 'override' to update existing" >> $GITHUB_STEP_SUMMARY

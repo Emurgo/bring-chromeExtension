@@ -11,7 +11,12 @@ interface Props {
 }
 
 const rootLoader = async ({ request }: Props) => {
-    const searchParams = new URL(request.url).searchParams
+    console.log({
+        original: request.url,
+        decoded: decodeURI(request.url)
+    })
+
+    const searchParams = new URL(decodeURI(request.url)).searchParams
     const userId = searchParams.get('userId') || ''
 
     const res = await verify({ token: searchParams.get('token'), userId })
