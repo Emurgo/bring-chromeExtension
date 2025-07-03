@@ -21,9 +21,9 @@ interface KeyFrames {
 export const iframeStyle: Styles = {
     default: {
         animation: 'slideIn .3s ease-in-out',
-        width: '540px',
-        height: `356px`,
-        borderRadius: '20px',
+        width: '480px',
+        height: `435px`,
+        borderRadius: '8px',
         display: 'block',
         top: '10px'
     },

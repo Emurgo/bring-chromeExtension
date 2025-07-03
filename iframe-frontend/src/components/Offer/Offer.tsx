@@ -32,7 +32,7 @@ interface Props {
 const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: Props) => {
     const { sendGaEvent } = useGoogleAnalytics()
     const { walletAddress, setWalletAddress } = useWalletAddress()
-    const { iconsPath, textMode, flowId } = useRouteLoaderData('root') as LoaderData
+    const { iconsPath, textMode, flowId, iconUrl, name } = useRouteLoaderData('root') as LoaderData
     const [tokenSymbol, setTokenSymbol] = useState(info.cryptoSymbols[0])
     const [optOutOpen, setOptOutOpen] = useState(false)
     const [isAddressUpdated, setIsAddressUpdated] = useState(false)
@@ -117,21 +117,41 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: Props) => {
                 :
                 <div className={styles.wallet_spacer} />
             }
-            <PlatformLogo
-                platformName={info.platformName}
-            />
             <div className={styles.details}>
-                <div className={styles.subtitle_container}>
-                    <img src={`${iconsPath}/coins.svg`} alt="cashback icon" />
-                    <h2 className={styles.subtitle}>Earn Crypto Cashback</h2>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'start' }}>
+                    <div className={styles.logo_container} >
+                        <div className={styles.logo_wrapper} >
+                            <img
+                                src={iconUrl}
+                                className={styles.logo}
+                                alt={`${name}-website-icon`}
+                                width={76}
+                                height={76}
+                            />
+                        </div>
+                        <div className={styles.logo_text}>{name}</div>
+                    </div>
+                    <img src="/icons/plus-sign.svg" alt="plus-sign" style={{ marginTop: '32px' }} />
+                    <div className={styles.logo_container} >
+                        <div className={styles.logo_wrapper} >
+                            <PlatformLogo
+                                platformName={info.platformName}
+                                width={49}
+                            />
+                        </div>
+                        <div className={styles.logo_text}>Wallet Name</div>
+                    </div>
                 </div>
-                <span className={styles.sm_txt}>Buy with any card and earn up to <span className={styles.cashback_amount}>{formatCashback(+info.maxCashback, info.cashbackSymbol, info.cashbackCurrency)}</span> in
-                    <CryptoSymbolSelect
+                <div style={{ textAlign: 'center' }}>
+                    {/* <div className={styles.subtitle}></div> */}
+                    <span className={styles.sm_txt}><br />Buy with any card and earn up to <span className={styles.cashback_amount}>{formatCashback(+info.maxCashback, info.cashbackSymbol, info.cashbackCurrency)}</span> in {info.cryptoSymbols[0]}
+                        {/* <CryptoSymbolSelect
                         options={info.cryptoSymbols}
                         select={tokenSymbol}
                         set={setTokenSymbol}
-                    />
-                </span>
+                    /> */}
+                    </span>
+                </div>
             </div>
             <div className={styles.action_container}>
                 <button
@@ -139,9 +159,15 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: Props) => {
                     className={styles.btn}
                     disabled={status !== 'idle'}
                 >
-                    {toCaseString("Let's go", textMode)}
+                    {toCaseString("Activate", textMode)}
                 </button>
                 <div className={styles.btns_container}>
+                    <button
+                        className={styles.action_btn}
+                        onClick={() => setOptOutOpen(true)}
+                    >
+                        {toCaseString("Opt out", textMode)}
+                    </button>
                     <button
                         className={styles.action_btn}
                         onClick={async () => {
@@ -155,13 +181,8 @@ const Offer = ({ info, nextFn, setRedirectUrl, closeFn }: Props) => {
                     >
                         {toCaseString("Cancel", textMode)}
                     </button>
-                    <button
-                        className={styles.action_btn}
-                        onClick={() => setOptOutOpen(true)}
-                    >
-                        {toCaseString("Turn off", textMode)}
-                    </button>
                 </div>
+                <div style={{ textAlign: 'center', color: 'white', textWrap: 'nowrap', fontSize: '14px', lineHeight: '22px' }}>No extra steps required - just shop and get {info.cryptoSymbols[0]} in your wallet</div>
             </div>
             <LoadingOverlay
                 open={['waiting', 'switch'].includes(status)}
