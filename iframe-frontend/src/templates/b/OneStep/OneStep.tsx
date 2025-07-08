@@ -1,7 +1,7 @@
 // Styles
 import styles from './style.module.css'
 // Hooks
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouteLoaderData } from "react-router-dom"
 import { useGoogleAnalytics } from "../../../hooks/useGoogleAnalytics"
 import { motion, AnimatePresence } from "framer-motion"
@@ -36,13 +36,10 @@ const slideVariants = {
     })
 }
 
-interface Props {
-    retailerMarkdown: string
-    generalMarkdown: string
-}
 
-const OneStep = ({ retailerMarkdown, generalMarkdown }: Props) => {
-    const { iconsPath, cashbackSymbol, maxCashback, cashbackCurrency, cryptoSymbols, walletAddress, platformName, retailerId, name, url, flowId, domain, isTester, version } = useRouteLoaderData('root') as LoaderData
+
+const OneStep = () => {
+    const { iconsPath, cashbackSymbol, maxCashback, cashbackCurrency, cryptoSymbols, walletAddress, platformName, retailerId, name, url, flowId, domain, isTester, version, retailerTermsUrl, generalTermsUrl } = useRouteLoaderData('root') as LoaderData
     const [[isShowingTerms, direction], setIsShowingTerms] = useState([false, 0])
     const [isShowingTurnoff, setIsShowingTurnoff] = useState(false)
     const tokenSymbol = cryptoSymbols[0]
@@ -51,6 +48,28 @@ const OneStep = ({ retailerMarkdown, generalMarkdown }: Props) => {
     const [isOptedOut, setIsOptedOut] = useState(false)
     const [isDemo, setIsDemo] = useState(false)
     const { sendGaEvent } = useGoogleAnalytics()
+    const [retailerMarkdown, setRetailerMarkdown] = useState('')
+    const [generalMarkdown, setGeneralMarkdown] = useState('')
+
+    const loadMarkdown = async (
+        url: string,
+        setData: (data: string) => void,
+    ) => {
+        try {
+            const response = await fetch(url)
+            const data = await response.text()
+            setData(data)
+        } catch (error) {
+            console.error("Error fetching markdown:", error)
+        }
+    }
+
+    useEffect(() => {
+        loadMarkdown(retailerTermsUrl, setRetailerMarkdown)
+        loadMarkdown(generalTermsUrl, setGeneralMarkdown)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
 
     const activateHandler = async () => {
         if (!walletAddress) {

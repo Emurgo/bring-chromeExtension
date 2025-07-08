@@ -12,8 +12,8 @@ interface Option {
 }
 
 const websiteOptions: Option[] = [
-    { label: 'For this website', value: 0 },
-    { label: 'For all websites', value: 1 }
+    { label: 'For this website', value: false },
+    { label: 'For all websites', value: true }
 ]
 
 const durationOptions: Option[] = [
@@ -45,7 +45,7 @@ const RadioGroup = ({ title, options, onChange, defaultOption }: RadioGroupProps
                 {options.map((option) => (
                     <span
                         key={option.label}
-                        style={{ display: 'flex', gap: '8px', alignItems: 'center', color: 'white' }}
+                        className={styles.input_container}
                     >
                         <input
                             className={styles.radio}
@@ -77,10 +77,10 @@ interface Props {
 }
 
 const OptOut = ({ onClose }: Props) => {
-    const { cryptoSymbols, platformName, textMode } = useRouteLoaderData('root') as LoaderData
+    const { cryptoSymbols, platformName, textMode, domain } = useRouteLoaderData('root') as LoaderData
     const { sendGaEvent } = useGoogleAnalytics()
     const [isOpted, setIsOpted] = useState(false)
-    const [selection, setSelection] = useState({
+    const [selection, setSelection] = useState<Selection>({
         websites: websiteOptions[0],
         duration: durationOptions[0]
     })
@@ -93,16 +93,25 @@ const OptOut = ({ onClose }: Props) => {
         }
     }, [isOpted, onClose])
 
-    const handleOptOut = (selection: Selection) => {
+    const handleOptOut = () => {
         const { websites, duration } = selection
         console.log(websites, duration)
-        sendMessage({ action: ACTIONS.OPT_OUT, time: +duration.value, key: dict[duration.label as keyof typeof dict] })
+
+        const event = {
+            action: websites.value ? ACTIONS.OPT_OUT : ACTIONS.OPT_OUT_SPECIFIC,
+            time: +duration.value,
+            domain,
+            key: dict[duration.label as keyof typeof dict]
+        }
+
+        sendMessage(event)
         setIsOpted(true)
-        // sendGaEvent('opt_out', {
-        //     category: 'user_action',
-        //     action: 'click',
-        //     details: label
-        // })
+        sendGaEvent('opt_out', {
+            category: 'user_action',
+            action: 'click',
+            details: duration.label,
+            domain
+        })
     }
 
     return (
@@ -116,13 +125,13 @@ const OptOut = ({ onClose }: Props) => {
                     </div>
                     <RadioGroup
                         options={websiteOptions}
-                        title={`Where do you want to turn off ${cryptoSymbols[0]} cashback?`}
+                        title={`Turn off cashback offers`}
                         onChange={(option => setSelection({ ...selection, websites: option }))}
                         defaultOption={websiteOptions[0]}
                     />
                     <RadioGroup
                         options={durationOptions}
-                        title={`Choose when to hide cashback offers`}
+                        title={`Turn off cashback offers for`}
                         onChange={(option => setSelection({ ...selection, duration: option }))}
                         defaultOption={durationOptions[0]}
                     />

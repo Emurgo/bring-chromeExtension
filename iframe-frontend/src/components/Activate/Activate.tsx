@@ -19,14 +19,12 @@ interface ActivateProps {
     redirectUrl: string
     retailerMarkdown: string
     generalMarkdown: string
-    platformName: string
-    retailerName: string
 }
 
 
-const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName, retailerName }: ActivateProps) => {
+const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown }: ActivateProps) => {
     const { walletAddress } = useWalletAddress()
-    const { textMode, url, domain, version } = useRouteLoaderData('root') as LoaderData
+    const { textMode, url, domain, version, platformName, name } = useRouteLoaderData('root') as LoaderData
     const { sendGaEvent } = useGoogleAnalytics()
     const [activated, setActivated] = useState(false)
     const effectRan = useRef(false);
@@ -35,7 +33,7 @@ const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName
         if (effectRan.current === true) return
         sendGaEvent('wallet_connected', {
             category: 'system',
-            details: retailerName
+            details: name
         }, true)
         effectRan.current = true
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -47,7 +45,7 @@ const Activate = ({ redirectUrl, retailerMarkdown, generalMarkdown, platformName
         sendGaEvent('retailer_shop', {
             category: 'user_action',
             action: 'click',
-            details: retailerName
+            details: name
         })
     }
 

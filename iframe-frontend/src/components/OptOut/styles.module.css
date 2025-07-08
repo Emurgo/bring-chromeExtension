@@ -50,6 +50,12 @@
     grid-template-columns: repeat(2, 1fr);
 }
 
+.input_container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
 .label {
     text-wrap: nowrap;
     cursor: pointer;
