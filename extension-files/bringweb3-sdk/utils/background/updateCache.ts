@@ -16,23 +16,23 @@ export const updateCache = async () => {
 
     // Check all conditions that would require a fetch
     if (!relevantDomainsList) {
-        trigger = `no domains in cache - value: ${safeStringify(relevantDomainsList)}`
+        trigger = `no domains in cache__value: ${safeStringify(relevantDomainsList)}`
     } else if (!Array.isArray(relevantDomainsList)) {
-        trigger = `domains list isn't an array - value: ${safeStringify(relevantDomainsList)}`
+        trigger = `domains list isn't an array__value: ${safeStringify(relevantDomainsList)}`
     } else if (!relevantDomainsCheck) {
-        trigger = `no domains timestamp check found - value: ${safeStringify(relevantDomainsCheck)}`
+        trigger = `no domains timestamp check found__value: ${safeStringify(relevantDomainsCheck)}`
     } else if (!Array.isArray(relevantDomainsCheck)) {
-        trigger = `invalid domains timestamp check format - not an array - value: ${safeStringify(relevantDomainsCheck)}`
+        trigger = `invalid domains timestamp check format - not an array__value: ${safeStringify(relevantDomainsCheck)}`
     } else if (relevantDomainsCheck.length !== 2) {
-        trigger = `invalid domains timestamp check format - length: ${relevantDomainsCheck.length} - value: ${safeStringify(relevantDomainsCheck)}`
+        trigger = `invalid domains timestamp check format__length: ${relevantDomainsCheck.length} - value: ${safeStringify(relevantDomainsCheck)}`
     } else if (relevantDomainsCheck[0] >= now) {
-        trigger = `cache expired - range start is bigger than Date.now() - value: ${safeStringify(relevantDomainsCheck)}, now: ${now}`
+        trigger = `cache expired - range start is bigger than Date.now()__value: ${safeStringify(relevantDomainsCheck)}, now: ${now}`
     } else if (now >= relevantDomainsCheck[1]) {
-        trigger = `cache expired - range end is smaller than Date.now() - value: ${safeStringify(relevantDomainsCheck)}, now: ${now}`
+        trigger = `cache expired - range end is smaller than Date.now()__value: ${safeStringify(relevantDomainsCheck)}, now: ${now}`
     } else if (whitelistEndpoint && !whitelist?.length) {
-        trigger = `missing whitelist data - endpoint: ${whitelistEndpoint}, whitelist: ${safeStringify(whitelist)}`
+        trigger = `missing whitelist data__endpoint: ${whitelistEndpoint}, whitelist: ${safeStringify(whitelist)}`
     } else if (isMsRangeExpired(relevantDomainsCheck as [number, number], now)) {
-        trigger = `cache expired - range is expired - range: ${safeStringify(relevantDomainsCheck)}, now: ${now}`
+        trigger = `cache expired - range is expired__range: ${safeStringify(relevantDomainsCheck)}, now: ${now}`
     }
 
     if (!trigger) {
