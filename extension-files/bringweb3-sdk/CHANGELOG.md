@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.4.4
+
+### Patch Changes
+
+- e60598d: More informative triggers
+
 ## 1.4.3
 
 ### Patch Changes
