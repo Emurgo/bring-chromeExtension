@@ -1,5 +1,6 @@
 'use strict';
 import { bringInitContentScript } from "@bringweb3/chrome-extension-kit";
+import { dark } from "./themes/yoroi";
 const argentTheme = {
     fontUrl: 'https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap',
     fontFamily: "'Barlow', sans-serif",
@@ -36,7 +37,7 @@ const template = {
     markdownBorderW: "0",
     markdownRadius: "4px",
     markdownBorderC: "black",
-    markdownScrollbarC: "#DADCE5",
+    markdownScrollbarC: "#4B5266",
     // Wallet address
     walletBg: "#33535B",
     walletFS: "10px",
@@ -290,123 +291,6 @@ const lightTheme = {
     activateTitleBoldFC: "#242838",
 }
 
-const yoroiDark = {
-    // font
-    fontUrl: 'https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap',
-    fontFamily: '"Rubik", sans-serif',
-    // Popup
-    popupBg: "#15171F",
-    popupShadow: "0px 6px 20px 0px rgba(0, 0, 0, 0.10), 0px 1px 8px 0px rgba(0, 0, 0, 0.06)",
-    xBtnFC: "#E1E6F5",
-    // Primary button
-    primaryBtnBg: "#4B6DDE",
-    primaryBtnFS: "14px",
-    primaryBtnFW: "500",
-    primaryBtnFC: "#FFFFFF",
-    primaryBtnBorderC: "transparent",
-    primaryBtnBorderW: "0",
-    primaryBtnRadius: "8px",
-    // Secondary button
-    secondaryBtnBg: "#15171F",
-    secondaryBtnFS: "14px",
-    secondaryBtnFW: "500",
-    secondaryBtnFC: "#7892E8",
-    secondaryBtnBorderC: "#7892E8",
-    secondaryBtnBorderW: "2px",
-    secondaryBtnRadius: "8px",
-    // Markdown
-    markdownBg: "#15171F",
-    markdownFS: "14px",
-    markdownFW: "400",
-    markdownFC: "#E1E6F5",
-    markdownTitleFS: "14px",
-    markdownTitleFW: "500",
-    markdownTitleFC: "#E1E6F5",
-    markdownBorderW: "1px",
-    markdownRadius: "8px",
-    markdownBorderC: "#262A38",
-    markdownScrollbarC: "#4B5266",
-    // Wallet address
-    walletBg: "#1F232E",
-    walletFS: "12px",
-    walletFW: "400",
-    walletFC: "#E1E6F5",
-    walletBorderC: "transparent",
-    walletBorderW: "0",
-    walletRadius: "80px",
-    // Details of offering
-    detailsBg: "#1F232E",
-    detailsTitleFS: "16px",
-    detailsTitleFW: "500",
-    detailsTitleFC: "#E1E6F5",
-    detailsSubtitleFS: "16px",
-    detailsSubtitleFW: "400",
-    detailsSubtitleFC: "#E1E6F5",
-    detailsRadius: "8px",
-    detailsBorderW: "0",
-    detailsBorderC: "transparent",
-    detailsAmountFC: "#66F2D6",
-    detailsAmountFW: "500",
-    // Logo
-    logoBg: "white",
-    logoRadius: "50%",
-    logoTxtFS: "14px",
-    logoTxtFW: "500",
-    logoTxtFC: "#E1E6F5",
-    // Overlay
-    overlayWaitingBg: "#15171F",
-    overlayBg: "#1F232ECC",
-    overlayFS: "16px",
-    overlayFW: "400",
-    overlayFC: "#E1E6F5",
-    loaderBg: "#4B6DDE",
-    // Optout \ Turn off
-    optoutBg: "#1F232E",
-    optoutFS: "20px",
-    optoutFW: "500",
-    optoutFC: "#E1E6F5",
-    optoutRadius: "8px",
-    optoutDescFS: "14px",
-    optoutDescFW: "400",
-    optoutDescFC: "#E1E6F5",
-    labelFS: "16px",
-    labelFW: "400",
-    labelFC: "#E1E6F5",
-    labelDescFS: "16px",
-    labelDescFW: "500",
-    labelDescFC: "#E1E6F5",
-    // X Button and close buttons
-    closeFS: "14px",
-    closeFW: "500",
-    closeFC: "#FFF",
-    // Token name
-    tokenBg: "#1F253B",
-    tokenFS: "14px",
-    tokenFW: "500",
-    tokenFC: "#7892E8",
-    tokenBorderW: "0",
-    tokenBorderC: "transparent",
-    tokenRadius: "80px",
-    // Notification popup
-    notificationFS: "16px",
-    notificationFW: "400",
-    notificationFC: "#E1E6F5",
-    notificationBtnBg: "#15171F",
-    notificationBtnFS: "14px",
-    notificationBtnFW: "500",
-    notificationBtnFC: "#7892E8",
-    notificationBtnBorderW: "2px",
-    notificationBtnBorderC: "#7892E8",
-    notificationBtnRadius: "8px",
-    // Activate title
-    activateTitleFS: "16px",
-    activateTitleFW: "400",
-    activateTitleFC: "#E1E6F5",
-    activateTitleBoldFS: "16px",
-    activateTitleBoldFW: "500",
-    activateTitleBoldFC: "#E1E6F5",
-}
-
 const promptLogin = () => {
     chrome.runtime.sendMessage({ action: "openWindow" });
 }
@@ -419,5 +303,5 @@ bringInitContentScript({
     theme: 'dark',
     text: 'upper',
     switchWallet: false,
-    darkTheme: yoroiDark
+    darkTheme: dark
 });

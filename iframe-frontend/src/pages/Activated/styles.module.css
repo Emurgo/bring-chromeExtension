@@ -1,0 +1,125 @@
+.container {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+}
+
+.top_container {
+    display: flex;
+    align-self: flex-start;
+    justify-content: center;
+    height: 23px;
+    gap: 7px;
+}
+
+.wallet_container {
+    display: flex;
+    align-self: flex-start;
+    justify-content: center;
+    align-items: center;
+    height: 23px;
+    background: var(--wallet-bg);
+    padding: 0 12px;
+    border-radius: var(--wallet-radius);
+    margin-bottom: 9px;
+}
+
+.wallet {
+    color: var(--wallet-f-c);
+    font-size: var(--wallet-f-s);
+    font-weight: var(--wallet-f-w);
+    border-width: var(--wallet-border-w);
+    border-style: solid;
+    border-color: var(--wallet-border-c);
+}
+
+.subcontainer {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+}
+
+.title {
+    margin-top: 6px;
+    font-size: var(--activate-title-f-s, 20px);
+    font-weight: var(--activate-title-f-w, 500);
+    color: var(--activate-title-f-c);
+    line-height: 28px;
+}
+
+.p {
+    font-size: var(--activate-subtitle-f-s, 14px);
+    font-weight: var(--activate-subtitle-f-w, 400);
+    color: var(--activate-subtitle-f-c, var(--activate-title-f-c));
+    margin: 0;
+    line-height: 22px;
+}
+
+.backed_by {
+    font-size: var(--activate-wallet-name-f-s, 12px);
+    font-weight: var(--activate-wallet-name-f-w, 400);
+    background: -webkit-linear-gradient(var(--activate-wallet-name-f-c, var(--activate-title-f-c)));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 12px;
+    margin-top: 8px;
+    margin-bottom: 10px;
+}
+
+.activate_btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--primary-btn-f-s);
+    font-weight: var(--primary-btn-f-w);
+    color: var(--primary-btn-f-c);
+    background: var(--primary-btn-bg);
+    border-width: var(--primary-btn-border-w);
+    border-style: solid;
+    border-color: var(--primary-btn-border-c);
+    border-radius: var(--primary-btn-radius);
+    width: 290px;
+    height: 36px;
+    line-height: 36px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.markdown {
+    padding: 16px;
+    padding-bottom: 0;
+    border-radius: var(--markdown-radius);
+    border-width: var(--markdown-border-w);
+    border-style: solid;
+    border-color: var(--markdown-border-c);
+    height: calc(218px - 32px);
+    font-size: var(--markdown-f-s);
+    font-weight: var(--markdown-f-w);
+    color: var(--markdown-f-c);
+    background: var(--markdown-bg);
+    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.05);
+    overflow-y: scroll;
+    margin-bottom: 25px;
+    line-height: 22px;
+}
+
+.markdown h3 {
+    font-size: var(--markdown-title-f-s, var(--markdown-f-s));
+    font-weight: var(--markdown-title-f-w, var(--markdown-f-w));
+    color: var(--markdown-title-f-c, var(--markdown-f-c));
+}
+
+.markdown::-webkit-scrollbar {
+    width: 4px;
+}
+
+.markdown::-webkit-scrollbar-thumb {
+    background: var(--markdown-scrollbar-c);
+    border-radius: 32px;
+}

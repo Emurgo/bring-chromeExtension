@@ -7,17 +7,6 @@ interface KeyFrames {
     [key: string]: string
 }
 
-
-// export const iframeStyle: Styles = {
-//     animation: 'slideIn .3s ease-in-out',
-//     width: '540px',
-//     height: `356px`,
-//     borderRadius: '20px',
-//     display: 'block',
-//     top: '10px'
-// }
-
-
 export const iframeStyle: Styles = {
     default: {
         animation: 'slideIn .3s ease-in-out',
@@ -40,8 +29,8 @@ export const iframeStyle: Styles = {
 export const notificationIframeStyle: Styles = {
     default: {
         animation: 'slideIn .3s ease-in-out',
-        width: '400px',
-        height: `50px`,
+        width: '452px',
+        height: `70px`,
         borderRadius: '10px',
         display: 'block',
         top: '40px'

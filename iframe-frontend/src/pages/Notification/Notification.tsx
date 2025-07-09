@@ -27,12 +27,12 @@ const Notification = () => {
     })
 
     useEffect(() => {
-        sendMessage({ action: ACTIONS.OPEN, style: notificationIframeStyle })
-        start()
+        sendMessage({ action: ACTIONS.OPEN, style: notificationIframeStyle[data.platformName.toLowerCase()] || notificationIframeStyle['default'] })
+        // start()
         return () => {
-            clear()
+            // clear()
         }
-    }, [clear, start])
+    }, [clear, data.platformName, start])
 
     const notificationSeen = () => {
         clear()

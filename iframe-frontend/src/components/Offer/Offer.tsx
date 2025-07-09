@@ -5,7 +5,6 @@ import { useGoogleAnalytics } from '../../hooks/useGoogleAnalytics'
 import OptOut from '../OptOut/OptOut'
 import activate from '../../api/activate'
 import CloseBtn from '../CloseBtn/CloseBtn'
-import PlatformLogo from '../PlatformLogo/PlatformLogo'
 import SwitchBtn from '../SwitchBtn/SwitchBtn'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 import splitWordMaxFive from '../../utils/splitWordMaxFive'
@@ -14,11 +13,11 @@ import { useRouteLoaderData } from 'react-router-dom'
 import toCaseString from '../../utils/toCaseString'
 import { useWalletAddress } from '../../hooks/useWalletAddress'
 import formatCashback from '../../utils/formatCashback'
-import toCapital from '../../utils/toCapital'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ACTIVATE_QUIET_TIME } from '../../config'
 import parseTime from '../../utils/parseTime'
 import { Oval } from 'react-loader-spinner'
+import CollaborationLogos from '../CollaborationLogos/CollaborationLogos'
 
 interface BringEventData {
     from: string
@@ -34,37 +33,11 @@ interface Props {
 const Offer = ({ closeFn }: Props) => {
     const { sendGaEvent } = useGoogleAnalytics()
     const { walletAddress, setWalletAddress } = useWalletAddress()
-    const { textMode, flowId, iconUrl, name, platformName, retailerId, url, cryptoSymbols, isTester, version, domain, maxCashback, cashbackSymbol, cashbackCurrency } = useRouteLoaderData('root') as LoaderData
+    const { textMode, flowId, name, platformName, retailerId, url, cryptoSymbols, isTester, version, domain, maxCashback, cashbackSymbol, cashbackCurrency } = useRouteLoaderData('root') as LoaderData
     const [optOutOpen, setOptOutOpen] = useState(false)
     const [isDemo, setIsDemo] = useState(false)
     const [isAddressUpdated, setIsAddressUpdated] = useState(false)
     const [status, setStatus] = useState<'idle' | 'waiting' | 'switch' | 'activating' | 'done'>('idle')
-
-    // const activateAction = useCallback(async () => {
-    //     try {
-    //         const { platformName, retailerId, url } = info
-
-    //         if (!walletAddress) {
-    //             setStatus('waiting')
-    //             sendMessage({ action: ACTIONS.PROMPT_LOGIN })
-    //             return
-    //         }
-    //         const res = await activate({
-    //             walletAddress,
-    //             platformName,
-    //             retailerId,
-    //             url,
-    //             tokenSymbol: info.cryptoSymbols[0],
-    //             flowId
-    //         })
-    //         if (res.status !== 200) throw `Got ${res.status} status`
-
-    //         setRedirectUrl(res.url)
-    //         nextFn()
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // }, [info, walletAddress, flowId, setRedirectUrl, nextFn])
 
     const activateAction = useCallback(async () => {
         if (!walletAddress) {
@@ -187,33 +160,9 @@ const Offer = ({ closeFn }: Props) => {
                                 <div className={styles.wallet_spacer} />
                             }
                             <div className={styles.details}>
-                                <div style={{ display: 'flex', gap: '8px', alignItems: 'start' }}>
-                                    <div className={styles.logo_container} >
-                                        <div className={styles.logo_wrapper} >
-                                            <img
-                                                src={iconUrl}
-                                                className={styles.logo}
-                                                alt={`${name}-website-icon`}
-                                                width={76}
-                                                height={76}
-                                            />
-                                        </div>
-                                        <div className={styles.logo_text}>{name}</div>
-                                    </div>
-                                    <img src="/icons/plus-sign.svg" alt="plus-sign" style={{ marginTop: '32px' }} />
-                                    <div className={styles.logo_container} >
-                                        <div className={styles.logo_wrapper} >
-                                            <PlatformLogo
-                                                platformName={platformName}
-                                                width={49}
-                                            />
-                                        </div>
-                                        <div className={styles.logo_text}>{toCapital(platformName)} wallet</div>
-                                    </div>
-                                </div>
-                                <div style={{ textAlign: 'center' }}>
-                                    <span className={styles.sm_txt}><br />Buy with any card and earn up to <span className={styles.cashback_amount}>{formatCashback(+maxCashback, cashbackSymbol, cashbackCurrency)}</span> in {cryptoSymbols[0]}
-                                    </span>
+                                <CollaborationLogos />
+                                <div className={styles.details_txt} >
+                                    Buy with any card and earn up to <span className={styles.cashback_amount}>{formatCashback(+maxCashback, cashbackSymbol, cashbackCurrency)}</span> in {cryptoSymbols[0]}
                                 </div>
                             </div>
                             <div className={styles.action_container}>

@@ -1,10 +1,15 @@
+/* body {
+    background: red;
+}
+
+*/
 .container {
     display: flex;
+    padding: 10px;
     gap: 16px;
     min-height: 50px;
     align-items: center;
     justify-content: flex-start;
-    padding-left: 8px;
 }
 
 .notification_details {

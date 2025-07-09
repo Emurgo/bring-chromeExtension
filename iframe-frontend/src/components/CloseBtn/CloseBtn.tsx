@@ -7,11 +7,12 @@ import parseTime from '../../utils/parseTime'
 
 interface Props {
     callback?: () => void
+    withTime?: boolean
 }
 
 const THIRTY_MIN_MS = 30 * 60 * 1000
 
-const CloseBtn = ({ callback }: Props) => {
+const CloseBtn = ({ callback, withTime = true }: Props) => {
     const { domain, version } = useRouteLoaderData('root') as LoaderData
     const { sendGaEvent } = useGoogleAnalytics()
 
@@ -24,7 +25,11 @@ const CloseBtn = ({ callback }: Props) => {
         if (compareVersions(version, '1.2.6') !== 1) {
             sendMessage({ action: ACTIONS.ACTIVATE, url: `https://${domain}` })
         }
-        sendMessage({ action: ACTIONS.CLOSE, domain, time: parseTime(THIRTY_MIN_MS, version) })
+
+        const message: Parameters<typeof sendMessage>[0] = { action: ACTIONS.CLOSE, domain, }
+        if (withTime) message.time = parseTime(THIRTY_MIN_MS, version)
+
+        sendMessage(message)
     }
 
     return (

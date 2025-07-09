@@ -96,8 +96,11 @@ export const themeNames: ThemeNames = {
     activateTitleFS: "--activate-title-f-s",
     activateTitleFW: "--activate-title-f-w",
     activateTitleFC: "--activate-title-f-c",
-    activateTitleBoldFS: "--activate-title-bold-f-s",
-    activateTitleBoldFW: "--activate-title-bold-f-w",
-    activateTitleBoldFC: "--activate-title-bold-f-c",
+    activateSubtitleFS: "--activate-subtitle-f-s",
+    activateSubtitleFW: "--activate-subtitle-f-w",
+    activateSubtitleFC: "--activate-subtitle-f-c",
+    activateWalletNameFS: "--activate-wallet-name-f-s",
+    activateWalletNameFW: "--activate-wallet-name-f-w",
+    activateWalletNameFC: "--activate-wallet-name-f-c",
     xBtnFC: "--x-btn-f-c"
 }

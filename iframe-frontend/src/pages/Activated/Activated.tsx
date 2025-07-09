@@ -1,12 +1,17 @@
-// import styles from './styles.module.css'
+import styles from './styles.module.css'
 import { useEffect, useState } from 'react'
 import { useRouteLoaderData } from 'react-router-dom'
-import Activate from '../../components/Activate/Activate'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 import { iframeStyle } from '../../utils/iframeStyles'
+import CloseBtn from '../../components/CloseBtn/CloseBtn'
+import { useWalletAddress } from '../../hooks/useWalletAddress'
+import splitWordMaxFive from '../../utils/splitWordMaxFive'
+import toCapital from '../../utils/toCapital'
+import Markdown from 'react-markdown'
 
 const Activated = () => {
-    const { retailerTermsUrl, generalTermsUrl, platformName } = useRouteLoaderData('root') as LoaderData
+    const { retailerTermsUrl, generalTermsUrl, platformName, iconsPath, cryptoSymbols } = useRouteLoaderData('root') as LoaderData
+    const { walletAddress } = useWalletAddress()
     const [retailerMarkdown, setRetailerMarkdown] = useState('')
     const [generalMarkdown, setGeneralMarkdown] = useState('')
 
@@ -31,11 +36,25 @@ const Activated = () => {
     }, [])
 
     return (
-        <Activate
-            retailerMarkdown={retailerMarkdown}
-            generalMarkdown={generalMarkdown}
-            redirectUrl='dga'
-        />
+        <div className={styles.container}>
+            <CloseBtn
+                withTime={false}
+            />
+            <div className={styles.top_container}>
+                {walletAddress ? <div className={styles.wallet_container}>
+                    <span className={styles.wallet}>{splitWordMaxFive(walletAddress)}</span>
+                </div> : null}
+            </div>
+            <div className={styles.subcontainer} >
+                <img src={`${iconsPath}/activated.svg`} />
+                <div className={styles.title}>{cryptoSymbols[0]} cashback activated</div>
+                <p className={styles.p}>Reward approval may take up to 48 hours.</p>
+                <div className={styles.backed_by}>Backed by {toCapital(platformName)} Wallet</div>
+            </div>
+            <Markdown className={styles.markdown} >
+                {`${retailerMarkdown}${generalMarkdown}`}
+            </Markdown>
+        </div>
     )
 }
 
