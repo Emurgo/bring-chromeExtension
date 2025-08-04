@@ -28,7 +28,8 @@
       ],
       "js": [
         "contentScript.js"
-      ]
+      ],
+      "all_frames": true
     }
   ],
   "host_permissions": [

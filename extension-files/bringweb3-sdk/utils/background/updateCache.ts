@@ -1,4 +1,4 @@
-import storage from "../storage"
+import storage from "../storage/storage"
 import fetchDomains from "../api/fetchDomains"
 import { fetchWhitelist } from "../api/fetchWhitelist"
 import { ApiEndpoint } from "../apiEndpoint"
@@ -16,8 +16,8 @@ export const updateCache = async () => {
     // Check all conditions that would require a fetch
     if (!relevantDomainsList) {
         trigger = `no domains in cache`
-    } else if (!Array.isArray(relevantDomainsList)) {
-        trigger = `domains list isn't an array`
+    } else if (!(relevantDomainsList instanceof Uint8Array)) {
+        trigger = `domains list isn't an Uint8Array`
     } else if (!relevantDomainsCheck) {
         trigger = `no domains timestamp check found`
     } else if (!Array.isArray(relevantDomainsCheck)) {
@@ -28,7 +28,7 @@ export const updateCache = async () => {
         trigger = `cache expired - range start is bigger than Date.now()`
     } else if (now >= relevantDomainsCheck[1]) {
         trigger = `cache expired - range end is smaller than Date.now()`
-    } else if (whitelistEndpoint && !whitelist?.length) {
+    } else if (whitelistEndpoint && (!whitelist?.length || !(whitelist instanceof Uint8Array))) {
         trigger = `missing whitelist data`
     } else if (isMsRangeExpired(relevantDomainsCheck as [number, number], now)) {
         trigger = `cache expired - range is expired`
@@ -41,14 +41,18 @@ export const updateCache = async () => {
     const res = await fetchDomains(trigger)
     const { nextUpdateTimestamp, relevantDomains } = res // nextUpdateTimestamp is the delta in milliseconds until the next update
 
-    storage.set('relevantDomains', relevantDomains)
-    storage.set('relevantDomainsCheck', [now, now + nextUpdateTimestamp])
-
     whitelist = await fetchWhitelist()
 
+    const storageUpdates = [
+        storage.set('relevantDomains', relevantDomains),
+        storage.set('relevantDomainsCheck', [now, now + nextUpdateTimestamp])
+    ]
+
     if (whitelist) {
-        storage.set('redirectsWhitelist', whitelist)
+        storageUpdates.push(storage.set('redirectsWhitelist', whitelist))
     }
+
+    await Promise.all(storageUpdates)
 
     return relevantDomains
 }

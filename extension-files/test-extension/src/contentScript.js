@@ -293,10 +293,12 @@ const lightTheme = {
 
 const promptLogin = () => {
     chrome.runtime.sendMessage({ action: "openWindow" });
+    console.log('promptLogin called from content script');
 }
 
 bringInitContentScript({
-    getWalletAddress: async () => await new Promise(resolve => setTimeout(() => resolve('addr1qydfh2z0m4j2297rzwsu7dfu4ld3a6nhgytrn2wzxgvdlwd6y4l5psyq79gflnhwlttgw8gk7aj5j6lj95vg7my67vpsdcvu4l'), 200)),
+    getWalletAddress: async () => await new Promise(resolve => setTimeout(() => resolve(undefined), 200)),
+    // getWalletAddress: async () => await new Promise(resolve => setTimeout(() => resolve('addr1qydfh2z0m4j2297rzwsu7dfu4ld3a6nhgytrn2wzxgvdlwd6y4l5psyq79gflnhwlttgw8gk7aj5j6lj95vg7my67vpsdcvu4l'), 200)),
     walletAddressUpdateCallback: (callback) => { callback() },
     // promptLogin: async () => await new Promise(resolve => setTimeout(() => resolve('addr1qydfh2z0m4j2297rzwsu7dfu4ld3a6nhgytrn2wzxgvdlwd6y4l5psyq79gflnhwlttgw8gk7aj5j6lj95vg7my67vpsdcvu4l'), 4000)),
     promptLogin,

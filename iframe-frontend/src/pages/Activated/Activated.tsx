@@ -10,7 +10,7 @@ import toCapital from '../../utils/toCapital'
 import Markdown from 'react-markdown'
 
 const Activated = () => {
-    const { retailerTermsUrl, generalTermsUrl, platformName, iconsPath, cryptoSymbols } = useRouteLoaderData('root') as LoaderData
+    const { retailerTermsUrl, generalTermsUrl, platformName, iconsPath, tokenSymbol } = useRouteLoaderData('root') as ActivatedData
     const { walletAddress } = useWalletAddress()
     const [retailerMarkdown, setRetailerMarkdown] = useState('')
     const [generalMarkdown, setGeneralMarkdown] = useState('')
@@ -47,7 +47,7 @@ const Activated = () => {
             </div>
             <div className={styles.subcontainer} >
                 <img src={`${iconsPath}/activated.svg`} />
-                <div className={styles.title}>{cryptoSymbols[0]} cashback activated</div>
+                <div className={styles.title}>{tokenSymbol} cashback activated</div>
                 <p className={styles.p}>Reward approval may take up to 48 hours.</p>
                 <div className={styles.backed_by}>Backed by {toCapital(platformName)} Wallet</div>
             </div>

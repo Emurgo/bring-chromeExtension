@@ -29,8 +29,8 @@ export const iframeStyle: Styles = {
 export const notificationIframeStyle: Styles = {
     default: {
         animation: 'slideIn .3s ease-in-out',
-        width: '452px',
-        height: `70px`,
+        width: '480px',
+        height: `56px`,
         borderRadius: '10px',
         display: 'block',
         top: '40px'

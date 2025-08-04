@@ -1,5 +1,4 @@
 import styles from './styles.module.css'
-
 import { useCallback, useEffect, useState } from 'react'
 import { useGoogleAnalytics } from '../../hooks/useGoogleAnalytics'
 import OptOut from '../OptOut/OptOut'
@@ -8,7 +7,6 @@ import CloseBtn from '../CloseBtn/CloseBtn'
 import SwitchBtn from '../SwitchBtn/SwitchBtn'
 import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 import splitWordMaxFive from '../../utils/splitWordMaxFive'
-import LoadingOverlay from '../LoadingOverlay/LoadingOverlay'
 import { useRouteLoaderData } from 'react-router-dom'
 import toCaseString from '../../utils/toCaseString'
 import { useWalletAddress } from '../../hooks/useWalletAddress'
@@ -20,107 +18,104 @@ import { Oval } from 'react-loader-spinner'
 import CollaborationLogos from '../CollaborationLogos/CollaborationLogos'
 
 interface BringEventData {
-    from: string
-    action: string
-    walletAddress: WalletAddress
+    from: string;
+    action: string;
+    walletAddress: WalletAddress;
 }
 
 interface Props {
-    closeFn: () => void
+    closeFn: () => void;
 }
 
 
 const Offer = ({ closeFn }: Props) => {
     const { sendGaEvent } = useGoogleAnalytics()
     const { walletAddress, setWalletAddress } = useWalletAddress()
-    const { textMode, flowId, name, platformName, retailerId, url, cryptoSymbols, isTester, version, domain, maxCashback, cashbackSymbol, cashbackCurrency } = useRouteLoaderData('root') as LoaderData
+    const {
+        textMode,
+        flowId,
+        name,
+        userId,
+        platformName,
+        retailerId,
+        url,
+        cryptoSymbols,
+        isTester,
+        version,
+        domain,
+        maxCashback,
+        cashbackSymbol,
+        cashbackCurrency
+    } = useRouteLoaderData('root') as LoaderData
     const [optOutOpen, setOptOutOpen] = useState(false)
     const [isDemo, setIsDemo] = useState(false)
-    const [isAddressUpdated, setIsAddressUpdated] = useState(false)
     const [status, setStatus] = useState<'idle' | 'waiting' | 'switch' | 'activating' | 'done'>('idle')
 
     const activateAction = useCallback(async () => {
-        if (!walletAddress) {
-            setStatus('waiting')
-            sendMessage({ action: ACTIONS.PROMPT_LOGIN })
-            return
-        }
-
         setStatus('activating')
 
-        sendGaEvent('retailer_activation', {
-            category: 'user_action',
-            action: 'click',
-            process: 'activate',
-            details: name
-        })
+        // sendGaEvent('retailer_activation', {
+        //     category: 'user_action',
+        //     action: 'click',
+        //     process: 'activate',
+        //     details: name
+        // })
 
         const body: Parameters<typeof activate>[0] = {
             walletAddress,
             platformName,
             retailerId,
             url,
+            userId,
             tokenSymbol: cryptoSymbols[0],
             flowId,
         }
 
-        if (isTester && isDemo) {
-            body.isDemo = true
-        }
+        if (isTester && isDemo) body.isDemo = true
 
-        const { status, url: redirectUrl } = await activate(body)
+        const { status, url: redirectUrl, iframeUrl, token } = await activate(body)
+
 
         if (status !== 200) {
             setStatus('idle')
             return
         }
 
-        sendMessage({ action: ACTIONS.ACTIVATE, url, domain, time: parseTime(ACTIVATE_QUIET_TIME, version), redirectUrl })
+        sendMessage({
+            action: ACTIONS.ACTIVATE,
+            url,
+            domain,
+            time: parseTime(ACTIVATE_QUIET_TIME, version),
+            redirectUrl,
+            iframeUrl,
+            token,
+            flowId
+        })
+
         sendGaEvent('retailer_shop', {
             category: 'user_action',
             action: 'click',
             details: name
         })
 
-    }, [cryptoSymbols, domain, flowId, isDemo, isTester, name, platformName, retailerId, sendGaEvent, url, version, walletAddress])
+    }, [cryptoSymbols, domain, flowId, isDemo, isTester, name, platformName, retailerId, sendGaEvent, url, userId, version, walletAddress])
 
-    const handleFirstClick = () => {
-        setStatus('activating')
-        sendGaEvent('retailer_activation', {
-            category: 'user_action',
-            action: 'click',
-            process: 'activate',
-            details: name
-        })
-        activateAction()
-    }
-
-    const walletAddressUpdate = useCallback((e: MessageEvent<BringEventData>) => {
-        const { walletAddress, action } = e.data
-        if (action !== 'WALLET_ADDRESS_UPDATE') return
-        setWalletAddress(walletAddress)
-        setIsAddressUpdated(true)
-    }, [setWalletAddress])
-
-    useEffect(() => {
-        if (!isAddressUpdated) return
-        if (status === 'waiting') {
-            setStatus('done')
-            activateAction()
-        } else if (status === 'switch') {
-            setStatus('idle')
-        }
-    }, [walletAddress, status, activateAction, isAddressUpdated])
 
     useEffect(() => {
         if (status === 'done') return
+
+        const walletAddressUpdate = (e: MessageEvent<BringEventData>) => {
+            const { walletAddress, action } = e.data
+            if (action !== 'WALLET_ADDRESS_UPDATE') return
+            setWalletAddress(walletAddress)
+        }
 
         window.addEventListener("message", walletAddressUpdate)
 
         return () => {
             window.removeEventListener("message", walletAddressUpdate)
         }
-    }, [status, activateAction, walletAddressUpdate])
+    }, [setWalletAddress, status])
 
     return (
         <>
@@ -136,29 +131,34 @@ const Offer = ({ closeFn }: Props) => {
                             exit={{ x: "-100%", opacity: 0 }}
                             transition={{ duration: .2, ease: "easeInOut" }}
                         >
-                            {walletAddress ?
-                                <div className={styles.top_container}>
+                            <div className={styles.top_container}>
+                                {walletAddress ?
                                     <div className={styles.wallet_container}>
-                                        <span className={styles.wallet}>{splitWordMaxFive(walletAddress)}</span>
+                                        <span className={styles.wallet} >{splitWordMaxFive(walletAddress)}</span>
                                     </div>
-                                    <SwitchBtn
-                                        callback={() => setStatus('switch')}
-                                    />
-                                    {isTester ?
-                                        <div className={styles.demo_container}>
-                                            <input
-                                                className={styles.demo_checkbox}
-                                                type="checkbox"
-                                                id='demo'
-                                                onChange={(e) => setIsDemo(e.target.checked)}
-                                            />
-                                            <label className={styles.demo_label} htmlFor="demo">Demo</label>
-                                        </div> : null
-                                    }
-                                </div>
-                                :
-                                <div className={styles.wallet_spacer} />
-                            }
+                                    :
+                                    <button
+                                        className={`${styles.wallet_container} ${styles.wallet} ${styles.connect_btn}`}
+                                        onClick={() => sendMessage({ action: ACTIONS.PROMPT_LOGIN })}
+                                    >
+                                        Connect wallet
+                                    </button>
+                                }
+                                <SwitchBtn
+                                    callback={() => setStatus('switch')}
+                                />
+                                {walletAddress && isTester ?
+                                    <div className={styles.demo_container}>
+                                        <input
+                                            className={styles.demo_checkbox}
+                                            type="checkbox"
+                                            id='demo'
+                                            onChange={(e) => setIsDemo(e.target.checked)}
+                                        />
+                                        <label className={styles.demo_label} htmlFor="demo">Demo</label>
+                                    </div> : null
+                                }
+                            </div>
                             <div className={styles.details}>
                                 <CollaborationLogos />
                                 <div className={styles.details_txt} >
@@ -167,7 +167,7 @@ const Offer = ({ closeFn }: Props) => {
                             </div>
                             <div className={styles.action_container}>
                                 <button
-                                    onClick={handleFirstClick}
+                                    onClick={activateAction}
                                     className={styles.btn}
                                     disabled={status !== 'idle'}
                                 >
@@ -209,11 +209,8 @@ const Offer = ({ closeFn }: Props) => {
                                         {toCaseString("Cancel", textMode)}
                                     </button>
                                 </div>
-                                <div style={{ textAlign: 'center', color: 'white', textWrap: 'nowrap', fontSize: '14px', lineHeight: '22px' }}>No extra steps required - just shop and get {cryptoSymbols[0]}</div>
+                                <div className={styles.clarify}>No extra steps required - just shop and get {cryptoSymbols[0]}</div>
                             </div>
-                            <LoadingOverlay
-                                open={['waiting', 'switch'].includes(status)}
-                            />
                         </motion.div>
                         :
                         <motion.div

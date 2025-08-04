@@ -1,22 +1,29 @@
-import storage from "../storage";
+import storage from "../storage/storage";
 import addQuietDomain from "./addQuietDomain";
 import checkNotifications from "./checkNotifications";
 import getCashbackUrl from "./getCashbackUrl";
 import isWhitelisted from "./isWhitelisted";
 import { DAY_MS } from "../constants";
+import closeAllPopups from "./closeAllPopups";
 
-const handleActivate = async (domain: string, extensionId: string, cashbackPagePath: string | undefined, time?: number, tabId?: number, redirectUrl?: string) => {
+const handleActivate = async (domain: string, extensionId: string, cashbackPagePath: string | undefined, time?: number, tabId?: number, iframeUrl?: string, token?: string, flowId?: string, redirectUrl?: string) => {
     const now = Date.now();
-    if (extensionId === chrome.runtime.id) {
+
+    const isSameExtension = extensionId === chrome.runtime.id
+
+    if (isSameExtension) {
         await storage.set('lastActivation', now);
     }
 
-    if (domain) addQuietDomain(domain, time || DAY_MS)
+    const phase = isSameExtension ? 'activated' : 'quiet';
+    console.log(phase)
+
+    if (domain) addQuietDomain(domain, time || DAY_MS, { iframeUrl, token, flowId }, phase);
+
+    closeAllPopups(domain, tabId || -1);
 
     if (tabId && redirectUrl) {
-        const whitelist = await storage.get('redirectsWhitelist')
-
-        if (await isWhitelisted(redirectUrl, whitelist)) {
+        if (await isWhitelisted(redirectUrl)) {
             chrome.tabs.update(tabId, { url: redirectUrl })
         }
     }

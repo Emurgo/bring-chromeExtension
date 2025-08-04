@@ -2,7 +2,7 @@ import getUserId from "./getUserId";
 import sendMessage from "./sendMessage";
 import checkNotifications from "./checkNotifications";
 import getCashbackUrl from "./getCashbackUrl";
-import storage from "../storage";
+import storage from "../storage/storage";
 import { isMsRangeExpired } from "./timestampRange";
 
 interface Notification {

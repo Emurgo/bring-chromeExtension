@@ -27,7 +27,6 @@ const injectIFrame = ({ query, theme, themeMode, text, iframeUrl, page, switchWa
     iframe.src = encodeURI(`${iframeHost}?${params}${customStyles}`);
     const sandbox = "allow-scripts allow-same-origin"
     iframe.setAttribute('sandbox', sandbox)
-    // iframe.setAttribute('sandbox', "allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation")
     iframe.style.position = "fixed";
     iframe.scrolling = "no";
     iframe.style.overflow = "hidden";

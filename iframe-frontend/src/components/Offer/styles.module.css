@@ -79,11 +79,6 @@
     user-select: none;
 }
 
-.wallet_spacer {
-    height: 24px;
-    margin-bottom: 16px;
-}
-
 .top_container {
     display: flex;
     align-self: flex-start;
@@ -109,6 +104,11 @@
     border-width: var(--wallet-border-w);
     border-style: solid;
     border-color: var(--wallet-border-c);
+}
+
+.connect_btn {
+    background: var(--wallet-bg);
+    cursor: pointer;
 }
 
 .btns_container {
@@ -149,4 +149,14 @@
     border-width: var(--wallet-border-w);
     border-style: solid;
     border-color: var(--wallet-border-c);
+}
+
+.clarify {
+    text-align: center;
+    text-wrap: nowrap;
+    font-size: var(--clarify-f-s, 14px);
+    font-weight: var(--clarify-f-w, 400);
+    color: var(--clarify-f-c, var(--details-subtitle-f-c));
+    line-height: 22px;
+    user-select: none;
 }

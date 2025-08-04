@@ -1,11 +1,13 @@
 interface Message {
-    action: 'INJECT' | 'GET_WALLET_ADDRESS'
+    action: 'INJECT' | 'GET_WALLET_ADDRESS' | 'CLOSE_POPUP'
     domain?: string
     token?: string
     iframeUrl?: string
     page?: string
     userId?: string | undefined
-    portalReferrers?: string[]
+    reason?: string
+    path?: string
+    referrers?: string[]
 }
 
 const sendMessage = (tabId: number, message: Message): Promise<any> => {
