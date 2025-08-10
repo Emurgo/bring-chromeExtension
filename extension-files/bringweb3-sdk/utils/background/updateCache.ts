@@ -1,5 +1,6 @@
 import storage from "../storage/storage"
 import fetchDomains from "../api/fetchDomains"
+import safeStringify from "./safeStringify"
 import { fetchWhitelist } from "../api/fetchWhitelist"
 import { ApiEndpoint } from "../apiEndpoint"
 import { isMsRangeExpired } from "./timestampRange"
@@ -19,19 +20,19 @@ export const updateCache = async () => {
     } else if (!(relevantDomainsList instanceof Uint8Array)) {
         trigger = `domains list isn't an Uint8Array`
     } else if (!relevantDomainsCheck) {
-        trigger = `no domains timestamp check found`
+        trigger = `no domains timestamp check found__value: ${safeStringify(relevantDomainsCheck)}`
     } else if (!Array.isArray(relevantDomainsCheck)) {
-        trigger = `invalid domains timestamp check format - not an array`
+        trigger = `invalid domains timestamp check format - not an array__value: ${safeStringify(relevantDomainsCheck)}`
     } else if (relevantDomainsCheck.length !== 2) {
-        trigger = `invalid domains timestamp check format`
+        trigger = `invalid domains timestamp check format__length: ${relevantDomainsCheck.length} - value: ${safeStringify(relevantDomainsCheck)}`
     } else if (relevantDomainsCheck[0] >= now) {
-        trigger = `cache expired - range start is bigger than Date.now()`
+        trigger = `cache expired - range start is bigger than Date.now()__value: ${safeStringify(relevantDomainsCheck)}, now: ${now}`
     } else if (now >= relevantDomainsCheck[1]) {
         trigger = `cache expired - range end is smaller than Date.now()`
     } else if (whitelistEndpoint && (!whitelist?.length || !(whitelist instanceof Uint8Array))) {
         trigger = `missing whitelist data`
     } else if (isMsRangeExpired(relevantDomainsCheck as [number, number], now)) {
-        trigger = `cache expired - range is expired`
+        trigger = `cache expired - range is expired__range: ${safeStringify(relevantDomainsCheck)}, now: ${now}`
     }
 
     if (!trigger) {
