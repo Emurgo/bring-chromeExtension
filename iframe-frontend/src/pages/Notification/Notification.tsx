@@ -140,6 +140,13 @@ const Notification = () => {
     const openCashbackPage = () => {
         sendMessage({ action: ACTIONS.OPEN_CASHBACK_PAGE, url: cashbackUrl })
         notificationSeen()
+        sendMessage({ action: ACTIONS.CLOSE })
+    }
+
+    const stopReminders = () => {
+        sendMessage({ action: ACTIONS.STOP_REMINDERS })
+        notificationSeen()
+        sendMessage({ action: ACTIONS.CLOSE })
     }
 
     if (walletAddress) {
@@ -188,7 +195,7 @@ const Notification = () => {
             {isExtraBtn ?
                 <button
                     className={`${styles.link} ${styles.no_wallet_link}`}
-                    onClick={() => sendMessage({ action: ACTIONS.STOP_REMINDERS })}
+                    onClick={stopReminders}
                 >
                     {toCaseString('Stop reminding', textMode)}
                 </button>

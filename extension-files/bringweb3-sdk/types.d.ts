@@ -28,5 +28,6 @@ interface BringEvent {
         iframeUrl?: string
         token?: string
         flowId?: string
+        platformName?: string
     }
 }

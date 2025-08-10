@@ -2,10 +2,12 @@ import injectIFrame from "./utils/contentScript/injectIFrame.js";
 import handleIframeMessages from "./utils/contentScript/handleIframeMessages.js";
 import startListenersForWalletAddress from "./utils/contentScript/startLIstenersForWalletAddress.js";
 import getDomain from "./utils/getDomain.js";
+import removeTrailingSlash from "./utils/background/removeTrailingSlash.js";
 
 let iframeEl: IFrame = null
 let iframePath: `/${string}` | undefined = undefined
 let isIframeOpen = false
+let flowId: string | null = null
 
 interface Configuration {
     getWalletAddress: () => Promise<WalletAddress>
@@ -63,18 +65,13 @@ const bringInitContentScript = async ({
     text,
     switchWallet = false
 }: Configuration) => {
-    console.log('origin', window.document.location.origin)
-    console.log('referrer', document.referrer, window.document.referrer)
-    if (window.self !== window.top || window.document.location.origin === 'http://localhost:5174') { // SWITCH BEFORE RELEASE
-        // if (removeTrailingSlash(window.document.location.origin).endsWith('bringweb3.io')) { // SWITCH BEFORE RELEASE
+    if (window.self !== window.top && removeTrailingSlash(window.document.location.origin).endsWith('bringweb3.io')) {
         console.log('Running in Bring Web3 iframe, adding activate event listener to:', window.document.location.origin);
 
         window.addEventListener('message', (e) => {
-            if (!e.data || e.data.from !== 'bringweb3' || e.data.action !== 'PORTAL_ACTIVATE'
-                // || !removeTrailingSlash(e.origin || '').endsWith('bringweb3.io')
-            ) return;
+            if (!e.data || e.data.from !== 'bringweb3' || e.data.action !== 'PORTAL_ACTIVATE') return;
 
-            const { action, domain, extensionId, time, iframeUrl, token } = e.data
+            const { action, domain, extensionId, time, iframeUrl, token, platformName } = e.data
 
             console.log(`Received message from Bring's Portal iframe:`, e.data);
 
@@ -85,12 +82,14 @@ const bringInitContentScript = async ({
                 extensionId,
                 time,
                 iframeUrl,
-                token
+                token,
+                source: 'portal',
+                platformName
             })
         })
-        // }
         return
     }
+
     if (!getWalletAddress || !promptLogin || (!walletAddressListeners?.length && typeof walletAddressUpdateCallback !== 'function')) throw new Error('Missing configuration')
 
     startListenersForWalletAddress({
@@ -124,7 +123,7 @@ const bringInitContentScript = async ({
                     iframeEl.parentNode?.removeChild(iframeEl)
                     isIframeOpen = false
                     iframePath = undefined
-                    sendResponse({ status: 'success', message: 'Popup closed' })
+                    sendResponse({ status: 'success', message: 'Popup closed', location: window.document.location.href, flowId })
                 } else {
                     sendResponse({ status: 'failed', message: 'Domain mismatch or iframe not open' })
                 }
@@ -166,6 +165,7 @@ const bringInitContentScript = async ({
                     });
                     isIframeOpen = true
                     iframePath = `/${request.page || ''}`
+                    flowId = request.flowId
                     sendResponse({ status: 'success' });
                     return true
                 } catch (error) {

@@ -1,20 +1,8 @@
-import { openExtensionCashbackPage } from './utils/background/openExtensionCashbackPage';
 import { ApiEndpoint, EndpointName } from "./utils/apiEndpoint.js"
 import storage from "./utils/storage/storage.js"
-import handleActivate from "./utils/background/activate.js"
-import addQuietDomain from "./utils/background/addQuietDomain.js"
-import { getOptOut, setOptOut } from "./utils/background/optOut.js"
-import { updateCache } from './utils/background/updateCache';
-import addOptOutDomain from './utils/background/addOptOutDomain';
 import { checkAndRunMigration } from './utils/background/dataMigration';
 import handleContentMessages from './utils/background/handleContentMessages';
 import handleUrlChange from './utils/background/handleUrlChange';
-
-// interface UrlDict {
-//     [key: string]: string
-// }
-
-// const urlsDict: UrlDict = {}
 
 interface Configuration {
     identifier: string
@@ -68,7 +56,7 @@ const ENDPOINT = process.env.ENDPOINT as EndpointName
 
 const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, whitelistEndpoint, isEnabledByDefault = true, showNotifications = true, notificationCallback }: Configuration) => {
     if (!identifier || !apiEndpoint) throw new Error('Missing configuration')
-    console.log({ ENDPOINT });
+    if (ENDPOINT) console.log({ ENDPOINT });
 
     if (!['prod', 'sandbox'].includes(apiEndpoint)) throw new Error('unknown apiEndpoint')
     const apiEndpointInstance = ApiEndpoint.getInstance()
@@ -87,13 +75,9 @@ const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, 
 
     await checkAndRunMigration();
 
-    updateCache()
-
-    handleContentMessages(cashbackPagePath)
+    handleContentMessages(cashbackPagePath, showNotifications)
 
     handleUrlChange(cashbackPagePath, showNotifications, notificationCallback)
-
-    // chrome.tabs.onRemoved.addListener(tabId => delete urlsDict[tabId])
 }
 
 export default bringInitBackground

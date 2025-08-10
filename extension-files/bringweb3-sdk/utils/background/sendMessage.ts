@@ -8,10 +8,11 @@ interface Message {
     reason?: string
     path?: string
     referrers?: string[]
+    flowId?: string
 }
 
-const sendMessage = (tabId: number, message: Message): Promise<any> => {
-    const maxRetries = 5;
+const sendMessage = (tabId: number, message: Message, maxRetries?: number): Promise<any> => {
+    maxRetries = maxRetries || 5;
     const baseDelay = 1000; // 1 second
 
     return new Promise((resolve, reject) => {

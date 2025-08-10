@@ -16,6 +16,7 @@ import { isMsRangeActive } from "./timestampRange";
 
 const handleUrlChange = (cashbackPagePath: string | undefined, showNotifications: boolean, notificationCallback: (() => void) | undefined) => {
     chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+        console.log('show notifications variable:', showNotifications)
         if (!changeInfo.url || !tab?.url?.startsWith('http')) return
 
         const url = parseUrl(tab.url);
@@ -24,24 +25,17 @@ const handleUrlChange = (cashbackPagePath: string | undefined, showNotifications
 
         if (!isPopupEnabled) return;
 
-        // const previousUrl = urlsDict[tabId];
-
-        // if (url === previousUrl) return;
-
-        // urlsDict[tabId] = url
-
         const { matched, match } = await getRelevantDomain(tab.url);
 
-        console.log({ matched, match, url: tab.url });
-
         if (!matched) {
+            console.log('showing notification')
             await showNotification(tabId, cashbackPagePath, url, showNotifications, notificationCallback)
             return;
         };
 
         const { phase, payload } = await getQuietDomain(match);
 
-        console.log({ phase });
+        console.log(match, phase);
 
         if (phase === 'new') {
             const now = Date.now();
@@ -106,12 +100,13 @@ const handleUrlChange = (cashbackPagePath: string | undefined, showNotifications
             userId,
             referrers: portalReferrers,
             page: phase === 'new' ? '' : phase,
+            flowId
         });
 
         if (res?.action) {
             switch (res.action) {
                 case 'activate':
-                    handleActivate(match, chrome.runtime.id, cashbackPagePath, time, tabId)
+                    handleActivate(match, chrome.runtime.id, 'popup', cashbackPagePath, time, tabId)
                     break;
                 default:
                     console.error(`Unknown action: ${res.action}`);

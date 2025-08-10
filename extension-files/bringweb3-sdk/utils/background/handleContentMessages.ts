@@ -5,23 +5,25 @@ import addQuietDomain from "./addQuietDomain"
 import { openExtensionCashbackPage } from "./openExtensionCashbackPage"
 import { getOptOut, setOptOut } from "./optOut"
 
-const handleContentMessages = (cashbackPagePath: string | undefined) => {
+const handleContentMessages = (cashbackPagePath: string | undefined, showNotifications: boolean) => {
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         if (request?.from !== 'bringweb3') return
-
+        console.log('content-message', request)
         const { action } = request
+
+        const source = request.source || 'popup'
 
         switch (action) {
             case 'ACTIVATE': {
                 const { domain, extensionId, time, redirectUrl, iframeUrl, token, flowId } = request
-                handleActivate(domain, extensionId, cashbackPagePath, time, sender.tab?.id, iframeUrl, token, flowId, redirectUrl)
+                handleActivate(domain, extensionId, source, cashbackPagePath, showNotifications, time, sender.tab?.id, iframeUrl, token, flowId, redirectUrl)
                     .then(() => sendResponse());
                 return true;
             }
             case 'PORTAL_ACTIVATE': {
                 const { domain, extensionId, time, iframeUrl, token, flowId } = request
-                handleActivate(domain, extensionId, cashbackPagePath, time, sender.tab?.id, iframeUrl, token, flowId)
+                handleActivate(domain, extensionId, source, cashbackPagePath, showNotifications, time, sender.tab?.id, iframeUrl, token, flowId)
                     .then(() => sendResponse());
                 return true;
             }
@@ -84,7 +86,7 @@ const handleContentMessages = (cashbackPagePath: string | undefined) => {
                 sendResponse({ message: 'cashback page opened successfully' })
                 return true
             case 'STOP_REMINDERS':
-                storage.set('stopReminders', true)
+                storage.set('disableReminders', true)
                     .then(() => sendResponse({ message: 'stopped reminders successfully' }))
                 return true
             default: {

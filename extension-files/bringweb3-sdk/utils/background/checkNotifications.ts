@@ -3,7 +3,7 @@ import checkEvents from "../api/checkEvents";
 import getWalletAddress from "./getWalletAddress";
 import { isMsRangeActive } from "./timestampRange";
 
-const checkNotifications = async (tabId?: number, cashbackUrl?: string) => {
+const checkNotifications = async (showNotifications: boolean, tabId?: number, cashbackUrl?: string) => {
     const falseReturn = { showNotification: false, token: '', iframeUrl: '' };
 
     const now = Date.now();
@@ -28,7 +28,7 @@ const checkNotifications = async (tabId?: number, cashbackUrl?: string) => {
         expiration: [now, now + res.expiration]
     }
 
-    if (notification.showNotification) {
+    if (notification.showNotification && showNotifications) {
         await storage.set('notification', notification)
     }
 

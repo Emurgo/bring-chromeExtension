@@ -1,3 +1,4 @@
+import storage from "../storage/storage"
 import { searchCompressed } from "./domainsListCompression"
 import { updateCache } from "./updateCache"
 
@@ -5,6 +6,7 @@ const urlRemoveOptions = ['www.', 'www1.', 'www2.']
 
 const getRelevantDomain = async (url: string | undefined): Promise<{ matched: boolean, match: string }> => {
     const relevantDomains = await updateCache()
+    const portalRelevantDomains = await storage.get('portalRelevantDomains')
     const falseResponse = { matched: false, match: '', phase: undefined }
 
     if (!url || !relevantDomains || !relevantDomains.length || !(relevantDomains instanceof Uint8Array)) return falseResponse
@@ -23,11 +25,17 @@ const getRelevantDomain = async (url: string | undefined): Promise<{ matched: bo
 
     const { hostname, pathname } = urlObj
 
-
     let query = hostname + pathname
 
     for (const urlRemoveOption of urlRemoveOptions) {
         query = query.replace(urlRemoveOption, '')
+    }
+    if (portalRelevantDomains) {
+        const search = searchCompressed(portalRelevantDomains, query)
+        if (search.matched) {
+            await storage.remove('portalRelevantDomains')
+            return search
+        }
     }
 
     const { matched, match } = searchCompressed(relevantDomains, query)

@@ -24,7 +24,7 @@ const isWhitelisted = async (url: string): Promise<boolean> => {
         const domain = getDomain(url)
 
         const { matched } = searchCompressed(whitelist, domain)
-        console.log(`Checking if ${domain} is whitelisted: ${matched}`);
+
         return matched;
 
     } catch (error) {

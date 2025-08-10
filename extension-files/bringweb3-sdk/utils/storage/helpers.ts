@@ -21,6 +21,10 @@ const helpers: Helpers = {
     redirectsWhitelist: {
         get: strToUint8Array,
         set: uint8ArrayToStr
+    },
+    portalRelevantDomains: {
+        get: strToUint8Array,
+        set: uint8ArrayToStr
     }
 }
 

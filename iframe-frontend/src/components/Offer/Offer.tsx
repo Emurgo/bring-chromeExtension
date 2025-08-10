@@ -54,13 +54,6 @@ const Offer = ({ closeFn }: Props) => {
     const activateAction = useCallback(async () => {
         setStatus('activating')
 
-        // sendGaEvent('retailer_activation', {
-        //     category: 'user_action',
-        //     action: 'click',
-        //     process: 'activate',
-        //     details: name
-        // })
-
         const body: Parameters<typeof activate>[0] = {
             walletAddress,
             platformName,
@@ -89,7 +82,8 @@ const Offer = ({ closeFn }: Props) => {
             redirectUrl,
             iframeUrl,
             token,
-            flowId
+            flowId,
+            platformName
         })
 
         sendGaEvent('retailer_shop', {

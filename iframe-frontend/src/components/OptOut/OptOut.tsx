@@ -77,7 +77,7 @@ interface Props {
 }
 
 const OptOut = ({ onClose }: Props) => {
-    const { cryptoSymbols, platformName, textMode, domain } = useRouteLoaderData('root') as LoaderData
+    const { cryptoSymbols, platformName, textMode, domain, name } = useRouteLoaderData('root') as LoaderData
     const { sendGaEvent } = useGoogleAnalytics()
     const [isOpted, setIsOpted] = useState(false)
     const [selection, setSelection] = useState<Selection>({
@@ -106,11 +106,12 @@ const OptOut = ({ onClose }: Props) => {
 
         sendMessage(event)
         setIsOpted(true)
-        sendGaEvent('opt_out', {
+        sendGaEvent(websites.value ? 'opt_out' : 'opt_out_specific', {
             category: 'user_action',
             action: 'click',
             details: duration.label,
-            domain
+            domain,
+            retailerName: name
         })
     }
 

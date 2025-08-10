@@ -30,6 +30,7 @@ declare global {
         cashbackCurrency: string
         backgroundColor: string
         retailerTermsUrl: string
+        topGeneralTermsUrl: string
         generalTermsUrl: string
         cryptoSymbols: string[]
         iconUrl: string
@@ -69,6 +70,7 @@ declare global {
         iframeUrl?: string
         token?: string
         flowId?: string
+        platformName?: string
     }
 
     interface GoogleAnalyticsContextType {
