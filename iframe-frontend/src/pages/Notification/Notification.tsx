@@ -130,7 +130,7 @@ const Notification = () => {
         return () => {
             clear()
         }
-    }, [clear, data.platformName, start])
+    }, [clear, start])
 
     const notificationSeen = () => {
         clear()
