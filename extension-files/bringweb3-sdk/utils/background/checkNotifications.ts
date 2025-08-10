@@ -1,9 +1,9 @@
-import storage from "../storage";
+import storage from "../storage/storage";
 import checkEvents from "../api/checkEvents";
 import getWalletAddress from "./getWalletAddress";
 import { isMsRangeActive } from "./timestampRange";
 
-const checkNotifications = async (tabId?: number, cashbackUrl?: string) => {
+const checkNotifications = async (showNotifications: boolean, tabId?: number, cashbackUrl?: string) => {
     const falseReturn = { showNotification: false, token: '', iframeUrl: '' };
 
     const now = Date.now();
@@ -14,14 +14,12 @@ const checkNotifications = async (tabId?: number, cashbackUrl?: string) => {
 
     const walletAddress = tabId ? await getWalletAddress(tabId) : await storage.get('walletAddress')
 
-    if (!walletAddress) return falseReturn;
-
     const lastActivation = await storage.get('lastActivation')
     const timeSinceLastActivation = lastActivation ? now - lastActivation : undefined;
 
     const res = await checkEvents({ walletAddress, cashbackUrl, lastActivation, timeSinceLastActivation });
 
-    storage.set('notificationCheck', [now, now + res.nextCall]);
+    await storage.set('notificationCheck', [now, now + res.nextCall]);
 
     const notification = {
         showNotification: res.showNotification as boolean,
@@ -30,7 +28,7 @@ const checkNotifications = async (tabId?: number, cashbackUrl?: string) => {
         expiration: [now, now + res.expiration]
     }
 
-    if (notification.showNotification) {
+    if (notification.showNotification && showNotifications) {
         await storage.set('notification', notification)
     }
 

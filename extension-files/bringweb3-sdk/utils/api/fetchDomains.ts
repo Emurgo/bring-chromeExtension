@@ -1,4 +1,5 @@
 import { ApiEndpoint } from "../apiEndpoint"
+import { strToUint8Array } from "../storage/helpers"
 import apiRequest from "./apiRequest"
 
 const fetchDomains = async (trigger?: string | null) => {
@@ -20,6 +21,8 @@ const fetchDomains = async (trigger?: string | null) => {
     }
 
     const res = await apiRequest(request)
+
+    res.relevantDomains = strToUint8Array(res.relevantDomains)
 
     return res
 }
