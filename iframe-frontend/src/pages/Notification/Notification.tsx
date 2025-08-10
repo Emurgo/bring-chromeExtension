@@ -126,9 +126,9 @@ const Notification = () => {
     }, [platformName, walletAddress])
 
     useEffect(() => {
-        // start()
+        start()
         return () => {
-            // clear()
+            clear()
         }
     }, [clear, start])
 
