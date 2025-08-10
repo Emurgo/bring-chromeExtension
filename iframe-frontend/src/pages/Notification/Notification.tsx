@@ -126,11 +126,11 @@ const Notification = () => {
     }, [platformName, walletAddress])
 
     useEffect(() => {
-        // start()
+        start()
         return () => {
-            // clear()
+            clear()
         }
-    }, [clear, data.platformName, start])
+    }, [clear, start])
 
     const notificationSeen = () => {
         clear()
