@@ -95,7 +95,6 @@ const OptOut = ({ onClose }: Props) => {
 
     const handleOptOut = () => {
         const { websites, duration } = selection
-        console.log(websites, duration)
 
         const event = {
             action: websites.value ? ACTIONS.OPT_OUT : ACTIONS.OPT_OUT_SPECIFIC,

@@ -1,4 +1,4 @@
-const isValidTimestampRange = (timestampRange: unknown): boolean => {
+export const isValidTimestampRange = (timestampRange: unknown): boolean => {
     if (!timestampRange || !Array.isArray(timestampRange) || timestampRange.length !== 2) {
         return false; // Invalid range
     }

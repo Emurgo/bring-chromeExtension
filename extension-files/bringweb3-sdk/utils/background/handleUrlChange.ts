@@ -16,7 +16,6 @@ import { isMsRangeActive } from "./timestampRange";
 
 const handleUrlChange = (cashbackPagePath: string | undefined, showNotifications: boolean, notificationCallback: (() => void) | undefined) => {
     chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-        console.log('show notifications variable:', showNotifications)
         if (!changeInfo.url || !tab?.url?.startsWith('http')) return
 
         const url = parseUrl(tab.url);
@@ -28,14 +27,11 @@ const handleUrlChange = (cashbackPagePath: string | undefined, showNotifications
         const { matched, match } = await getRelevantDomain(tab.url);
 
         if (!matched) {
-            console.log('showing notification')
             await showNotification(tabId, cashbackPagePath, url, showNotifications, notificationCallback)
             return;
         };
 
         const { phase, payload } = await getQuietDomain(match);
-
-        console.log(match, phase);
 
         if (phase === 'new') {
             const now = Date.now();

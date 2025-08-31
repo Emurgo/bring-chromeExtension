@@ -33,7 +33,7 @@ const handleActivate = async (domain: string, extensionId: string, source: strin
         }
     }
 
-    await checkNotifications(showNotifications, undefined, getCashbackUrl(cashbackPagePath))
+    await checkNotifications(showNotifications, undefined, getCashbackUrl(cashbackPagePath), isSameExtension)
 }
 
 export default handleActivate;

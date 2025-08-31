@@ -3,14 +3,14 @@ import checkEvents from "../api/checkEvents";
 import getWalletAddress from "./getWalletAddress";
 import { isMsRangeActive } from "./timestampRange";
 
-const checkNotifications = async (showNotifications: boolean, tabId?: number, cashbackUrl?: string) => {
+const checkNotifications = async (showNotifications: boolean, tabId?: number, cashbackUrl?: string, checkAnyway: boolean = false) => {
     const falseReturn = { showNotification: false, token: '', iframeUrl: '' };
 
     const now = Date.now();
 
     const nextCall = await storage.get('notificationCheck');
 
-    if (isMsRangeActive(nextCall, now)) return falseReturn;
+    if (!checkAnyway && isMsRangeActive(nextCall, now)) return falseReturn;
 
     const walletAddress = tabId ? await getWalletAddress(tabId) : await storage.get('walletAddress')
 
@@ -29,7 +29,10 @@ const checkNotifications = async (showNotifications: boolean, tabId?: number, ca
     }
 
     if (notification.showNotification && showNotifications) {
-        await storage.set('notification', notification)
+        await Promise.all([
+            storage.set('notification', notification),
+            storage.remove('lastActivation')
+        ])
     }
 
     return notification

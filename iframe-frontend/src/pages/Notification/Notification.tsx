@@ -138,7 +138,11 @@ const Notification = () => {
     }
 
     const openCashbackPage = () => {
-        sendMessage({ action: ACTIONS.OPEN_CASHBACK_PAGE, url: cashbackUrl })
+        if (!walletAddress) {
+            sendMessage({ action: ACTIONS.PROMPT_LOGIN })
+        } else {
+            sendMessage({ action: ACTIONS.OPEN_CASHBACK_PAGE, url: cashbackUrl })
+        }
         notificationSeen()
         sendMessage({ action: ACTIONS.CLOSE })
     }

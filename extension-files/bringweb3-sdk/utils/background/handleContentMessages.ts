@@ -2,6 +2,8 @@ import storage from "../storage/storage"
 import handleActivate from "./activate"
 import addOptOutDomain from "./addOptOutDomain"
 import addQuietDomain from "./addQuietDomain"
+import checkNotifications from "./checkNotifications"
+import getCashbackUrl from "./getCashbackUrl"
 import { openExtensionCashbackPage } from "./openExtensionCashbackPage"
 import { getOptOut, setOptOut } from "./optOut"
 
@@ -72,7 +74,10 @@ const handleContentMessages = (cashbackPagePath: string | undefined, showNotific
                         .then(() => sendResponse({ message: 'wallet address removed successfully' }))
                 } else {
                     storage.set('walletAddress', walletAddress as string)
-                        .then(() => sendResponse(walletAddress))
+                        .then(() =>
+                            checkNotifications(showNotifications, undefined, getCashbackUrl(cashbackPagePath), true)
+                                .then(() => sendResponse(walletAddress))
+                        )
                 }
                 return true;
             }

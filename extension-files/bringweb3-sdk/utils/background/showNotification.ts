@@ -12,7 +12,6 @@ interface Notification {
 }
 
 const show = async (tabId: number, notification: Notification, domain: string) => {
-    console.log('injecting notification')
     await sendMessage(tabId, {
         action: 'INJECT',
         page: 'notification',
@@ -33,7 +32,6 @@ const showNotification = async (tabId: number, cashbackPagePath: string | undefi
     if (isMsRangeExpired(expiration, now)) {
         await storage.remove('notification')
     } else if (notificationFromStorage) {
-        console.log('notification from storage')
         return await show(tabId, notificationFromStorage, domain)
     }
 
@@ -41,7 +39,6 @@ const showNotification = async (tabId: number, cashbackPagePath: string | undefi
 
     if (notification.showNotification) {
         if (showNotifications) {
-            console.log('notification from API')
             await show(tabId, notification, domain)
         }
         if (notificationCallback) notificationCallback()

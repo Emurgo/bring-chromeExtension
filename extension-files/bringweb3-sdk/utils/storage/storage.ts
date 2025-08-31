@@ -2,6 +2,7 @@
 import StorageCache from "./cache";
 import helpers from "./helpers";
 import { decompress } from "../background/domainsListCompression";
+import { isValidTimestampRange } from "../background/timestampRange";
 
 const STORAGE_PREFIX = 'bring_';
 
@@ -91,7 +92,11 @@ const initializeDebugCache = () => {
             get: async (key: string) => await get(key),
             getReadable: async (key: string) => {
                 let value = await get(key)
-                if (value instanceof Uint8Array) value = decompress(value);
+                if (value instanceof Uint8Array) {
+                    value = decompress(value)
+                } else if (isValidTimestampRange(value)) {
+                    value = `[${new Date(value[0]).toLocaleString('en-GB')} - ${new Date(value[1]).toLocaleString('en-GB')}] Total of ${(value[1] - value[0]) / 1000 / 60} minutes`
+                }
                 return value;
             },
             set: async (key: string, value: any) => await set(key, value),

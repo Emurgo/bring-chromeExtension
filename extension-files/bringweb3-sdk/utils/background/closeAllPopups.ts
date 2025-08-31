@@ -11,7 +11,6 @@ const closeAllPopups = async (domain: string, currentTabId: number, closer: stri
 
     const events: any[] = []
 
-    const start = performance.now()
     const userId = await getUserId()
     const walletAddress = await getWalletAddress()
     // Send all messages in parallel
@@ -31,10 +30,6 @@ const closeAllPopups = async (domain: string, currentTabId: number, closer: stri
     );
 
     await Promise.all(promises);
-
-    const end = performance.now()
-
-    console.log('events', events, `time to close ${(end - start).toFixed(2)}ms`)
 
     if (events.length) await analytics(events)
 }

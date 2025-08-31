@@ -66,14 +66,14 @@ const bringInitContentScript = async ({
     switchWallet = false
 }: Configuration) => {
     if (window.self !== window.top && removeTrailingSlash(window.document.location.origin).endsWith('bringweb3.io')) {
-        console.log('Running in Bring Web3 iframe, adding activate event listener to:', window.document.location.origin);
+        // console.log('Running in Bring Web3 iframe, adding activate event listener to:', window.document.location.origin);
 
         window.addEventListener('message', (e) => {
             if (!e.data || e.data.from !== 'bringweb3' || e.data.action !== 'PORTAL_ACTIVATE') return;
 
             const { action, domain, extensionId, time, iframeUrl, token, platformName } = e.data
 
-            console.log(`Received message from Bring's Portal iframe:`, e.data);
+            // console.log(`Received message from Bring's Portal iframe:`, e.data);
 
             chrome.runtime.sendMessage({
                 action,
@@ -141,8 +141,6 @@ const bringInitContentScript = async ({
                     }
 
                     const isReferrer = !!referrer && referrers.includes(getDomain(referrer))
-
-                    console.log('isReferrer', isReferrer, 'referrer', referrer, 'referrers', referrers)
 
                     if (isReferrer && request.page === '') {
                         sendResponse({ status: 'failed', message: `already activated by ${getDomain(referrer)}`, action: 'activate' });
