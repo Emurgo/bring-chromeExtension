@@ -40,13 +40,14 @@ export const updateCache = async () => {
     }
 
     const res = await fetchDomains(trigger)
-    const { nextUpdateTimestamp, relevantDomains } = res // nextUpdateTimestamp is the delta in milliseconds until the next update
+    const { nextUpdateTimestamp, relevantDomains, thankYouPages } = res // nextUpdateTimestamp is the delta in milliseconds until the next update
 
     whitelist = await fetchWhitelist()
 
     const storageUpdates = [
         storage.set('relevantDomains', relevantDomains),
-        storage.set('relevantDomainsCheck', [now, now + nextUpdateTimestamp])
+        storage.set('relevantDomainsCheck', [now, now + nextUpdateTimestamp]),
+        storage.set('thankYouPages', thankYouPages)
     ]
 
     if (whitelist) {

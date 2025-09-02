@@ -11,7 +11,7 @@ const handleContentMessages = (cashbackPagePath: string | undefined, showNotific
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         if (request?.from !== 'bringweb3') return
-        console.log('content-message', request)
+
         const { action } = request
 
         const source = request.source || 'popup'

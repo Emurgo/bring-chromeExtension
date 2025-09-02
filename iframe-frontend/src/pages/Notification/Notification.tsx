@@ -92,21 +92,10 @@ interface Notification {
     promptPairing: boolean
 }
 
-// const example: NotificationTextProps = {
-//     // new: { ADA: 12.47 },
-//     new: null,
-//     // total: { ADA: 56.17 },
-//     total: null,
-//     claimable: { ADA: 13.52 },
-//     // claimable: null,
-//     expiredAt: Date.now() + 7 * 24 * 60 * 60 * 1000
-//     // expiredAt: null
-// }
-
 const Notification = () => {
-    const { platformName, textMode, cashbackUrl, new: _new, eligible, total, expiredAt } = useRouteLoaderData('root') as Notification
+    const { platformName, textMode, cashbackUrl, new: _new, eligible, total, expiredAt, promptPairing } = useRouteLoaderData('root') as Notification
     const { walletAddress } = useWalletAddress()
-    const ctaText = walletAddress ? 'Details' : eligible ? 'Claim' : 'Connect'
+    const ctaText = !promptPairing ? 'Details' : eligible ? 'Claim' : 'Connect'
     const isExtraBtn = !_new
     const { start, clear } = useTimeout({
         callback: () => sendMessage({ action: ACTIONS.ERASE_NOTIFICATION }),
@@ -116,14 +105,14 @@ const Notification = () => {
     useEffect(() => {
         const style = notificationIframeStyle[platformName.toLowerCase()] || notificationIframeStyle['default']
 
-        if (!walletAddress) {
+        if (promptPairing) {
             style.width = '699px';
             style.height = '70px';
         }
 
         sendMessage({ action: ACTIONS.OPEN, style })
 
-    }, [platformName, walletAddress])
+    }, [platformName, promptPairing])
 
     useEffect(() => {
         start()
@@ -153,7 +142,7 @@ const Notification = () => {
         sendMessage({ action: ACTIONS.CLOSE })
     }
 
-    if (walletAddress) {
+    if (!promptPairing) {
         return (
             <div className={styles.container}>
                 <PlatformLogo

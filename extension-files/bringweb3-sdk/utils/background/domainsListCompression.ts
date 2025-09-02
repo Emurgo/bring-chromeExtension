@@ -1,4 +1,4 @@
-const MIN_DOMAIN_CHAR = '*'.charCodeAt(0)
+const MIN_DOMAIN_CHAR = '!'.charCodeAt(0)
 const MAX_LCP = MIN_DOMAIN_CHAR - 1;
 
 const reverseStr = (str: string): string => {
@@ -111,7 +111,7 @@ type SearchCompressedResult =
     | { matched: false, match: undefined }
     | { matched: true, match: string }
 
-export const searchCompressed = (blob: Uint8Array, query: string): SearchCompressedResult => {
+export const searchCompressed = (blob: Uint8Array, query: string, regex: boolean = false, fullMatch: boolean = false): SearchCompressedResult => {
     /**
       * Scan the compressed blob and return true if `query` matches:
       *   - exactly an entry, or
@@ -177,10 +177,20 @@ export const searchCompressed = (blob: Uint8Array, query: string): SearchCompres
                     match: `${entryDomain}${entrySlashIndex !== -1 ? `/${entryPath}` : ''}`
                 }
             }
-            if (queryPath.startsWith(entryPath) || (entryPath[entryPath.length - 1] === "/" && queryPath === entryPath.slice(0, -1))) {
-                return {
-                    matched: true,
-                    match: `${entryDomain}${entrySlashIndex !== -1 ? `/${entryPath}` : ''}`
+            if (!regex) {
+                if ((fullMatch && queryPath === entryPath) || (!fullMatch && queryPath.startsWith(entryPath))) {
+                    return {
+                        matched: true,
+                        match: `${entryDomain}${entrySlashIndex !== -1 ? `/${entryPath}` : ''}`
+                    }
+                }
+            } else {
+                const pattern = `^${entryPath}${fullMatch ? '$' : ''}`;
+                if (new RegExp(pattern).test(queryPath)) {
+                    return {
+                        matched: true,
+                        match: `${entryDomain}${entrySlashIndex !== -1 ? `/${entryPath}` : ''}`
+                    }
                 }
             }
         }

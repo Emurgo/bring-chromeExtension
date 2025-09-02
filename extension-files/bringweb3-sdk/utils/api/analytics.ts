@@ -8,7 +8,10 @@ interface AnalyticEvent {
     action?: string
     process?: string
     details?: unknown
-    flowId: string
+    flowId?: string,
+    page?: string,
+    domain?: string,
+    entry?: string,
 }
 
 

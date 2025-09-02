@@ -25,6 +25,10 @@ const helpers: Helpers = {
     portalRelevantDomains: {
         get: strToUint8Array,
         set: uint8ArrayToStr
+    },
+    thankYouPages: {
+        get: strToUint8Array,
+        set: uint8ArrayToStr
     }
 }
 
