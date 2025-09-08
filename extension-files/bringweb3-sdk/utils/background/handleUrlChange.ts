@@ -5,7 +5,7 @@ import parseUrl from "../parseUrl";
 import storage from "../storage/storage";
 import handleActivate from "./activate";
 import addQuietDomain from "./addQuietDomain";
-import checkThankYouPage from "./checkThankYouPage";
+import checkPostPurchasePage from "./checkPostPurhcasePage";
 import getQuietDomain from "./getQuietDomain";
 import getRelevantDomain from "./getRelevantDomain";
 import getUserId from "./getUserId";
@@ -25,7 +25,7 @@ const handleUrlChange = (cashbackPagePath: string | undefined, showNotifications
 
         if (!isPopupEnabled) return;
 
-        await checkThankYouPage(tab.url);
+        await checkPostPurchasePage(tab.url);
 
         const { matched, match } = await getRelevantDomain(tab.url);
 

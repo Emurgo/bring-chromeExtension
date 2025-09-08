@@ -3,6 +3,7 @@ import storage from "./utils/storage/storage.js"
 import { checkAndRunMigration } from './utils/background/dataMigration';
 import handleContentMessages from './utils/background/handleContentMessages';
 import handleUrlChange from './utils/background/handleUrlChange';
+import { ENV_ENDPOINT } from "./utils/config.js";
 
 interface Configuration {
     identifier: string
@@ -52,7 +53,7 @@ interface Configuration {
  * });
  */
 
-const ENDPOINT = process.env.ENDPOINT as EndpointName
+const ENDPOINT = ENV_ENDPOINT as EndpointName
 
 const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, whitelistEndpoint, isEnabledByDefault = true, showNotifications = true, notificationCallback }: Configuration) => {
     if (!identifier || !apiEndpoint) throw new Error('Missing configuration')

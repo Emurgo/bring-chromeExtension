@@ -5,7 +5,7 @@ import analytics from "../api/analytics"
 const urlRemoveOptions = ['www.', 'www1.', 'www2.']
 const falseResponse = { matched: false, match: '' }
 
-const checkThankYouPage = async (url: string) => {
+const checkPostPurchasePage = async (url: string) => {
 
     let urlObj = null
 
@@ -29,11 +29,11 @@ const checkThankYouPage = async (url: string) => {
 
     let query = hostname + pathname
 
-    const thankYouPages = await storage.get('thankYouPages')
+    const postPurchaseUrls = await storage.get('postPurchaseUrls')
 
-    if (!thankYouPages || !thankYouPages.length || !(thankYouPages instanceof Uint8Array)) return falseResponse
+    if (!postPurchaseUrls || !postPurchaseUrls.length || !(postPurchaseUrls instanceof Uint8Array)) return falseResponse
 
-    const { matched, match } = searchCompressed(thankYouPages, query, true, true)
+    const { matched, match } = searchCompressed(postPurchaseUrls, query, true, true)
 
     if (!matched) {
         return falseResponse
@@ -47,4 +47,4 @@ const checkThankYouPage = async (url: string) => {
     }
 }
 
-export default checkThankYouPage;
+export default checkPostPurchasePage;

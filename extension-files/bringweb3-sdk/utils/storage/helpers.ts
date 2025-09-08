@@ -26,7 +26,7 @@ const helpers: Helpers = {
         get: strToUint8Array,
         set: uint8ArrayToStr
     },
-    thankYouPages: {
+    postPurchaseUrls: {
         get: strToUint8Array,
         set: uint8ArrayToStr
     }

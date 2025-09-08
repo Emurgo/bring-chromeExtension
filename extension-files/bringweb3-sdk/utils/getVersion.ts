@@ -1,8 +1,8 @@
 import pJson from '../package.json'
-const version = process.env.VERSION
+import { ENV_VERSION } from './config'
 
 const getVersion = (): string => {
-    return version || pJson.version
+    return ENV_VERSION || pJson.version
 }
 
 export default getVersion

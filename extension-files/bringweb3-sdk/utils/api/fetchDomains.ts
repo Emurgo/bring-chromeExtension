@@ -1,8 +1,6 @@
 import { ApiEndpoint } from "../apiEndpoint"
-import { compress } from "../background/domainsListCompression"
 import { strToUint8Array } from "../storage/helpers"
 import apiRequest from "./apiRequest"
-import thankYouPages from "./tmpThankYou"
 
 const fetchDomains = async (trigger?: string | null) => {
     const whitelistEndpoint = ApiEndpoint.getInstance().getWhitelistEndpoint()
@@ -23,7 +21,7 @@ const fetchDomains = async (trigger?: string | null) => {
     const res = await apiRequest(request)
 
     res.relevantDomains = strToUint8Array(res.relevantDomains)
-    res.thankYouPages = compress(thankYouPages)
+    res.postPurchaseUrls = strToUint8Array(res.postPurchaseUrls)
 
     return res
 }
