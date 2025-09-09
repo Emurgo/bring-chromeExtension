@@ -1,5 +1,12 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.5.0
+
+### Minor Changes
+
+- e2b9f80: Enable option for walletless rewards
+- 32cc9c0: One click solution
+
 ## 1.4.4
 
 ### Patch Changes
