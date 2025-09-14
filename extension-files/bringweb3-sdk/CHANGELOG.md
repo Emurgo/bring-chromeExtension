@@ -1,5 +1,11 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.5.1
+
+### Patch Changes
+
+- 0707c44: fix: Bug unable to migrate local storage because of data type
+
 ## 1.5.0
 
 ### Minor Changes
