@@ -1,10 +1,13 @@
 import injectIFrame from "./utils/contentScript/injectIFrame.js";
 import handleIframeMessages from "./utils/contentScript/handleIframeMessages.js";
 import startListenersForWalletAddress from "./utils/contentScript/startLIstenersForWalletAddress.js";
-import parseUrl from "./utils/parseUrl.js";
 import getDomain from "./utils/getDomain.js";
+import removeTrailingSlash from "./utils/background/removeTrailingSlash.js";
+
 let iframeEl: IFrame = null
+let iframePath: `/${string}` | undefined = undefined
 let isIframeOpen = false
+let flowId: string | null = null
 
 interface Configuration {
     getWalletAddress: () => Promise<WalletAddress>
@@ -62,9 +65,31 @@ const bringInitContentScript = async ({
     text,
     switchWallet = false
 }: Configuration) => {
-    if (window.self !== window.top) {
+    if (window.self !== window.top && removeTrailingSlash(window.document.location.origin).endsWith('bringweb3.io')) {
+        // console.log('Running in Bring Web3 iframe, adding activate event listener to:', window.document.location.origin);
+
+        window.addEventListener('message', (e) => {
+            if (!e.data || e.data.from !== 'bringweb3' || e.data.action !== 'PORTAL_ACTIVATE') return;
+
+            const { action, domain, extensionId, time, iframeUrl, token, platformName } = e.data
+
+            // console.log(`Received message from Bring's Portal iframe:`, e.data);
+
+            chrome.runtime.sendMessage({
+                action,
+                from: "bringweb3",
+                domain,
+                extensionId,
+                time,
+                iframeUrl,
+                token,
+                source: 'portal',
+                platformName
+            })
+        })
         return
     }
+
     if (!getWalletAddress || !promptLogin || (!walletAddressListeners?.length && typeof walletAddressUpdateCallback !== 'function')) throw new Error('Missing configuration')
 
     startListenersForWalletAddress({
@@ -81,7 +106,7 @@ const bringInitContentScript = async ({
     }))
 
     // Listen for message
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
         if (request?.from !== 'bringweb3') return
 
         const { action } = request
@@ -93,9 +118,19 @@ const bringInitContentScript = async ({
                     .then(walletAddress => sendResponse({ status: 'success', walletAddress }))
                     .catch(err => sendResponse({ status: 'success', walletAddress: undefined }))
                 return true
-
+            case 'CLOSE_POPUP':
+                if (iframeEl && iframePath === request.path && getDomain(location.href) === getDomain(request.domain)) {
+                    iframeEl.parentNode?.removeChild(iframeEl)
+                    isIframeOpen = false
+                    iframePath = undefined
+                    sendResponse({ status: 'success', message: 'Popup closed', location: window.document.location.href, flowId })
+                } else {
+                    sendResponse({ status: 'failed', message: 'Domain mismatch or iframe not open' })
+                }
             case 'INJECT':
                 try {
+                    const { referrer } = document
+                    const referrers = request.referrers || []
 
                     if (getDomain(location.href) !== getDomain(request.domain)) {
                         sendResponse({ status: 'failed', message: 'Domain already changed' });
@@ -104,6 +139,14 @@ const bringInitContentScript = async ({
                         sendResponse({ status: 'failed', message: 'iframe already open' });
                         return true
                     }
+
+                    const isReferrer = !!referrer && referrers.includes(getDomain(referrer))
+
+                    if (isReferrer && request.page === '') {
+                        sendResponse({ status: 'failed', message: `already activated by ${getDomain(referrer)}`, action: 'activate' });
+                        return true
+                    }
+
                     const { token, iframeUrl, userId } = request;
 
                     const query: { [key: string]: string } = { token }
@@ -119,6 +162,8 @@ const bringInitContentScript = async ({
                         page: request.page
                     });
                     isIframeOpen = true
+                    iframePath = `/${request.page || ''}`
+                    flowId = request.flowId
                     sendResponse({ status: 'success' });
                     return true
                 } catch (error) {

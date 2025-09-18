@@ -3,16 +3,18 @@ import { sendMessage, ACTIONS } from '../../utils/sendMessage'
 import { useGoogleAnalytics } from '../../hooks/useGoogleAnalytics'
 import { useRouteLoaderData } from 'react-router-dom'
 import compareVersions from '../../utils/compareVersions'
+import parseTime from '../../utils/parseTime'
 
 interface Props {
     callback?: () => void
+    withTime?: boolean
+    className?: string
 }
 
-const DAY_IN_MS = 24 * 60 * 60 * 1000
 const THIRTY_MIN_MS = 30 * 60 * 1000
 
-const CloseBtn = ({ callback }: Props) => {
-    const { domain, version, variant } = useRouteLoaderData('root') as LoaderData
+const CloseBtn = ({ callback, withTime = true, className = '' }: Props) => {
+    const { domain, version } = useRouteLoaderData('root') as LoaderData
     const { sendGaEvent } = useGoogleAnalytics()
 
     const close = async () => {
@@ -24,8 +26,11 @@ const CloseBtn = ({ callback }: Props) => {
         if (compareVersions(version, '1.2.6') !== 1) {
             sendMessage({ action: ACTIONS.ACTIVATE, url: `https://${domain}` })
         }
-        const QUIET_TIME = variant === 'control' ? DAY_IN_MS : THIRTY_MIN_MS
-        sendMessage({ action: ACTIONS.CLOSE, domain, time: Date.now() + QUIET_TIME })
+
+        const message: Parameters<typeof sendMessage>[0] = { action: ACTIONS.CLOSE, domain }
+        if (withTime) message.time = parseTime(THIRTY_MIN_MS, version)
+
+        sendMessage(message)
     }
 
     return (
@@ -34,10 +39,14 @@ const CloseBtn = ({ callback }: Props) => {
                 close()
                 callback && callback()
             }}
-            className={styles.btn}
+            className={`${styles.btn} ${className}`}
         >
             <div
                 className={styles.icon}
+                style={{
+                    maskImage: `url(${import.meta.env.BASE_URL}icons/x-mark.svg)`,
+                    WebkitMaskImage: `url(${import.meta.env.BASE_URL}icons/x-mark.svg)`
+                }}
             />
         </button>
     )

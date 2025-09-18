@@ -1,0 +1,474 @@
+name: Deploy Iframe Frontend
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment_mode:
+        description: 'Deployment mode'
+        required: true
+        default: 'override'
+        type: choice
+        options:
+        - override
+        - new_version
+      target_environment:
+        description: 'Target environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - sandbox
+  push:
+    paths:
+      - 'iframe-frontend/**'
+    branches:
+      - main
+      - sandbox
+
+env:
+  NODE_VERSION: 'lts/*'
+
+jobs:
+  determine-deployment:
+    runs-on: ubuntu-latest
+    outputs:
+      deployment-mode: ${{ steps.mode.outputs.mode }}
+      target-version: ${{ steps.version.outputs.version }}
+      skip-auto-deployment: ${{ steps.commit-check.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Check commit message for new version flag
+        id: commit-check
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
+            echo "Commit message: $COMMIT_MESSAGE"
+            if [[ "$COMMIT_MESSAGE" == *"iframe-new-version"* ]]; then
+              echo "Found 'iframe-new-version' in commit message - skipping auto-deployment"
+              echo "skip=true" >> $GITHUB_OUTPUT
+            else
+              echo "No 'iframe-new-version' flag found - proceeding with auto-deployment"
+              echo "skip=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            # Manual dispatch - never skip
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Determine deployment mode
+        id: mode
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "mode=${{ github.event.inputs.deployment_mode }}" >> $GITHUB_OUTPUT
+          else
+            # Auto-push defaults to override mode
+            echo "mode=override" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Setup Node.js for changeset version prediction
+        if: steps.mode.outputs.mode == 'new_version'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
+          cache-dependency-path: 'extension-files/bringweb3-sdk/yarn.lock'
+      
+      - name: Install dependencies for changeset
+        if: steps.mode.outputs.mode == 'new_version'
+        run: |
+          cd extension-files/bringweb3-sdk
+          yarn install --frozen-lockfile
+      
+      - name: Get target version
+        id: version
+        run: |
+          if [ "${{ steps.mode.outputs.mode }}" = "new_version" ]; then
+            BRANCH_NAME="${{ github.ref_name }}"
+            echo "Branch: $BRANCH_NAME"
+            
+            cd extension-files/bringweb3-sdk
+            CURRENT_VERSION=$(cat package.json | jq -r '.version')
+            echo "Current package.json version: $CURRENT_VERSION"
+            
+            # Get the base version (always from main branch)
+            git fetch origin main
+            # Create a temporary local main branch for changeset to reference (if it doesn't exist)
+            git branch main origin/main 2>/dev/null || true
+            MAIN_VERSION=$(git show origin/main:extension-files/bringweb3-sdk/package.json | jq -r '.version' 2>/dev/null)
+            
+            if [ -z "$MAIN_VERSION" ] || [ "$MAIN_VERSION" = "null" ]; then
+              echo "ERROR: Could not fetch version from main branch"
+              echo "This might be a git fetch issue or file path problem"
+              exit 1
+            fi
+            
+            echo "Main branch version (base): $MAIN_VERSION"
+            echo "Current branch version: $CURRENT_VERSION"
+            
+            # Check if there are changeset files
+            CHANGESET_FILES=$(find .changeset -name "*.md" -not -name "README.md" -not -name "config.json" 2>/dev/null | wc -l)
+            echo "Found $CHANGESET_FILES changeset files"
+            
+            if [ "$CHANGESET_FILES" -gt 0 ]; then
+              # There are changesets - predict the next version
+              echo "Found changesets, predicting next version from main base..."
+              
+              # Temporarily update package.json to main's version for changeset calculation
+              TEMP_PACKAGE=$(mktemp)
+              cp package.json "$TEMP_PACKAGE"
+              
+              # Set the version to main's version temporarily
+              echo "Temporarily setting package.json version to main version: $MAIN_VERSION"
+              if jq --arg version "$MAIN_VERSION" '.version = $version' package.json > package.json.tmp; then
+                mv package.json.tmp package.json
+                echo "Successfully updated package.json version"
+              else
+                echo "ERROR: Failed to update package.json version with jq"
+                exit 1
+              fi
+              
+              # Now run changeset status with main's version as base
+              echo "Running changeset status command..."
+              if yarn changeset status --output=changeset-output.json; then
+                echo "Changeset command succeeded"
+                RELEASE_OUTPUT=$(cat changeset-output.json 2>/dev/null || echo '{"releases":[]}')
+                rm -f changeset-output.json
+              else
+                CHANGESET_EXIT_CODE=$?
+                echo "ERROR: changeset status command failed with exit code: $CHANGESET_EXIT_CODE"
+                echo "Attempting to run changeset status without output redirection for debugging:"
+                yarn changeset status || echo "Changeset status also failed in debug mode"
+                # Restore original package.json before exiting
+                mv "$TEMP_PACKAGE" package.json
+                exit 1
+              fi
+              echo "Changeset status output (with main base): $RELEASE_OUTPUT"
+              
+              # Restore original package.json
+              mv "$TEMP_PACKAGE" package.json
+              
+              # Check if releases array is empty
+              RELEASES_COUNT=$(echo "$RELEASE_OUTPUT" | jq '.releases | length' 2>/dev/null || echo "0")
+              echo "Number of releases found: $RELEASES_COUNT"
+              
+              if [ "$RELEASES_COUNT" -gt 0 ]; then
+                # Valid releases found
+                PREDICTED_VERSION=$(echo "$RELEASE_OUTPUT" | jq -r '.releases[0].newVersion // empty' 2>/dev/null)
+                
+                if [ -n "$PREDICTED_VERSION" ] && [ "$PREDICTED_VERSION" != "null" ]; then
+                  VERSION="$PREDICTED_VERSION"
+                  echo "Using predicted version (main $MAIN_VERSION + changesets): v${VERSION}"
+                else
+                  echo "ERROR: Changeset returned null version despite having releases"
+                  echo "Changeset output: $RELEASE_OUTPUT"
+                  exit 1
+                fi
+              else
+                # Changeset files exist but releases array is empty (malformed changesets)
+                echo "WARNING: Found $CHANGESET_FILES changeset files but no valid releases detected"
+                echo "This usually means changeset files are malformed or empty"
+                echo "Changeset output: $RELEASE_OUTPUT"
+                
+                # List the changeset files for debugging
+                echo "Changeset files found:"
+                find .changeset -name "*.md" -not -name "README.md" -not -name "config.json" 2>/dev/null | head -5
+                
+                echo "Falling back to main version..."
+                VERSION="$MAIN_VERSION"
+                echo "Using main version: v${VERSION}"
+              fi
+              
+            else
+              # No changesets - use current branch version or main version
+              echo "No changesets found"
+              
+              if [ "$BRANCH_NAME" = "main" ]; then
+                # On main with no changesets, use current version (likely after changeset PR merge)
+                if [ "$CURRENT_VERSION" = "0.0.0" ]; then
+                  echo "ERROR: Main branch has version 0.0.0 and no changesets"
+                  exit 1
+                fi
+                VERSION="$CURRENT_VERSION"
+                echo "Using main current version: v${VERSION}"
+              else
+                # On other branches with no changesets, use main's version
+                VERSION="$MAIN_VERSION"
+                echo "Using main version (no changesets): v${VERSION}"
+              fi
+            fi
+            
+            cd ../..
+            echo "version=v${VERSION}" >> $GITHUB_OUTPUT
+          else
+            # For override mode, get the latest existing version from S3
+            echo "version=latest" >> $GITHUB_OUTPUT
+          fi
+      
+
+  build-and-deploy:
+    needs: determine-deployment
+    if: needs.determine-deployment.outputs.skip-auto-deployment != 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    environment: ${{ github.event.inputs.target_environment || (github.ref_name == 'sandbox' && 'sandbox' || 'production') }}
+    defaults:
+      run:
+        working-directory: iframe-frontend
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
+          cache-dependency-path: 'iframe-frontend/yarn.lock'
+      
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      
+      - name: Set environment configuration
+        id: config
+        run: |
+          # Determine environment: manual input takes priority, otherwise infer from branch
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ENV="${{ github.event.inputs.target_environment }}"
+          else
+            # Auto-deployment: infer environment from branch
+            if [ "${{ github.ref_name }}" = "sandbox" ]; then
+              ENV="sandbox"
+            else
+              ENV="production"
+            fi
+          fi
+          
+          echo "Event: ${{ github.event_name }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Target environment: $ENV"
+          
+          # Use environment-specific secrets (configured in GitHub Environment settings)
+          S3_BUCKET="${{ secrets.S3_BUCKET }}"
+          CLOUDFRONT_ID="${{ secrets.CLOUDFRONT_ID }}"
+          echo "Using $ENV environment"
+          
+          echo "S3 Bucket: $S3_BUCKET"
+          echo "CloudFront ID: $CLOUDFRONT_ID"
+          
+          if [ -z "$S3_BUCKET" ]; then
+            echo "ERROR: S3_BUCKET is empty! Check your secrets configuration."
+            exit 1
+          fi
+          
+          echo "s3-bucket=$S3_BUCKET" >> $GITHUB_OUTPUT
+          echo "cloudfront-id=$CLOUDFRONT_ID" >> $GITHUB_OUTPUT
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-session-name: GitHubActions-IframeDeployment
+      
+      - name: Build application
+        run: |
+          # Set base path for deployment
+          if [ "${{ needs.determine-deployment.outputs.deployment-mode }}" = "new_version" ]; then
+            BASE_PATH="/${{ needs.determine-deployment.outputs.target-version }}/"
+          else
+            # For override mode, get latest version from S3
+            S3_BUCKET="${{ steps.config.outputs.s3-bucket }}"
+            LATEST_VERSION=$(aws s3 ls "s3://${S3_BUCKET}/" | grep -E 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -1 | awk '{print $2}' | sed 's/\///' || echo "v1.0.0")
+            BASE_PATH="/${LATEST_VERSION}/"
+          fi
+          
+          # Determine environment for Vite variables
+          ENV="${{ github.event.inputs.target_environment || (github.ref_name == 'sandbox' && 'sandbox' || 'production') }}"
+          echo "Building for environment: $ENV"
+          echo "Building with base path: $BASE_PATH"
+          
+          # Set environment-specific secrets from GitHub Environment
+          export VITE_API_URL="${{ secrets.VITE_API_URL }}"
+          export VITE_API_KEY="${{ secrets.VITE_API_KEY }}"
+          export VITE_GA_MEASUREMENT_ID="${{ secrets.VITE_GA_MEASUREMENT_ID }}"
+          export VITE_APP_ENV="$ENV"
+          if [ "$ENV" = "sandbox" ]; then
+            export VITE_DEBUG_MODE="true"
+          else
+            export VITE_DEBUG_MODE="false"
+          fi
+          
+          # Common variables for all environments
+          export VITE_BASE_PATH="$BASE_PATH"
+          export VITE_APP_VERSION="${{ github.sha }}"
+          export VITE_BUILD_TIME="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          export VITE_BRANCH_NAME="${{ github.ref_name }}"
+          export VITE_TEST_ID="${{ secrets.VITE_TEST_ID }}"
+          
+          yarn build
+        env:
+          NODE_ENV: production
+      
+      - name: Get latest version for override mode
+        if: needs.determine-deployment.outputs.deployment-mode == 'override'
+        id: latest-version
+        run: |
+          S3_BUCKET="${{ steps.config.outputs.s3-bucket }}"
+          echo "Using S3 bucket: $S3_BUCKET"
+          
+          # List all version directories and get the latest one
+          LATEST_VERSION=$(aws s3 ls "s3://${S3_BUCKET}/" | grep -E 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -1 | awk '{print $2}' | sed 's/\///')
+          if [ -z "$LATEST_VERSION" ]; then
+            # If no versions exist, use v1.0.0 as default
+            LATEST_VERSION="v1.0.0"
+            echo "No existing versions found, using default: $LATEST_VERSION"
+          else
+            echo "Found latest version: $LATEST_VERSION"
+          fi
+          echo "latest-version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+      
+      - name: Deploy to S3 (New Version)
+        if: needs.determine-deployment.outputs.deployment-mode == 'new_version'
+        run: |
+          TARGET_VERSION="${{ needs.determine-deployment.outputs.target-version }}"
+          S3_BUCKET="${{ steps.config.outputs.s3-bucket }}"
+          
+          # Check if version already exists
+          if aws s3 ls "s3://${S3_BUCKET}/${TARGET_VERSION}/" > /dev/null 2>&1; then
+            echo "Version ${TARGET_VERSION} already exists. Aborting deployment."
+            exit 1
+          fi
+          
+          # Deploy to new version folder
+          aws s3 sync dist/ "s3://${S3_BUCKET}/${TARGET_VERSION}/" \
+            --delete \
+            --cache-control "public, max-age=31536000" \
+            --metadata-directive REPLACE
+          
+          # Update index.html with correct content type and shorter cache control
+          aws s3 cp "s3://${S3_BUCKET}/${TARGET_VERSION}/index.html" \
+            "s3://${S3_BUCKET}/${TARGET_VERSION}/index.html" \
+            --content-type "text/html" \
+            --cache-control "public, max-age=300" \
+            --metadata-directive REPLACE
+          
+          echo "✅ Deployed new version: ${TARGET_VERSION}"
+      
+      - name: Deploy to S3 (Override)
+        if: needs.determine-deployment.outputs.deployment-mode == 'override'
+        run: |
+          TARGET_VERSION="${{ steps.latest-version.outputs.latest-version }}"
+          S3_BUCKET="${{ steps.config.outputs.s3-bucket }}"
+          
+          # Deploy to existing version folder (override)
+          aws s3 sync dist/ "s3://${S3_BUCKET}/${TARGET_VERSION}/" \
+            --delete \
+            --cache-control "public, max-age=31536000" \
+            --metadata-directive REPLACE
+          
+          # Update index.html with correct content type and shorter cache control
+          aws s3 cp "s3://${S3_BUCKET}/${TARGET_VERSION}/index.html" \
+            "s3://${S3_BUCKET}/${TARGET_VERSION}/index.html" \
+            --content-type "text/html" \
+            --cache-control "public, max-age=300" \
+            --metadata-directive REPLACE
+          
+          echo "✅ Overrode existing version: ${TARGET_VERSION}"
+      
+      - name: Invalidate CloudFront
+        run: |
+          CLOUDFRONT_ID="${{ steps.config.outputs.cloudfront-id }}"
+          
+          if [ "${{ needs.determine-deployment.outputs.deployment-mode }}" = "new_version" ]; then
+            TARGET_VERSION="${{ needs.determine-deployment.outputs.target-version }}"
+          else
+            TARGET_VERSION="${{ steps.latest-version.outputs.latest-version }}"
+          fi
+          
+          # Invalidate specific version path
+          aws cloudfront create-invalidation \
+            --distribution-id "${CLOUDFRONT_ID}" \
+            --paths "/${TARGET_VERSION}/*"
+          
+          echo "✅ CloudFront invalidation created for /${TARGET_VERSION}/*"
+      
+      - name: Update CloudFront KeyValueStore
+        run: |
+          S3_BUCKET="${{ steps.config.outputs.s3-bucket }}"
+          
+          # Determine environment key name
+          ENV="${{ github.event.inputs.target_environment || (github.ref_name == 'sandbox' && 'sandbox' || 'production') }}"
+          if [ "$ENV" = "sandbox" ]; then
+            KVS_KEY="sandbox"
+          else
+            KVS_KEY="prod"
+          fi
+          
+          echo "Updating KeyValueStore for environment: $KVS_KEY"
+          
+          # Get all version directories from S3 and format as comma-separated list
+          VERSIONS=$(aws s3 ls "s3://${S3_BUCKET}/" | grep -E 'v[0-9]+\.[0-9]+\.[0-9]+' | awk '{print $2}' | sed 's/\///' | sed 's/^v//' | sort -V | tr '\n' ',' | sed 's/,$//')
+          
+          echo "Available versions: $VERSIONS"
+          
+          # Use shared repository secret for KVS ARN
+          KVS_ARN="${{ secrets.CLOUDFRONT_KVS_ARN }}"
+          
+          # Get current ETag from the KeyValueStore description
+          ETAG=$(aws cloudfront-keyvaluestore describe-key-value-store \
+            --kvs-arn "$KVS_ARN" \
+            --query 'ETag' --output text 2>/dev/null || echo "")
+          
+          if [ -n "$ETAG" ] && [ "$ETAG" != "None" ]; then
+            echo "Updating KeyValueStore with ETag: $ETAG"
+            # Update with current ETag
+            aws cloudfront-keyvaluestore put-key \
+              --kvs-arn "$KVS_ARN" \
+              --key "$KVS_KEY" \
+              --value "$VERSIONS" \
+              --if-match "$ETAG"
+          else
+            echo "No ETag found or KeyValueStore doesn't exist"
+            # Try without if-match (for new KeyValueStore or if describe fails)
+            aws cloudfront-keyvaluestore put-key \
+              --kvs-arn "$KVS_ARN" \
+              --key "$KVS_KEY" \
+              --value "$VERSIONS"
+          fi
+          
+          echo "✅ Updated KeyValueStore key '$KVS_KEY' with versions: $VERSIONS"
+      
+      - name: Deployment Summary
+        run: |
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Mode**: ${{ needs.determine-deployment.outputs.deployment-mode }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: ${{ github.event.inputs.target_environment || (github.ref_name == 'sandbox' && 'sandbox' || 'production') }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.determine-deployment.outputs.deployment-mode }}" = "new_version" ]; then
+            echo "- **Version**: ${{ needs.determine-deployment.outputs.target-version }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Updated Version**: ${{ steps.latest-version.outputs.latest-version }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "- **S3 Bucket**: ${{ steps.config.outputs.s3-bucket }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **CloudFront**: Invalidation triggered" >> $GITHUB_STEP_SUMMARY
+
+  deployment-skipped:
+    needs: determine-deployment
+    if: needs.determine-deployment.outputs.skip-auto-deployment == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deployment Skipped Summary
+        run: |
+          echo "## ⏭️ Deployment Skipped" >> $GITHUB_STEP_SUMMARY
+          echo "Auto-deployment was skipped because commit message contains 'iframe-new-version'" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: ${{ github.event.head_commit.message }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "To deploy manually:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Go to Actions → Deploy Iframe Frontend" >> $GITHUB_STEP_SUMMARY
+          echo "2. Click 'Run workflow'" >> $GITHUB_STEP_SUMMARY
+          echo "3. Select 'new_version' mode for new version or 'override' to update existing" >> $GITHUB_STEP_SUMMARY
