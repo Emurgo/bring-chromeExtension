@@ -5,6 +5,15 @@ import apiRequest from "./apiRequest"
 const fetchDomains = async (trigger?: string | null) => {
     const whitelistEndpoint = ApiEndpoint.getInstance().getWhitelistEndpoint()
 
+    // ***** IMPORTANT BEGIN ***** //
+
+    if ((whitelistEndpoint?.trim().length ?? 0) < 1) {
+        // This is local EMURGO change we do not allow there to be a version with no whitelist
+        throw new Error('Cashback redirection whitelist endpoint is required!');
+    }
+
+    // ***** IMPORTANT END ***** //
+
     const request: Parameters<typeof apiRequest>[0] = {
         path: '/domains',
         method: 'GET',

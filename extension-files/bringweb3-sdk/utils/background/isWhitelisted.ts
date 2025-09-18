@@ -32,7 +32,8 @@ const isWhitelisted = async (url: string): Promise<boolean> => {
          whitelist presence check
          */
 
-        // This must not change!
+        // THIS MUST NOT CHANGE!
+        // No whitelist present means all domains are FORBIDDEN by default
         if (!whitelist?.length) return false
 
         /*

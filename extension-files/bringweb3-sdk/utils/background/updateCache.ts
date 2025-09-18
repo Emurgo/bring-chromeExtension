@@ -11,6 +11,15 @@ export const updateCache = async () => {
     let whitelist = await storage.get('redirectsWhitelist')
     const whitelistEndpoint = ApiEndpoint.getInstance().getWhitelistEndpoint()
 
+    // ***** IMPORTANT BEGIN ***** //
+
+    if ((whitelistEndpoint?.trim().length ?? 0) < 1) {
+        // This is local EMURGO change we do not allow there to be a version with no whitelist
+        throw new Error('Cashback redirection whitelist endpoint is required!');
+    }
+
+    // ***** IMPORTANT END ***** //
+
     let trigger: string | null = null
     const now = Date.now()
 
@@ -43,6 +52,15 @@ export const updateCache = async () => {
     const { nextUpdateTimestamp, relevantDomains, postPurchaseUrls } = res // nextUpdateTimestamp is the delta in milliseconds until the next update
 
     whitelist = await fetchWhitelist()
+
+    // ***** IMPORTANT BEGIN ***** //
+
+    if (!whitelist?.length) {
+        // This is local EMURGO change we do not allow there to be a version with no whitelist
+        throw new Error('Cashback redirection whitelist array is required!');
+    }
+
+    // ***** IMPORTANT END ***** //
 
     const storageUpdates = [
         storage.set('relevantDomains', relevantDomains),

@@ -3,13 +3,18 @@ import { compress } from "../background/domainsListCompression"
 
 export const fetchWhitelist = async () => {
     try {
-        const endpoint = ApiEndpoint.getInstance().getWhitelistEndpoint()
+        const whitelistEndpoint = ApiEndpoint.getInstance().getWhitelistEndpoint()
 
-        if (!endpoint) {
-            return []
+        // ***** IMPORTANT BEGIN ***** //
+
+        if ((whitelistEndpoint?.trim().length ?? 0) < 1) {
+            // This is local EMURGO change we do not allow there to be a version with no whitelist
+            throw new Error('Cashback redirection whitelist endpoint is required!');
         }
 
-        const response = await fetch(endpoint, {
+        // ***** IMPORTANT END ***** //
+
+        const response = await fetch(whitelistEndpoint, {
             method: 'GET',
             cache: 'no-store', // Prevents caching
             headers: {
