@@ -1,3 +1,4 @@
+import { ENV_IFRAME_URL } from "../config";
 import getQueryParams from "../getQueryParams";
 import getVersion from "../getVersion";
 interface Query {
@@ -18,14 +19,45 @@ const injectIFrame = ({ query, theme, themeMode, text, iframeUrl, page, switchWa
     const extensionId = chrome.runtime.id;
     const iframeId = `bringweb3-iframe-${extensionId}`;
     const element = document.getElementById(iframeId)
-    const iframeHost = process?.env?.IFRAME_URL ? `${process.env.IFRAME_URL}${page ? '/' + page : ''}` : iframeUrl
+    const iframeHost = ENV_IFRAME_URL ? `${ENV_IFRAME_URL}${page ? '/' + page : ''}` : iframeUrl
     if (element) return element as HTMLIFrameElement;
     const params = getQueryParams({ query: { ...query, extensionId, v: getVersion(), themeMode, textMode: text, switchWallet: String(switchWallet) } })
     const customStyles = theme ? `&${getQueryParams({ query: theme, prefix: 't' })}` : ''
     const iframe = document.createElement('iframe');
     iframe.id = iframeId;
-    iframe.src = `${iframeHost}?${params}${customStyles}`;
-    iframe.setAttribute('sandbox', "allow-scripts allow-same-origin")
+    iframe.src = encodeURI(`${iframeHost}?${params}${customStyles}`);
+
+    // ***** IMPORTANT BEGIN ***** //
+
+    /*
+     This is an Emurgo specific change
+     to add a comment around setting
+     the sandbox attribute on the iframe.
+     */
+
+    // NOTE THIS PART MUST NOT CHANGE!
+    iframe.setAttribute('sandbox', "allow-scripts allow-same-origin");
+
+    /*
+     Previous library versions were allowing
+     extra permissions to the iframe, like:
+
+     `allow-popups`
+     and
+     `allow-top-navigation-by-user-activation`
+
+     This was specifically removed to not
+     allow iframe to redirect the top frame.
+
+     Now iframe is only given two permissions:
+     scripts and same-origin.
+
+     If this EVER changes. There needs to be
+     a critically important reason for it.
+     */
+
+    // ***** IMPORTANT END ***** //
+
     iframe.style.position = "fixed";
     iframe.scrolling = "no";
     iframe.style.overflow = "hidden";

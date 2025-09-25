@@ -1,4 +1,5 @@
-import storage from "../storage"
+import storage from "../storage/storage"
+import { isMsRangeActive } from "./timestampRange"
 
 interface OptOut {
     isOptedOut: boolean
@@ -9,7 +10,8 @@ export const setOptOut = async (time: number): Promise<OptOut> => {
         await storage.remove('optOut')
         return { isOptedOut: false }
     } else {
-        await storage.set('optOut', Date.now() + time)
+        const now = Date.now()
+        await storage.set('optOut', [now, now + time])
         return { isOptedOut: true }
     }
 }
@@ -17,5 +19,5 @@ export const setOptOut = async (time: number): Promise<OptOut> => {
 export const getOptOut = async (): Promise<OptOut> => {
     const optOut = await storage.get('optOut')
 
-    return { isOptedOut: !!(optOut && optOut > Date.now()) };
+    return { isOptedOut: isMsRangeActive(optOut) };
 }

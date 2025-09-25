@@ -1,83 +1,18 @@
-import { openExtensionCashbackPage } from './utils/background/openExtensionCashbackPage';
-import validateDomain from "./utils/api/validateDomain.js"
-import { ApiEndpoint } from "./utils/apiEndpoint.js"
-import parseUrl from "./utils/parseUrl.js"
-import { UPDATE_CACHE_ALARM_NAME } from './utils/constants.js'
-import storage from "./utils/storage.js"
-import handleActivate from "./utils/background/activate.js"
-import addQuietDomain from "./utils/background/addQuietDomain.js"
-import { getOptOut, setOptOut } from "./utils/background/optOut.js"
-import getWalletAddress from "./utils/background/getWalletAddress.js"
-import sendMessage from "./utils/background/sendMessage.js"
-import getUserId from "./utils/background/getUserId.js"
-import showNotification from "./utils/background/showNotification.js"
-import isWhitelisted from './utils/background/isWhitelisted';
-import { updateCache } from './utils/background/updateCache';
-import removeTrailingSlash from './utils/background/removeTrailingSlash';
-import analytics from './utils/api/analytics';
-
-const urlRemoveOptions = ['www.', 'www1.', 'www2.']
-
-const getRelevantDomain = async (url: string | undefined) => {
-    const relevantDomains = await updateCache()
-
-    if (!url || !relevantDomains || !relevantDomains.length) return ''
-
-    let urlObj = null
-
-    try {
-        urlObj = new URL(url)
-    } catch (error) {
-        urlObj = new URL(`https://${url}`)
-    }
-
-    let tabDomain = urlObj.hostname
-    let tabPath = removeTrailingSlash(urlObj.pathname)
-
-    for (const urlRemoveOption of urlRemoveOptions) {
-        tabDomain = tabDomain.replace(urlRemoveOption, '')
-    }
-
-    for (let relevantDomain of relevantDomains) {
-        const originalRelevantDomain = relevantDomain
-        relevantDomain = removeTrailingSlash(relevantDomain)
-        let allowSubdomain = false
-
-        if (relevantDomain.startsWith('*.')) {
-            allowSubdomain = true
-        }
-
-        const relevantDomainPath = "/" + relevantDomain.split('/').slice(1).join('/') || '';
-
-        if (relevantDomainPath !== '/' && tabPath.startsWith(relevantDomainPath)) {
-            tabDomain += relevantDomainPath
-        }
-
-        if (tabDomain === relevantDomain || (allowSubdomain && tabDomain.endsWith(relevantDomain.replace('*.', '')))) {
-
-            const quietDomains = await storage.get('quietDomains')
-            if (quietDomains &&
-                (quietDomains[relevantDomain] && Date.now() < quietDomains[relevantDomain]
-                    && quietDomains[relevantDomain] < Date.now() + 60 * 24 * 60 * 60 * 1000)) {
-                return ''
-            }
-            return originalRelevantDomain
-        }
-    }
-    return ''
-}
-
-interface UrlDict {
-    [key: string]: string
-}
-
-const urlsDict: UrlDict = {}
+import { ApiEndpoint, EndpointName } from "./utils/apiEndpoint.js"
+import storage from "./utils/storage/storage.js"
+import { checkAndRunMigration } from './utils/background/dataMigration';
+import handleContentMessages from './utils/background/handleContentMessages';
+import handleUrlChange from './utils/background/handleUrlChange';
+import { ENV_ENDPOINT } from "./utils/config.js";
 
 interface Configuration {
     identifier: string
     apiEndpoint: string
     whitelistEndpoint?: string
     cashbackPagePath?: string
+    isEnabledByDefault: boolean
+    showNotifications?: boolean
+    notificationCallback?: () => void
 }
 /**
  * Initializes the background script for the Bring extension.
@@ -89,6 +24,8 @@ interface Configuration {
  * @param {string} configuration.apiEndpoint - The API endpoint ('prod' or 'sandbox').
  * @param {string} configuration.whitelistEndpoint - Endpoint for whitelist of redirect urls.
  * @param {string} [configuration.cashbackPagePath] - Optional path to the cashback page.
+ * @param {boolean} [configuration.isEnabledByDefault] - Determine if the user see the popup by default. defaults to true.
+ * @param {boolean} [configuration.showNotifications] - Determine if the extension should show notifications about new rewards. defaults to true.
  * @throws {Error} Throws an error if identifier or apiEndpoint is missing, or if apiEndpoint is invalid.
  * @returns {Promise<void>}
  *
@@ -111,159 +48,45 @@ interface Configuration {
  *   identifier: '<bring_identifier>',
  *   apiEndpoint: 'sandbox',
  *   whitelistEndpoint: 'https://example.com/whitelist.json',
+ *   isEnabledByDefault: true,
  *   cashbackPagePath: '/cashback.html'
  * });
  */
-const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, whitelistEndpoint }: Configuration) => {
+
+const ENDPOINT = ENV_ENDPOINT as EndpointName
+
+const bringInitBackground = async ({ identifier, apiEndpoint, cashbackPagePath, whitelistEndpoint, isEnabledByDefault = true, showNotifications = true, notificationCallback }: Configuration) => {
     if (!identifier || !apiEndpoint) throw new Error('Missing configuration')
     if (!['prod', 'sandbox'].includes(apiEndpoint)) throw new Error('unknown apiEndpoint')
+
+    // ***** IMPORTANT BEGIN ***** //
 
     if ((whitelistEndpoint?.trim().length ?? 0) < 1) {
         // This is local EMURGO change we do not allow there to be a version with no whitelist
         throw new Error('Cashback redirection whitelist endpoint is required!');
     }
 
-    ApiEndpoint.getInstance().setApiEndpoint(apiEndpoint)
-    ApiEndpoint.getInstance().setWhitelistEndpoint(whitelistEndpoint || '')
-    ApiEndpoint.getInstance().setApiKey(identifier)
+    // ***** IMPORTANT END ***** //
 
-    updateCache()
+    const apiEndpointInstance = ApiEndpoint.getInstance()
+    apiEndpointInstance.setApiEndpoint(ENDPOINT || apiEndpoint as EndpointName)
+    apiEndpointInstance.setWhitelistEndpoint(whitelistEndpoint || '')
+    apiEndpointInstance.setApiKey(identifier)
 
-    chrome.alarms.onAlarm.addListener(async (alarm) => {
-        const { name } = alarm
+    // Initialize debug cache after API endpoint is set
+    storage.initializeDebugCache()
 
-        switch (name) {
-            case UPDATE_CACHE_ALARM_NAME:
-                updateCache()
-                break;
-            default:
-                console.error('alarm with no use case:', name);
-                break;
-        }
-    })
+    const popupEnabled = await storage.get('popupEnabled')
 
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (popupEnabled === undefined) {
+        await storage.set('popupEnabled', isEnabledByDefault)
+    }
 
-        if (request?.from !== 'bringweb3') return
+    await checkAndRunMigration();
 
-        const { action } = request
+    handleContentMessages(cashbackPagePath, showNotifications)
 
-        switch (action) {
-            case 'ACTIVATE': {
-                const { domain, extensionId, time, redirectUrl } = request
-                handleActivate(domain, extensionId, identifier, cashbackPagePath, time, sender.tab?.id, redirectUrl)
-                    .then(() => sendResponse());
-                return true;
-            }
-            case 'GET_OPT_OUT': {
-                getOptOut().then(res => sendResponse(res))
-                return true;
-            }
-            case 'OPT_OUT': {
-                const { time } = request
-                setOptOut(time).then(res => sendResponse(res))
-                return true;
-            }
-            case 'CLOSE': {
-                const { time, domain } = request
-                if (!domain) return true;
-                addQuietDomain(domain, time)
-                sendResponse({ message: 'domain added to quiet list' })
-                return true;
-            }
-            case 'WALLET_ADDRESS_UPDATE': {
-                const { walletAddress } = request
-                if (!walletAddress) {
-                    storage.remove('walletAddress')
-                        .then(() => sendResponse({ message: 'wallet address removed successfully' }))
-                } else {
-                    storage.set('walletAddress', walletAddress as string)
-                        .then(() => sendResponse(walletAddress))
-                }
-                return true;
-            }
-            case 'ERASE_NOTIFICATION':
-                storage.remove('notification')
-                    .then(() => sendResponse({ message: 'notification erased successfully' }))
-                return true
-            default: {
-                console.warn(`Bring unknown action: ${action}`);
-                return true;
-            }
-            case 'OPEN_CASHBACK_PAGE':
-                const { url } = request
-                openExtensionCashbackPage(url || cashbackPagePath)
-                sendResponse({ message: 'cashback page opened successfully' })
-                return true
-        }
-    })
-
-    chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-
-        if (!tab?.url?.startsWith('http') || !tab.url) return;
-
-        const url = parseUrl(tab.url)
-
-        const optOut = await storage.get('optOut');
-
-        if (optOut && optOut > Date.now()) {
-            return;
-        } else if (optOut) {
-            storage.remove('optOut')
-            storage.remove('optOutKey')
-        }
-
-        const previousUrl = urlsDict[tabId];
-
-        if (changeInfo.status !== 'complete' || url === previousUrl) return;
-
-        urlsDict[tabId] = url
-
-        const match = await getRelevantDomain(tab.url);
-
-        if (!match || !match.length) {
-            await showNotification(identifier, tabId, cashbackPagePath, url)
-            return;
-        };
-
-        const address = await getWalletAddress(tabId);
-
-        const { token, isValid, iframeUrl, networkUrl, flowId, time = Date.now() + 24 * 60 * 60 * 1000 } = await validateDomain({
-            body: {
-                domain: match,
-                url: tab.url,
-                address
-            }
-        });
-
-        if (!isValid) {
-            if (isValid === false) addQuietDomain(match, time);
-            return;
-        }
-        if (!await isWhitelisted(networkUrl, await storage.get('redirectsWhitelist'))) return;
-
-        const userId = await getUserId()
-
-        const res = await sendMessage(tabId, {
-            action: 'INJECT',
-            token,
-            domain: url,
-            iframeUrl,
-            userId
-        });
-
-        if (res?.status !== 'success') {
-            analytics({
-                type: 'no_popup',
-                userId,
-                walletAddress: address,
-                details: { url: tab.url, match, iframeUrl, reason: res?.message, status: res?.status },
-                flowId
-            })
-        }
-    })
-
-    chrome.tabs.onRemoved.addListener(tabId => delete urlsDict[tabId])
+    handleUrlChange(cashbackPagePath, showNotifications, notificationCallback)
 }
 
 export default bringInitBackground

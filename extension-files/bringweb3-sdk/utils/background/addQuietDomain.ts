@@ -1,13 +1,33 @@
-import storage from "../storage"
-const addQuietDomain = async (domain: string, time?: number) => {
-    let quietDomains = await storage.get('quietDomains')
+import storage from "../storage/storage"
 
-    if (typeof quietDomains === 'object') {
-        quietDomains[domain] = time
-    } else {
-        quietDomains = { [domain]: time }
+const storageKey = 'quietDomains'
+
+interface Payload {
+    iframeUrl?: string
+    token?: string
+    flowId?: string
+}
+
+const addQuietDomain = async (domain: string, time: number, payload?: Payload, phase?: 'activated' | 'quiet') => {
+    let quietDomains = await storage.get(storageKey)
+
+    if (typeof quietDomains !== 'object' || quietDomains === null) {
+        quietDomains = {}
     }
-    storage.set('quietDomains', quietDomains)
+
+    const now = Date.now()
+    const end = now + time
+
+    quietDomains[domain] = {
+        time: [now, end],
+        phase: phase || 'quiet'
+    }
+
+    if (payload) {
+        quietDomains[domain].payload = payload
+    }
+
+    await storage.set(storageKey, quietDomains)
 }
 
 export default addQuietDomain;

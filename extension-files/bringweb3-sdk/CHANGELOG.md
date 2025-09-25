@@ -1,5 +1,49 @@
 # @bringweb3/chrome-extension-kit
 
+## 1.5.1
+
+### Patch Changes
+
+- 0707c44: fix: Bug unable to migrate local storage because of data type
+
+## 1.5.0
+
+### Minor Changes
+
+- e2b9f80: Enable option for walletless rewards
+- 32cc9c0: One click solution
+
+## 1.4.4
+
+### Patch Changes
+
+- e60598d: More informative triggers
+
+## 1.4.3
+
+### Patch Changes
+
+- 916b73f: Improve popping speed
+- cf971a2: Improve data expiration mechanism
+
+## 1.4.2
+
+### Patch Changes
+
+- a628b15: Remove unnecessary calls to update domains list
+
+## 1.4.1
+
+### Patch Changes
+
+- dbeea72: Prevent popup from popping after activation from Portal
+
+## 1.4.0
+
+### Minor Changes
+
+- 9081329: add disable popup by default feature
+
 ## 1.3.11
 
 ### Patch Changes
