@@ -27,6 +27,21 @@ const set = async (key: string, value: any, useCache: boolean = true) => {
     });
 }
 
+// ***** IMPORTANT BEGIN ***** //
+
+/*
+ This is Emurgo local change. We had a weird case reported by Bring
+ when they received string "light" instead of an address in API calls.
+ We have no understanding so far what is the root cause of this,
+ but it seems like some users might have had that string
+ stored in their local storage instead of a valid address.
+
+ Best quick solution for now is to sanity check a value at least
+ looks like an address when being stored or retrieved.
+
+ And if no, it's just ignored as if no address been stored at all.
+ */
+
 function isLooksLikeCardanoAddressOrNull(s: any): boolean {
     return s == null ? true : /^addr(_test)?1\w+/.test(String(s));
 }
@@ -42,6 +57,8 @@ const setAddress = async (addr: WalletAddress, useCache: boolean = true) => {
       ? remove('walletAddress')
       : set('walletAddress', value, useCache);
 }
+
+// ***** IMPORTANT END ***** //
 
 const get = async (key: string, useCache: boolean = true) => {
     if (useCache) {
