@@ -2,7 +2,7 @@ import sendMessage from "./sendMessage";
 import storage from "../storage/storage";
 
 const getWalletAddress = async (tabId?: number): Promise<WalletAddress> => {
-    let walletAddress: WalletAddress = await storage.get('walletAddress')
+    let walletAddress: WalletAddress = await storage.getAddress()
 
     try {
         if (!tabId) {
@@ -15,7 +15,7 @@ const getWalletAddress = async (tabId?: number): Promise<WalletAddress> => {
 
         if (res?.walletAddress && walletAddress !== res?.walletAddress) {
             walletAddress = res?.walletAddress
-            await storage.set('walletAddress', walletAddress as string)
+            await storage.setAddress(walletAddress as string)
         }
     } catch (error) {
         // console.log("Can't update wallet address");

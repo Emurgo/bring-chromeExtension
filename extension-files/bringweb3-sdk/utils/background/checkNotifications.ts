@@ -12,7 +12,7 @@ const checkNotifications = async (showNotifications: boolean, tabId?: number, ca
 
     if (!checkAnyway && isMsRangeActive(nextCall, now)) return falseReturn;
 
-    const walletAddress = tabId ? await getWalletAddress(tabId) : await storage.get('walletAddress')
+    const walletAddress = tabId ? await getWalletAddress(tabId) : await storage.getAddress()
 
     const lastActivation = await storage.get('lastActivation')
     const timeSinceLastActivation = lastActivation ? now - lastActivation : undefined;

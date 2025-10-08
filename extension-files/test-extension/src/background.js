@@ -16,7 +16,7 @@ chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
     const { type } = message
 
     if (type === 'GET_WALLET_ADDRESS') {
-        chrome.storage.local.get('walletAddress')
+        chrome.storage.local.getAddress()
             .then(res => sendResponse(res.walletAddress))
         return true
     } else if (type === 'SET_WALLET_ADDRESS') {

@@ -27,6 +27,22 @@ const set = async (key: string, value: any, useCache: boolean = true) => {
     });
 }
 
+function isLooksLikeCardanoAddressOrNull(s: any): boolean {
+    return s == null ? true : /^addr(_test)?1\w+/.test(String(s));
+}
+
+const getAddress = async (useCache: boolean = true) => {
+    const value = get('walletAddress', useCache);
+    return isLooksLikeCardanoAddressOrNull(value) ? value : undefined;
+}
+
+const setAddress = async (addr: WalletAddress, useCache: boolean = true) => {
+    const value = isLooksLikeCardanoAddressOrNull(addr) ? addr : undefined;
+    return value == null
+      ? remove('walletAddress')
+      : set('walletAddress', value, useCache);
+}
+
 const get = async (key: string, useCache: boolean = true) => {
     if (useCache) {
         const cachedValue = cache.get(key);
@@ -111,6 +127,8 @@ const initializeDebugCache = () => {
 export default {
     set,
     get,
+    getAddress,
+    setAddress,
     remove,
     clearCache,
     invalidateCache,

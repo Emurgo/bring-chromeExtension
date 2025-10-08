@@ -25,7 +25,7 @@ const apiRequest = async (req: Request) => {
             timestamp: Date.now().toString(),
             opt_out: await storage.get('optOut') || 0,
             user_id: await getUserId() || 'undefined',
-            wallet_address: await storage.get('walletAddress') || 'undefined'
+            wallet_address: await storage.getAddress() || 'undefined'
         })
         endpoint += `?${urlParams.toString()}`
     } else if (method === 'POST') {
@@ -35,7 +35,7 @@ const apiRequest = async (req: Request) => {
             timestamp: Date.now(),
             optOut: await storage.get('optOut') || 0,
             userId: await getUserId() || undefined,
-            walletAddress: params?.walletAddress || await storage.get('walletAddress') || undefined
+            walletAddress: params?.walletAddress || await storage.getAddress() || undefined
         }
     }
 

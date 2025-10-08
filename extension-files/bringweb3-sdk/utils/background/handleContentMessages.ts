@@ -70,10 +70,10 @@ const handleContentMessages = (cashbackPagePath: string | undefined, showNotific
             case 'WALLET_ADDRESS_UPDATE': {
                 const { walletAddress } = request
                 if (!walletAddress) {
-                    storage.remove('walletAddress')
+                    storage.setAddress(undefined)
                         .then(() => sendResponse({ message: 'wallet address removed successfully' }))
                 } else {
-                    storage.set('walletAddress', walletAddress as string)
+                    storage.setAddress(walletAddress as string)
                         .then(() =>
                             checkNotifications(showNotifications, undefined, getCashbackUrl(cashbackPagePath), true)
                                 .then(() => sendResponse(walletAddress))
